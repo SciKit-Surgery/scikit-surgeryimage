@@ -1,0 +1,8 @@
+# Pycharm
+/.idea
+ 
+# Generated files
+.tox
+.coverage
+*.rst
+*.pyc

@@ -1,0 +1,2 @@
+include versioneer.py
+include sksurgeryimage/_version.py
