@@ -9,13 +9,11 @@ def validate_interlaced_image_sizes(even_rows, odd_rows, interlaced):
     """
     Validates the relative sizes of the even_rows, odd_rows and interlaced images.
 
-    1. Inputs must all be numpy images.
-    2. Must all be the same width.
-    3. Must all have an even number of rows.
-    4. even_rows and odd_rows must have the same number of rows.
-    5. even_rows and odd_rows must have half the number of rows as interlaced.
-
-    Failures are indicated by throwing ValueError.
+    1. Inputs must all be numpy images, or throw TypeError.
+    2. Must all be the same width, or throw ValueError.
+    3. Must all have an even number of rows, or throw ValueError.
+    4. even_rows and odd_rows must have the same number of rows, or throw ValueError.
+    5. even_rows and odd_rows must have half the number of rows as interlaced, or throw ValueError.
 
     :param even_rows: numpy image array, with even number of rows, for example 540 (rows) x 1920 (columns).
     :param odd_rows: numpy image array, with even number of rows, for example 540 (rows) x 1920 (columns).
@@ -75,25 +73,22 @@ def interlace(even_rows, odd_rows):
 
     return interlaced
 
-    
+
+def deinterlace(interlaced, even_rows, odd_rows):
+
+    validate_interlaced_image_sizes(even_rows, odd_rows, interlaced)
+
+    even_rows = interlaced[0::2]
+    odd_rows = interlaced[1::2]
+
+
 def deinterlace(interlaced):
 
-    if not isinstance(interlaced, np.ndarray):
-        raise TypeError('Input is not a numpy array')
-        return False
-
-    if interlaced.shape[0] % 2:
-        raise ValueError("Interlaced array has an odd number of rows")
-        return False
-    
-
-    # Using // for integer division
     output_dims = (interlaced.shape[0]//2, interlaced.shape[1], interlaced.shape[2])
 
-    left = np.empty(output_dims, dtype = interlaced.dtype)
-    right = np.empty(output_dims, dtype = interlaced.dtype)
+    even_rows = np.empty(output_dims, dtype=interlaced.dtype)
+    odd_rows = np.empty(output_dims, dtype=interlaced.dtype)
 
-    left = interlaced[0::2]
-    right = interlaced[1::2]
+    deinterlace(interlaced, even_rows, odd_rows)
 
-    return left, right
+    return even_rows, odd_rows
