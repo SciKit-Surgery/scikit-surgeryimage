@@ -1,3 +1,7 @@
+# coding=utf-8
+
+"""Functions to support de-interlacing and re-interlacing of 2D video frames."""
+
 import numpy as np
 
 
@@ -53,27 +57,21 @@ def validate_interlaced_image_sizes(even_rows, odd_rows, interlaced):
         raise ValueError("The odd_rows output image should have half the number of rows as the interlaced image.")
 
 
-def interlace(left, right):
+def interlace(even_rows, odd_rows, interlaced):
 
-    if not isinstance(left, np.ndarray):
-        raise TypeError('Left input is not a numpy array')
-        return False
-    
-    if not isinstance(right, np.ndarray):
-        raise TypeError('Right input is not a numpy array')
-        return False
+    validate_interlaced_image_sizes(even_rows, odd_rows, interlaced)
 
-    if left.shape != right.shape:
-        raise ValueError('Left and Right arrays do not have the same dimensions')
-        return False
+    interlaced[0::2] = even_rows
+    interlaced[1::2] = odd_rows
 
-    new_height = left.shape[0] + right.shape[0]
-    new_dims = (new_height, left.shape[1], left.shape[2])
 
-    interlaced = np.empty( new_dims, dtype = left.dtype)
+def interlace(even_rows, odd_rows):
 
-    interlaced[0::2] = left
-    interlaced[1::2] = right
+    new_height = even_rows.shape[0] + odd_rows.shape[0]
+    new_dims = (new_height, even_rows.shape[1], even_rows.shape[2])
+    interlaced = np.empty(new_dims, dtype=even_rows.dtype)
+
+    interlace(even_rows, odd_rows, interlaced)
 
     return interlaced
 
