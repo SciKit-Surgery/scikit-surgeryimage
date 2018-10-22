@@ -5,10 +5,11 @@ def validate_interlaced_image_sizes(even_rows, odd_rows, interlaced):
     """
     Validates the relative sizes of the even_rows, odd_rows and interlaced images.
 
-    1. Must all be the same width.
-    2. Must all have an even number of rows.
-    3. even_rows and odd_rows must have the same number of rows.
-    4. even_rows and odd_rows must have half the number of rows as interlaced.
+    1. Inputs must all be numpy images.
+    2. Must all be the same width.
+    3. Must all have an even number of rows.
+    4. even_rows and odd_rows must have the same number of rows.
+    5. even_rows and odd_rows must have half the number of rows as interlaced.
 
     Failures are indicated by throwing ValueError.
 
@@ -17,6 +18,15 @@ def validate_interlaced_image_sizes(even_rows, odd_rows, interlaced):
     :param interlaced: numpy image array, with even number of rows, for example 1080 (rows) x 1920 (columns).
     :return: nothing
     """
+
+    if not isinstance(even_rows, np.ndarray):
+        raise TypeError('even_rows is not a numpy array')
+
+    if not isinstance(odd_rows, np.ndarray):
+        raise TypeError('odd_rows is not a numpy array')
+
+    if not isinstance(interlaced, np.ndarray):
+        raise TypeError('interlaced is not a numpy array')
 
     if even_rows.shape[1] != odd_rows.shape[1]:
         raise ValueError("The even_rows image should have the same number of columns as the odd_rows image")
