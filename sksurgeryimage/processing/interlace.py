@@ -55,7 +55,7 @@ def validate_interlaced_image_sizes(even_rows, odd_rows, interlaced):
         raise ValueError("The odd_rows output image should have half the number of rows as the interlaced image.")
 
 
-def interlace(even_rows, odd_rows, interlaced):
+def interlace_preallocated_images(even_rows, odd_rows, interlaced):
 
     validate_interlaced_image_sizes(even_rows, odd_rows, interlaced)
 
@@ -65,30 +65,39 @@ def interlace(even_rows, odd_rows, interlaced):
 
 def interlace(even_rows, odd_rows):
 
+    if not isinstance(even_rows, np.ndarray):
+        raise TypeError('even_rows is not a numpy array')
+
+    if not isinstance(odd_rows, np.ndarray):
+        raise TypeError('odd_rows is not a numpy array')
+
     new_height = even_rows.shape[0] + odd_rows.shape[0]
     new_dims = (new_height, even_rows.shape[1], even_rows.shape[2])
     interlaced = np.empty(new_dims, dtype=even_rows.dtype)
 
-    interlace(even_rows, odd_rows, interlaced)
+    interlace_preallocated_images(even_rows, odd_rows, interlaced)
 
     return interlaced
 
 
-def deinterlace(interlaced, even_rows, odd_rows):
+def deinterlace_preallocated_images(interlaced, even_rows, odd_rows):
 
     validate_interlaced_image_sizes(even_rows, odd_rows, interlaced)
 
-    even_rows = interlaced[0::2]
-    odd_rows = interlaced[1::2]
+    even_rows[:, :, :] = interlaced[0::2]
+    odd_rows[:, :, :] = interlaced[1::2]
 
 
 def deinterlace(interlaced):
+
+    if not isinstance(interlaced, np.ndarray):
+        raise TypeError('interlaced is not a numpy array')
 
     output_dims = (interlaced.shape[0]//2, interlaced.shape[1], interlaced.shape[2])
 
     even_rows = np.empty(output_dims, dtype=interlaced.dtype)
     odd_rows = np.empty(output_dims, dtype=interlaced.dtype)
 
-    deinterlace(interlaced, even_rows, odd_rows)
+    deinterlace_preallocated_images(interlaced, even_rows, odd_rows)
 
     return even_rows, odd_rows

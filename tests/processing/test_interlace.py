@@ -12,32 +12,32 @@ def create_valid_inputs():
         left = np.ones(dims, dtype=np.uint8)
         right = np.zeros(dims, dtype=np.uint8)
 
-        return (left, right)
+        return left, right
 
     return _create_valid_inputs
 
 
 def test_empty_inputs():
 
-    dims = (10,10,3)
+    dims = (10, 10, 3)
 
     left = None
     right = np.ones(dims)
 
     with pytest.raises(TypeError):
-        interlaced = interlace.interlace(left,right)
+        interlaced = interlace.interlace(left, right)
 
 
 def test_inputs_arent_same_size():
 
-    left_dims = (10,10,3)
-    right_dims = (20,20,3)
+    left_dims = (10, 10, 3)
+    right_dims = (20, 20, 3)
 
     left = np.ones(left_dims)
-    right =  np.zeros(right_dims)
+    right = np.zeros(right_dims)
 
     with pytest.raises(ValueError):
-        interlaced = interlace.interlace(left,right)
+        interlaced = interlace.interlace(left, right)
 
 
 def test_small_inputs(create_valid_inputs):
