@@ -52,11 +52,11 @@ def test_small_inputs(create_valid_inputs):
         left_idx = idx * 2
         right_idx = left_idx + 1
 
-        np.testing.assert_array_equal(interlaced[left_idx,:,:], left[idx,:,:])
-        np.testing.assert_array_equal(interlaced[right_idx,:,:], right[idx,:,:])
+        np.testing.assert_array_equal(interlaced[left_idx, :, :], left[idx, :, :])
+        np.testing.assert_array_equal(interlaced[right_idx, :, :], right[idx, :, :])
      
  
-def test_HD_inputs(create_valid_inputs):
+def test_hd_inputs(create_valid_inputs):
 
     rows = 1080
     cols = 1920
@@ -68,6 +68,6 @@ def test_HD_inputs(create_valid_inputs):
         left_idx = idx * 2
         right_idx = left_idx + 1
 
-        np.testing.assert_array_equal(interlaced[left_idx,:,:], left[idx,:,:])
-        np.testing.assert_array_equal(interlaced[right_idx,:,:], right[idx,:,:])
+        np.testing.assert_array_equal(interlaced[left_idx, :, :], left[idx, :, :])
+        np.testing.assert_array_equal(interlaced[right_idx, :, :], right[idx, :, :])
 

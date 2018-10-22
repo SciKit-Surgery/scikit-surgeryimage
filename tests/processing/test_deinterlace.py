@@ -16,9 +16,9 @@ def create_valid_input():
 
         for idx in range(rows):
             if idx % 2:
-                interlaced[idx,:,:] = odd_row_value
+                interlaced[idx, :, :] = odd_row_value
             else:
-                interlaced[idx,:,:] = even_row_value
+                interlaced[idx, :, :] = even_row_value
 
         return interlaced
     
@@ -43,7 +43,6 @@ def test_missized_input(create_valid_input):
     with pytest.raises(ValueError):
         interlace.deinterlace(interlaced)
 
-                
 
 def test_small_input(create_valid_input):
 
