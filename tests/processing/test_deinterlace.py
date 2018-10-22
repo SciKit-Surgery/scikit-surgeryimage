@@ -28,7 +28,9 @@ def create_valid_input():
 def test_invalid_input():
     
     interlaced = None
-    assert interlace.deinterlace(interlaced) == False
+
+    with pytest.raises(TypeError):
+        interlace.deinterlace(interlaced)
 
 
 def test_missized_input(create_valid_input):
@@ -38,8 +40,8 @@ def test_missized_input(create_valid_input):
 
     interlaced = create_valid_input(rows, cols)
 
-    assert interlace.deinterlace(interlaced) == False
-
+    with pytest.raises(ValueError):
+        interlace.deinterlace(interlaced)
 
                 
 

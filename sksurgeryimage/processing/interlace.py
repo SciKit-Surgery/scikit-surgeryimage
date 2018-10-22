@@ -3,12 +3,15 @@ import numpy as np
 def interlace(left, right):
 
     if not isinstance(left, np.ndarray):
+        raise TypeError('Left input is not a numpy array')
         return False
     
     if not isinstance(right, np.ndarray):
+        raise TypeError('Right input is not a numpy array')
         return False
 
     if left.shape != right.shape:
+        raise ValueError('Left and Right arrays do not have the same dimensions')
         return False
 
     new_height = left.shape[0] + right.shape[0]
@@ -25,9 +28,11 @@ def interlace(left, right):
 def deinterlace(interlaced):
 
     if not isinstance(interlaced, np.ndarray):
+        raise TypeError('Input is not a numpy array')
         return False
 
     if interlaced.shape[0] % 2:
+        raise ValueError("Interlaced array has an odd number of rows")
         return False
     
 

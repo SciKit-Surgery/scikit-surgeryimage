@@ -24,7 +24,8 @@ def test_empty_inputs():
     left = None
     right = np.ones(dims)
 
-    assert interlace.interlace(left,right) == False
+    with pytest.raises(TypeError):
+        interlaced = interlace.interlace(left,right)
 
 
 def test_inputs_arent_same_size():
@@ -35,7 +36,8 @@ def test_inputs_arent_same_size():
     left = np.ones(left_dims)
     right =  np.zeros(right_dims)
 
-    assert interlace.interlace(left,right) == False
+    with pytest.raises(ValueError):
+        interlaced = interlace.interlace(left,right)
 
 
 def test_small_inputs(create_valid_inputs):
@@ -56,8 +58,8 @@ def test_small_inputs(create_valid_inputs):
  
 def test_HD_inputs(create_valid_inputs):
 
-    rows = 1920
-    cols = 1080
+    rows = 1080
+    cols = 1920
 
     left, right = create_valid_inputs(rows, cols)
     interlaced = interlace.interlace(left, right)
