@@ -137,6 +137,7 @@ def split_stacked(stacked):
     Useful if you have stereo 1080x1920 inputs, into an AJA Hi5-3D
     which stacks them vertically into 2 frames of 540x1920 in the
     same image.
+    :return: top_half and bottom_half images
     """
     if not isinstance(stacked, np.ndarray):
         raise TypeError('interlaced is not a numpy array')
