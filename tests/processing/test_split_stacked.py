@@ -1,4 +1,5 @@
 import numpy as np
+import cv2 as cv2
 import pytest
 from sksurgeryimage.processing import interlace as i
 
@@ -17,5 +18,14 @@ def test_small_image_split():
 
     top, bottom = i.split_stacked(stacked)
 
+    np.testing.assert_array_equal(top, expected_top)
+    np.testing.assert_array_equal(bottom, expected_bottom)
+
+
+def test_split_from_file():
+    stacked = cv2.imread('tests/data/test-16x8-rgb.png')
+    expected_top = cv2.imread('tests/data/test-16x8-rgb-top.png')
+    expected_bottom = cv2.imread('tests/data/test-16x8-rgb-bottom.png')
+    top, bottom = i.split_stacked(stacked)
     np.testing.assert_array_equal(top, expected_top)
     np.testing.assert_array_equal(bottom, expected_bottom)

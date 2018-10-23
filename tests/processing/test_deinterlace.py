@@ -1,5 +1,6 @@
 import pytest
 import numpy as np
+import cv2 as cv2
 from sksurgeryimage.processing import interlace
 
 @pytest.fixture
@@ -68,3 +69,11 @@ def test_big_input(create_valid_input):
     np.testing.assert_array_equal(left, expected_left)
     np.testing.assert_array_equal(right, expected_right)
 
+
+def test_deinterlace_from_file():
+    interlaced = cv2.imread('tests/data/test-16x8-rgb.png')
+    expected_even = cv2.imread('tests/data/test-16x8-rgb-even.png')
+    expected_odd = cv2.imread('tests/data/test-16x8-rgb-odd.png')
+    even, odd = interlace.deinterlace(interlaced)
+    np.testing.assert_array_equal(even, expected_even)
+    np.testing.assert_array_equal(odd, expected_odd)

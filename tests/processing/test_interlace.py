@@ -1,4 +1,5 @@
 import numpy as np
+import cv2 as cv2
 import pytest
 from sksurgeryimage.processing import interlace
 
@@ -70,3 +71,10 @@ def test_hd_inputs(create_valid_inputs):
         np.testing.assert_array_equal(interlaced[left_idx, :, :], left[idx, :, :])
         np.testing.assert_array_equal(interlaced[right_idx, :, :], right[idx, :, :])
 
+
+def test_interlace_from_file():
+    even = cv2.imread('tests/data/test-16x8-rgb-even.png')
+    odd = cv2.imread('tests/data/test-16x8-rgb-odd.png')
+    expected_interlaced = cv2.imread('tests/data/test-16x8-rgb.png')
+    interlaced = interlace.interlace(even, odd)
+    np.testing.assert_array_equal(interlaced, expected_interlaced)

@@ -136,7 +136,7 @@ def split_stacked(stacked):
     :return: top_half and bottom_half images
     """
     if not isinstance(stacked, np.ndarray):
-        raise TypeError('interlaced is not a numpy array')
+        raise TypeError('stacked is not a numpy array')
 
     output_dims = (stacked.shape[0]//2,
                    stacked.shape[1],
