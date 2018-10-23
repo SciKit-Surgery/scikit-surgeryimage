@@ -17,7 +17,7 @@ def create_valid_inputs():
     return _create_valid_inputs
 
 
-def test_empty_inputs():
+def test_empty_left():
 
     dims = (10, 10, 3)
 
@@ -28,15 +28,14 @@ def test_empty_inputs():
         interlaced = interlace.interlace(left, right)
 
 
-def test_inputs_arent_same_size():
+def test_empty_right():
 
-    left_dims = (10, 10, 3)
-    right_dims = (20, 20, 3)
+    dims = (10, 10, 3)
 
-    left = np.ones(left_dims)
-    right = np.zeros(right_dims)
+    left = np.ones(dims)
+    right = None
 
-    with pytest.raises(ValueError):
+    with pytest.raises(TypeError):
         interlaced = interlace.interlace(left, right)
 
 
