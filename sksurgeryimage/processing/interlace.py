@@ -10,15 +10,10 @@ def validate_interlaced_image_sizes(even_rows, odd_rows, interlaced):
     Validates the sizes of the even_rows, odd_rows and interlaced images.
 
     1. Inputs must all be numpy images.
-    2. Must all be the same width.
-    3. Must all have an even number of rows.
+    2. Inputs must all have the same number of columns.
+    3. Inputs must all have an even number of rows.
     4. even_rows and odd_rows must have the same number of rows.
     5. even_rows and odd_rows must have half the number of rows as interlaced.
-
-    :param even_rows: numpy image array, with even number of rows.
-    :param odd_rows: numpy image array, with even number of rows.
-    :param interlaced: numpy image array, with even number of rows.
-    :return: nothing
     """
 
     if not isinstance(even_rows, np.ndarray):
@@ -60,7 +55,7 @@ def validate_interlaced_image_sizes(even_rows, odd_rows, interlaced):
                          + "interlaced")
 
 
-def interlace_preallocated_images(even_rows, odd_rows, interlaced):
+def interlace_preallocated(even_rows, odd_rows, interlaced):
     """
     Interlaces even_rows and odd_rows images into the interlaced image,
     assuming all inputs are pre-allocated.
@@ -85,12 +80,12 @@ def interlace(even_rows, odd_rows):
     new_dims = (new_height, even_rows.shape[1], even_rows.shape[2])
     interlaced = np.empty(new_dims, dtype=even_rows.dtype)
 
-    interlace_preallocated_images(even_rows, odd_rows, interlaced)
+    interlace_preallocated(even_rows, odd_rows, interlaced)
 
     return interlaced
 
 
-def deinterlace_preallocated_images(interlaced, even_rows, odd_rows):
+def deinterlace_preallocated(interlaced, even_rows, odd_rows):
     """
     Deinterlaces the interlaced image into even_rows and odd_rows images,
     assuming that all images are pre-allocated.
@@ -115,16 +110,16 @@ def deinterlace(interlaced):
     even_rows = np.empty(output_dims, dtype=interlaced.dtype)
     odd_rows = np.empty(output_dims, dtype=interlaced.dtype)
 
-    deinterlace_preallocated_images(interlaced, even_rows, odd_rows)
+    deinterlace_preallocated(interlaced, even_rows, odd_rows)
 
     return even_rows, odd_rows
 
 
-def split_vertically_stacked_preallocated_images(stacked, top, bottom):
+def split_stacked_preallocated(stacked, top, bottom):
     """
     Splits a vertically stacked image, extracting the top and
     bottom halves, assuming images are the right size and pre-allocated.
-    
+
     Useful if you have stereo 1080x1920 inputs, into an AJA Hi5-3D
     which stacks them vertically into 2 frames of 540x1920 in the
     same image.
@@ -135,7 +130,7 @@ def split_vertically_stacked_preallocated_images(stacked, top, bottom):
     bottom[:, :, :] = stacked[stacked.shape[0]//2:, :, :]
 
 
-def split_vertically_stacked(stacked):
+def split_stacked(stacked):
     """
     Takes the input stacked image, and extracts the top and bottom half.
 
@@ -150,11 +145,11 @@ def split_vertically_stacked(stacked):
                    stacked.shape[1],
                    stacked.shape[2])
 
-    top_half = np.empty(output_dims, dtype=interlaced.dtype)
-    bottom_half = np.empty(output_dims, dtype=interlaced.dtype)
+    top_half = np.empty(output_dims, dtype=stacked.dtype)
+    bottom_half = np.empty(output_dims, dtype=stacked.dtype)
 
-    split_vertically_stacked_preallocated_images(stacked,
-                                                 top_half,
-                                                 bottom_half)
+    split_stacked_preallocated(stacked,
+                               top_half,
+                               bottom_half)
 
     return top_half, bottom_half
