@@ -118,3 +118,43 @@ def deinterlace(interlaced):
     deinterlace_preallocated_images(interlaced, even_rows, odd_rows)
 
     return even_rows, odd_rows
+
+
+def split_vertically_stacked_preallocated_images(stacked, top, bottom):
+    """
+    Splits a vertically stacked image, extracting the top and
+    bottom halves, assuming images are the right size and pre-allocated.
+    
+    Useful if you have stereo 1080x1920 inputs, into an AJA Hi5-3D
+    which stacks them vertically into 2 frames of 540x1920 in the
+    same image.
+    """
+    validate_interlaced_image_sizes(top, bottom, stacked)
+
+    top[:, :, :] = stacked[0:stacked.shape[0]//2, :, :]
+    bottom[:, :, :] = stacked[stacked.shape[0]//2:, :, :]
+
+
+def split_vertically_stacked(stacked):
+    """
+    Takes the input stacked image, and extracts the top and bottom half.
+
+    Useful if you have stereo 1080x1920 inputs, into an AJA Hi5-3D
+    which stacks them vertically into 2 frames of 540x1920 in the
+    same image.
+    """
+    if not isinstance(stacked, np.ndarray):
+        raise TypeError('interlaced is not a numpy array')
+
+    output_dims = (stacked.shape[0]//2,
+                   stacked.shape[1],
+                   stacked.shape[2])
+
+    top_half = np.empty(output_dims, dtype=interlaced.dtype)
+    bottom_half = np.empty(output_dims, dtype=interlaced.dtype)
+
+    split_vertically_stacked_preallocated_images(stacked,
+                                                 top_half,
+                                                 bottom_half)
+
+    return top_half, bottom_half
