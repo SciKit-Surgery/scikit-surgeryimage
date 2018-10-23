@@ -50,10 +50,6 @@ def validate_interlaced_image_sizes(even_rows, odd_rows, interlaced):
         raise ValueError("even_rows output image should have half the number "
                          + "of rows as interlaced")
 
-    if odd_rows.shape[0] * 2 != interlaced.shape[0]:
-        raise ValueError("odd_rows should have half the number of rows as "
-                         + "interlaced")
-
 
 def interlace_preallocated(even_rows, odd_rows, interlaced):
     """
