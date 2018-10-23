@@ -33,17 +33,6 @@ def test_invalid_input():
         interlace.deinterlace(interlaced)
 
 
-def test_missized_input(create_valid_input):
-
-    rows = 21
-    cols = 10
-
-    interlaced = create_valid_input(rows, cols)
-
-    with pytest.raises(ValueError):
-        interlace.deinterlace(interlaced)
-
-
 def test_small_input(create_valid_input):
 
     rows = 20
@@ -64,7 +53,7 @@ def test_small_input(create_valid_input):
 
 def test_big_input(create_valid_input):
 
-    rows = 1080 * 2
+    rows = 540 * 2
     cols = 1920
 
     interlaced = create_valid_input(rows, cols)
