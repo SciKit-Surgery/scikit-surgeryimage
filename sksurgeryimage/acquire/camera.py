@@ -10,7 +10,8 @@ import datetime
 LOGGER = logging.getLogger(__name__)
 
 class CameraWrapper():
-    
+    # TODO: Option to select stacking on/off
+    # TODO: Something sensible to set fps
     def __init__(self):
         self.cameras = []
         self.frames = []
@@ -121,7 +122,7 @@ class CameraWrapper():
 
         
     def save_to_file(self, filename, frames_to_save = 9999999):
-
+        #TODO: Refacotr & Tests
         if not self.check_valid_filename(filename):
             return -1
         
@@ -131,7 +132,8 @@ class CameraWrapper():
         self.timestamp_idx = 0
 
         fourcc = cv2.VideoWriter_fourcc(*'XVID')
-        self.video_writer = cv2.VideoWriter(filename, fourcc, self.fps, self.output_video_dimensions)
+        width, height = self.output_array.shape[:2]
+        self.video_writer = cv2.VideoWriter(filename, fourcc, self.fps, (height, width))
         
 
         while self.are_all_cameras_open() and frames_to_save > 0:
@@ -148,7 +150,8 @@ class CameraWrapper():
             self.write_timestamps(filename)
 
     
-    def check_valid_filename(self, filename):
+    @staticmethod
+    def check_valid_filename(filename):
         if isinstance(filename, str):
             LOGGER.info("Output filename: %s", filename)
             return True
@@ -165,7 +168,6 @@ class CameraWrapper():
                 return False
         
         return True
-
     
     def release_cameras(self):
         """Close all camera objects"""
@@ -175,6 +177,7 @@ class CameraWrapper():
 
 
     def update_frames(self):
+        #TODO: Refactor & Tests
         """ Grab a frame from each device"""
 
         timestamps = []
@@ -194,8 +197,9 @@ class CameraWrapper():
         #     for i, frame in enumerate(self.frames):
         #         annotate_text_to_frame(timestamps[i], frame)
 
-    
+
     def combine_frames(self):
+        #TODO: Refactor & Tests
         """Put all the camera frames in a single array"""
 
         #Side by side
@@ -218,6 +222,7 @@ class CameraWrapper():
         self.video_writer.write(self.output_array)
 
     def write_timestamps(self, filename):
+        #TODO: Tests
         timestamp_file = filename + '.timestamps'
         LOGGER.info("Writing timestamps to %s", timestamp_file)
 
