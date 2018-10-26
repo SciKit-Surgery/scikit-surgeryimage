@@ -32,6 +32,8 @@ def test_add_camera():
         assert cam_wrapper.frames[0].shape == (cam_width, cam_height, 3)
 
         # Only one camera input, so the output should have the same dimensions
-        assert cam_wrapper.output_video_dimensions == (cam_width, cam_height)
+        assert cam_wrapper.output_array.shape[:2] == (cam_height, cam_width)
+
+
 
 

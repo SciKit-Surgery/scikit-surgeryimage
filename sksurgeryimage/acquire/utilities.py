@@ -41,8 +41,8 @@ def identify_cameras():
             title_string = "Camera: " + str(i) + ". Press q to quit."
 
             if ret:
-                text_overlay = prepare_cv2_text_overlay(i, frame)
-                cv2.putText(frame, *text_overlay)
+                text_overlay_properties = prepare_cv2_text_overlay(i, frame)
+                cv2.putText(frame, *text_overlay_properties)
 
                 cv2.imshow(title_string,frame)
 
@@ -69,19 +69,21 @@ def prepare_cv2_text_overlay(overlay_text, frame, text_scale = 1):
     text_location = (0 , frame.shape[0] - text_y_offset) #Bottom left
     text_colour = (255, 255, 255)
 
-    text_overlay = (text, text_location, cv2.FONT_HERSHEY_COMPLEX, text_scale, text_colour)
+    text_overlay_properties = (text, text_location, cv2.FONT_HERSHEY_COMPLEX, text_scale, text_colour)
 
-    return text_overlay
+    return text_overlay_properties
 
 def validate_text_input(overlay_text):
-
+    """
+    Return an error if input isn't a string or number.
+    """
     if not is_string_or_number(overlay_text):
         raise TypeError('Text overlay must be string or numeric')
 
 def is_string_or_number(var):
     """
     Return true if the input variable is either a string or a numeric type.
-    Return false otherwise
+    Return false otherwise.s
     """
     valid_types = (str, int, float)
     if isinstance(var, valid_types):
