@@ -29,7 +29,7 @@ def run_tests_with_camera():
     """
 
     cam_wrapper = add_camera_test()
-    check_camera_open_and_release_test(cam_wrapper)
+    check_if_camera_open_and_release_test(cam_wrapper)
 
 def add_camera_test():
         """This runs add_cameras, add_single_cameras and update_output_video_dimensions. """
@@ -55,7 +55,7 @@ def add_camera_test():
         return cam_wrapper
 
 
-def check_camera_open_and_release_test(cam_wrapper):
+def check_if_camera_open_and_release_test(cam_wrapper):
         
         print("In check_camera_open_and_release_test")
 
@@ -63,6 +63,14 @@ def check_camera_open_and_release_test(cam_wrapper):
         cam_wrapper.release_cameras()
         assert not cam_wrapper.are_all_cameras_open()
 
+
+def test_check_valid_filename():
+
+        valid = "any.string"
+        invalid = 123
+
+        assert camera.CameraWrapper.check_valid_filename(valid)
+        assert not camera.CameraWrapper.check_valid_filename(invalid)
 
         
 
