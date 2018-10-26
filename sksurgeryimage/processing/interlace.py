@@ -51,7 +51,7 @@ def validate_interlaced_image_sizes(even_rows, odd_rows, interlaced):
                          + "of rows as interlaced")
 
 
-def interlace_preallocated(even_rows, odd_rows, interlaced):
+def interlace_to_preallocated(even_rows, odd_rows, interlaced):
     """
     Interlaces even_rows and odd_rows images into the interlaced image,
     assuming all inputs are pre-allocated.
@@ -76,12 +76,12 @@ def interlace(even_rows, odd_rows):
     new_dims = (new_height, even_rows.shape[1], even_rows.shape[2])
     interlaced = np.empty(new_dims, dtype=even_rows.dtype)
 
-    interlace_preallocated(even_rows, odd_rows, interlaced)
+    interlace_to_preallocated(even_rows, odd_rows, interlaced)
 
     return interlaced
 
 
-def deinterlace_preallocated(interlaced, even_rows, odd_rows):
+def deinterlace_to_preallocated(interlaced, even_rows, odd_rows):
     """
     Deinterlaces the interlaced image into even_rows and odd_rows images,
     assuming that all images are pre-allocated.
@@ -106,12 +106,12 @@ def deinterlace(interlaced):
     even_rows = np.empty(output_dims, dtype=interlaced.dtype)
     odd_rows = np.empty(output_dims, dtype=interlaced.dtype)
 
-    deinterlace_preallocated(interlaced, even_rows, odd_rows)
+    deinterlace_to_preallocated(interlaced, even_rows, odd_rows)
 
     return even_rows, odd_rows
 
 
-def split_stacked_preallocated(stacked, top, bottom):
+def split_stacked_to_preallocated(stacked, top, bottom):
     """
     Splits a vertically stacked image, extracting the top and
     bottom halves, assuming images are the right size and pre-allocated.
@@ -145,8 +145,8 @@ def split_stacked(stacked):
     top_half = np.empty(output_dims, dtype=stacked.dtype)
     bottom_half = np.empty(output_dims, dtype=stacked.dtype)
 
-    split_stacked_preallocated(stacked,
-                               top_half,
-                               bottom_half)
+    split_stacked_to_preallocated(stacked,
+                                  top_half,
+                                  bottom_half)
 
     return top_half, bottom_half
