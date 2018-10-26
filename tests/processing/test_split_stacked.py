@@ -4,6 +4,40 @@ import pytest
 from sksurgeryimage.processing import interlace as i
 
 
+def test_empty_input_to_split_stacked_to_new():
+
+    stacked = None
+
+    with pytest.raises(TypeError):
+        i.split_stacked_to_new(stacked)
+
+
+def test_empty_input_to_split_stacked_to_view():
+
+    stacked = None
+
+    with pytest.raises(TypeError):
+        i.split_stacked_to_view(stacked)
+
+
+def test_odd_input_to_split_stacked_to_new():
+
+    dims = [5, 10, 3]
+    stacked = np.ndarray(dims, dtype=np.uint8)
+
+    with pytest.raises(ValueError):
+        i.split_stacked_to_new(stacked)
+
+
+def test_odd_input_to_split_stacked_to_view():
+
+    dims = [5, 10, 3]
+    stacked = np.ndarray(dims, dtype=np.uint8)
+
+    with pytest.raises(ValueError):
+        i.split_stacked_to_view(stacked)
+
+
 def test_small_image_split():
     rows = 20
     cols = 10
@@ -28,7 +62,7 @@ def test_split_from_file():
     expected_bottom = cv2.imread('tests/data/test-16x8-rgb-bottom.png')
 
     # Testing creating views
-    top_view, bottom_view = i.split_stacked_to_new(stacked)
+    top_view, bottom_view = i.split_stacked_to_view(stacked)
     np.testing.assert_array_equal(top_view, expected_top)
     np.testing.assert_array_equal(bottom_view, expected_bottom)
 

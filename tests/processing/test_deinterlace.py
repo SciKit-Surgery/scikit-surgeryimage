@@ -42,6 +42,22 @@ def test_empty_input_to_deinterlace_to_view():
         interlace.deinterlace_to_view(interlaced)
 
 
+def test_odd_input_to_deinterlace_to_new(create_valid_input):
+
+    interlaced = create_valid_input(5, 10)
+
+    with pytest.raises(ValueError):
+        interlace.deinterlace_to_new(interlaced)
+
+
+def test_odd_input_to_deinterlace_to_view(create_valid_input):
+
+    interlaced = create_valid_input(3, 10)
+
+    with pytest.raises(ValueError):
+        interlace.deinterlace_to_view(interlaced)
+
+
 def test_small_input(create_valid_input):
 
     rows = 20
@@ -89,6 +105,6 @@ def test_deinterlace_from_file():
     np.testing.assert_array_equal(odd_view, expected_odd)
 
     # Testing creating new images
-    even_new, odd_new = interlace.deinterlace_to_view(interlaced)
+    even_new, odd_new = interlace.deinterlace_to_new(interlaced)
     np.testing.assert_array_equal(even_new, expected_even)
     np.testing.assert_array_equal(odd_new, expected_odd)
