@@ -1,6 +1,7 @@
 #coding=utf-8
 
 """ Classes to handle capture of data from multiple camera sources at the same time """
+
 import cv2
 import numpy as np
 import logging
@@ -14,9 +15,10 @@ class CameraWrapper():
         self.cameras = []
         self.frames = []
         self.fps = 30
-        self.do_timestamps = False
+        self.timestamp_frames = False
         self.stack_direction = "horizontal"
     
+
     def add_cameras(self, camera_inputs):
         """
         Take one (integer) or more (list of ints) camera inputs and
@@ -24,11 +26,12 @@ class CameraWrapper():
         """
 
         if self.is_single_camera_input(camera_inputs):
-            self.add_camera(camera_inputs)
+            self.add_single_camera(camera_inputs)
 
         else:
             for camera_input in camera_inputs:
-                self.add_camera(camera_input)
+                self.add_single_camera(camera_input)
+
 
     @staticmethod
     def is_single_camera_input(camera_inputs):
@@ -39,7 +42,7 @@ class CameraWrapper():
         return False
 
 
-    def add_camera(self, camera_input):
+    def add_single_camera(self, camera_input):
         """ Add a VideoCapture object to the cameras list"""
         
         LOGGER.info("Adding camera input: %d", camera_input)
@@ -56,7 +59,7 @@ class CameraWrapper():
         self.frames.append(empty_frame)
 
         self.update_output_video_dimensions()
-        
+
 
     def update_output_video_dimensions(self):
         """ 
@@ -115,3 +118,109 @@ class CameraWrapper():
 
         # Otherwise vertical stacking
         return (max_width, total_height)
+
+        
+    def save_to_file(self, filename, frames_to_save = 9999999):
+
+        if not self.check_valid_filename(filename):
+            return -1
+        
+        # self.estimate_fps(filename)
+
+        self.timestamps = np.empty(frames_to_save * len(self.cameras), dtype=object)
+        self.timestamp_idx = 0
+
+        fourcc = cv2.VideoWriter_fourcc(*'XVID')
+        self.video_writer = cv2.VideoWriter(filename, fourcc, self.fps, self.output_video_dimensions)
+        
+
+        while self.are_all_cameras_open() and frames_to_save > 0:
+            self.update_frames()
+            self.combine_frames()
+            self.write_frames()
+
+            frames_to_save -= 1
+
+        self.release_cameras()
+        self.video_writer.release()
+
+        if self.do_timestamps:
+            self.write_timestamps(filename)
+
+    
+    def check_valid_filename(self, filename):
+        if isinstance(filename, str):
+            LOGGER.info("Output filename: %s", filename)
+            return True
+
+        LOGGER.info("Invalid filename passed")
+
+        return False
+
+    
+    def are_all_cameras_open(self):
+        """ Check all input cameras are active/open"""
+        for camera in self.cameras:
+            if not camera.isOpened():
+                return False
+        
+        return True
+
+    
+    def release_cameras(self):
+        """Close all camera objects"""
+        logging.info("Releasing Cameras")
+        for camera in self.cameras:
+            camera.release()
+
+
+    def update_frames(self):
+        """ Grab a frame from each device"""
+
+        timestamps = []
+        
+        for i, camera in enumerate(self.cameras):
+            ret = camera.grab()
+
+            if self.do_timestamps:
+                now = datetime.datetime.now().isoformat()
+                self.timestamps[self.timestamp_idx] = now
+                self.timestamp_idx += 1
+
+        for i, camera in enumerate(self.cameras):
+            ret, self.frames[i] = camera.read()
+
+        # if self.do_timestamps:
+        #     for i, frame in enumerate(self.frames):
+        #         annotate_text_to_frame(timestamps[i], frame)
+
+    
+    def combine_frames(self):
+        """Put all the camera frames in a single array"""
+
+        #Side by side
+        cumulative_width = 0
+        for frame in self.frames:
+            height, width = frame.shape[:2]
+            logging.debug("Frame dims: %s x %s", width, height)
+
+            x_start = cumulative_width
+            x_end = cumulative_width + width
+            y_start = 0
+            y_end = height
+
+            self.output_array[y_start:y_end, x_start:x_end, :] = frame
+
+            cumulative_width += width
+
+    def write_frames(self):
+        """Write data to output file"""
+        self.video_writer.write(self.output_array)
+
+    def write_timestamps(self, filename):
+        timestamp_file = filename + '.timestamps'
+        LOGGER.info("Writing timestamps to %s", timestamp_file)
+
+        with open(timestamp_file, "w") as text_file:
+            for line in self.timestamps:
+                text_file.write(line + '\n')
