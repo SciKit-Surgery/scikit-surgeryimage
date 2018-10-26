@@ -1,6 +1,7 @@
 # coding=utf-8
 
-"""Functions to support deinterlacing and reinterlacing of 2D video frames."""
+"""Functions to support deinterlacing, reinterlacing and
+vertical destacking of 2D video frames."""
 
 import numpy as np
 
@@ -54,7 +55,7 @@ def validate_interlaced_image_sizes(even_rows, odd_rows, interlaced):
 def interlace_to_preallocated(even_rows, odd_rows, interlaced):
     """
     Interlaces even_rows and odd_rows images into the interlaced image,
-    assuming all inputs are pre-allocated.
+    where all inputs must be pre-allocated to the correct size.
     """
     validate_interlaced_image_sizes(even_rows, odd_rows, interlaced)
 
@@ -62,7 +63,7 @@ def interlace_to_preallocated(even_rows, odd_rows, interlaced):
     interlaced[1::2] = odd_rows
 
 
-def interlace(even_rows, odd_rows):
+def interlace_to_new(even_rows, odd_rows):
     """
     Interlaces even_rows and odd_rows images into a new output image.
     """
@@ -76,6 +77,7 @@ def interlace(even_rows, odd_rows):
     new_dims = (new_height, even_rows.shape[1], even_rows.shape[2])
     interlaced = np.empty(new_dims, dtype=even_rows.dtype)
 
+    # Contains further validation.
     interlace_to_preallocated(even_rows, odd_rows, interlaced)
 
     return interlaced
@@ -84,7 +86,7 @@ def interlace(even_rows, odd_rows):
 def deinterlace_to_preallocated(interlaced, even_rows, odd_rows):
     """
     Deinterlaces the interlaced image into even_rows and odd_rows images,
-    assuming that all images are pre-allocated.
+    which must be pre-allocated, and the correct size.
     """
     validate_interlaced_image_sizes(even_rows, odd_rows, interlaced)
 
@@ -92,12 +94,35 @@ def deinterlace_to_preallocated(interlaced, even_rows, odd_rows):
     odd_rows[:, :, :] = interlaced[1::2]
 
 
-def deinterlace(interlaced):
+def deinterlace_to_view(interlaced):
     """
-    Takes the input image, and splits into an image of even_rows and odd_rows.
+    Takes the interlaced image, and returns
+    two new views of even_rows and odd_rows.
+    :return: even_rows, odd_rows images
     """
     if not isinstance(interlaced, np.ndarray):
         raise TypeError('interlaced is not a numpy array')
+
+    if interlaced.shape[0] % 2 != 0:
+        raise ValueError("interlaced should have an even number of rows")
+
+    even_rows = interlaced[0::2]
+    odd_rows = interlaced[1::2]
+
+    return even_rows, odd_rows
+
+
+def deinterlace_to_new(interlaced):
+    """
+    Takes the interlaced image, and splits into two
+    new images of even_rows and odd_rows.
+    :return: even_rows, odd_rows images
+    """
+    if not isinstance(interlaced, np.ndarray):
+        raise TypeError('interlaced is not a numpy array')
+
+    if interlaced.shape[0] % 2 != 0:
+        raise ValueError("interlaced should have an even number of rows")
 
     output_dims = (interlaced.shape[0]//2,
                    interlaced.shape[1],
@@ -126,7 +151,25 @@ def split_stacked_to_preallocated(stacked, top, bottom):
     bottom[:, :, :] = stacked[stacked.shape[0]//2:, :, :]
 
 
-def split_stacked(stacked):
+def split_stacked_to_view(stacked):
+    """
+    Takes the input stacked image, and returns views that
+    refer to the top and bottom half.
+    :return: top_half, bottom_half images
+    """
+    if not isinstance(stacked, np.ndarray):
+        raise TypeError('stacked is not a numpy array')
+
+    if stacked.shape[0] % 2 != 0:
+        raise ValueError("stacked should have an even number of rows")
+
+    top_half = stacked[0:stacked.shape[0]//2, :, :]
+    bottom_half = stacked[stacked.shape[0]//2:, :, :]
+
+    return top_half, bottom_half
+
+
+def split_stacked_to_new(stacked):
     """
     Takes the input stacked image, and extracts the top and bottom half.
 
@@ -137,6 +180,9 @@ def split_stacked(stacked):
     """
     if not isinstance(stacked, np.ndarray):
         raise TypeError('stacked is not a numpy array')
+
+    if stacked.shape[0] % 2 != 0:
+        raise ValueError("stacked should have an even number of rows")
 
     output_dims = (stacked.shape[0]//2,
                    stacked.shape[1],

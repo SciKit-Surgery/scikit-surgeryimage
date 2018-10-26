@@ -16,7 +16,7 @@ def test_small_image_split():
     stacked[0:20, :, :] = expected_top
     stacked[20:, :, :] = expected_bottom
 
-    top, bottom = i.split_stacked(stacked)
+    top, bottom = i.split_stacked_to_new(stacked)
 
     np.testing.assert_array_equal(top, expected_top)
     np.testing.assert_array_equal(bottom, expected_bottom)
@@ -26,6 +26,13 @@ def test_split_from_file():
     stacked = cv2.imread('tests/data/test-16x8-rgb.png')
     expected_top = cv2.imread('tests/data/test-16x8-rgb-top.png')
     expected_bottom = cv2.imread('tests/data/test-16x8-rgb-bottom.png')
-    top, bottom = i.split_stacked(stacked)
-    np.testing.assert_array_equal(top, expected_top)
-    np.testing.assert_array_equal(bottom, expected_bottom)
+
+    # Testing creating views
+    top_view, bottom_view = i.split_stacked_to_new(stacked)
+    np.testing.assert_array_equal(top_view, expected_top)
+    np.testing.assert_array_equal(bottom_view, expected_bottom)
+
+    # Testing creating new images
+    top_new, bottom_new = i.split_stacked_to_new(stacked)
+    np.testing.assert_array_equal(top_new, expected_top)
+    np.testing.assert_array_equal(bottom_new, expected_bottom)

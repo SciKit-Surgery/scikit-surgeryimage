@@ -26,7 +26,7 @@ def test_empty_left():
     right = np.ones(dims)
 
     with pytest.raises(TypeError):
-        interlaced = interlace.interlace(left, right)
+        interlace.interlace_to_new(left, right)
 
 
 def test_empty_right():
@@ -37,7 +37,7 @@ def test_empty_right():
     right = None
 
     with pytest.raises(TypeError):
-        interlaced = interlace.interlace(left, right)
+        interlace.interlace_to_new(left, right)
 
 
 def test_small_inputs(create_valid_inputs):
@@ -46,7 +46,7 @@ def test_small_inputs(create_valid_inputs):
     cols = 10
 
     left, right = create_valid_inputs(rows, cols)
-    interlaced = interlace.interlace(left, right)
+    interlaced = interlace.interlace_to_new(left, right)
 
     for idx in range(rows):
         left_idx = idx * 2
@@ -62,7 +62,7 @@ def test_hd_inputs(create_valid_inputs):
     cols = 1920
 
     left, right = create_valid_inputs(rows, cols)
-    interlaced = interlace.interlace(left, right)
+    interlaced = interlace.interlace_to_new(left, right)
 
     for idx in range(rows):
         left_idx = idx * 2
@@ -76,5 +76,5 @@ def test_interlace_from_file():
     even = cv2.imread('tests/data/test-16x8-rgb-even.png')
     odd = cv2.imread('tests/data/test-16x8-rgb-odd.png')
     expected_interlaced = cv2.imread('tests/data/test-16x8-rgb.png')
-    interlaced = interlace.interlace(even, odd)
+    interlaced = interlace.interlace_to_new(even, odd)
     np.testing.assert_array_equal(interlaced, expected_interlaced)
