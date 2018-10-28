@@ -4,6 +4,5 @@
 # Generated files
 .tox
 .coverage
-*.rst
 *.pyc
 .pytest_cache/
