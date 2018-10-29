@@ -23,8 +23,6 @@ scikit-surgeryimage
 scikit-surgeryimage is a python only project to implement image processing algorithms
 that are useful for image-guided surgery.
 
-Author: Matt Clarkson
-
 scikit-surgeryimage was developed at the `Wellcome EPSRC Centre for Interventional and Surgical Sciences`_ in `University College London (UCL)`_.
 
 
