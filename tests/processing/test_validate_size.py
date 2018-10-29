@@ -45,7 +45,7 @@ def test_third_arg_not_numpy(create_small_images):
                                           interlaced)
 
 
-def test_mismatched_columns(create_small_images):
+def test_mismatched_columns_even(create_small_images):
     even_rows, odd_rows, interlaced = create_small_images(4, 4)
     even_rows = np.ones((4, 5, 3))
     with pytest.raises(ValueError):
@@ -54,7 +54,7 @@ def test_mismatched_columns(create_small_images):
                                           interlaced)
 
 
-def test_mismatched_columns(create_small_images):
+def test_mismatched_columns_odd(create_small_images):
     even_rows, odd_rows, interlaced = create_small_images(4, 4)
     interlaced = np.ones((4, 5, 3))
     with pytest.raises(ValueError):
