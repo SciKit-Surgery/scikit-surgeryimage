@@ -41,7 +41,7 @@ def create_valid_deinterlace_inputs():
 @pytest.fixture
 def create_input_and_output_arrays():
 
-    def _create_small_images(rows, cols):
+    def _create_input_and_output_arrays(rows, cols):
         dims = (rows, cols, 3)
         even_rows = np.ones(dims)
         odd_rows = np.ones(dims)
@@ -50,4 +50,4 @@ def create_input_and_output_arrays():
 
         return even_rows, odd_rows, interlaced
 
-    return _create_small_images
+    return _create_input_and_output_arrays
