@@ -7,7 +7,7 @@ sys.path.append(os.getcwd())
 from sksurgeryimage.acquire import camera, utilities
 import logging
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.DEBUG)
 LOGGER = logging.getLogger(__name__)
 
 def main():
@@ -19,6 +19,7 @@ def save_camera_feeds():
     """
     cam_wrapper = camera.CameraWrapper()
     cam_wrapper.do_timestamps = True
+    cam_wrapper.do_stacking = True
     cam_wrapper.stack_direction = "horizontal"
 
     camera_inputs = range(utilities.count_cameras()) 
