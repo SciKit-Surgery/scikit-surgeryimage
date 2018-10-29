@@ -14,22 +14,14 @@ scikit-surgeryimage
     :target: https://weisslab.cs.ucl.ac.uk/WEISS/SoftwareRepositories/scikit-surgeryimage/commits/master
     :alt: Test coverage
 
-.. image:: https://travis-ci.org/WEISS/SoftwareRepositories/scikit-surgeryimage.svg?branch=master
-    :target: https://travis-ci.org/WEISS/SoftwareRepositories/scikit-surgeryimage
-    :alt: Travis test status
-
-.. image:: https://weisslab.cs.ucl.ac.uk/WEISS/SoftwareRepositories/scikit-surgeryimage/badges/master/coverage.svg
-   :target: https://weisslab.cs.ucl.ac.uk/WEISS/SoftwareRepositories/scikit-surgeryimage/pipelines
-
 .. image:: https://readthedocs.org/projects/scikit-surgeryimage/badge/?version=latest
     :target: http://scikit-surgeryimage.readthedocs.io/en/latest/?badge=latest
     :alt: Documentation Status
 
 
 
-scikit-surgeryimage is a python project that does interesting things.
-
-Author: Matt Clarkson
+scikit-surgeryimage is a python only project to implement image processing algorithms
+that are useful for image-guided surgery.
 
 scikit-surgeryimage was developed at the `Wellcome EPSRC Centre for Interventional and Surgical Sciences`_ in `University College London (UCL)`_.
 
