@@ -1,6 +1,7 @@
 
 import os
-import filecmp
+import cv2
+import numpy as np
 from sksurgeryimage.acquire import VideoWriter, SourceWrapper
 from sksurgeryimage.acquire import utilities
 
@@ -17,7 +18,7 @@ def test_save_a_file_and_all_cameras():
     source_wrapper.add_file(input_file)
     
     num_cameras = utilities.count_cameras()
-
+    
     for camera in range(num_cameras):
         source_wrapper.add_camera(camera)
 
@@ -33,6 +34,15 @@ def test_save_a_file_and_all_cameras():
 
     output_file_name = 'test_0.avi'
     output_file_full_path = output_dir + '/' + output_file_name
+    source_wrapper.release_all_sources()
 
     # The input and output files should be identical
-    assert filecmp.cmp(input_file, output_file_full_path)
+
+    input_video = cv2.VideoCapture(input_file)
+    output_video = cv2.VideoCapture(output_file_full_path)
+
+    for i in range(num_frames_in_input_file):
+        ret, frame_in = input_video.read()
+        ret, frame_out = output_video.read()
+
+        np.testing.assert_array_equal(frame_in, frame_out)
