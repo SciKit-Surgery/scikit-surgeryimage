@@ -27,7 +27,11 @@ def save_all_cameras_and_one_file():
     for camera in range(num_cameras):
         source_wrapper.add_camera(camera)
 
-    base_filename = 'outputs/test.avi'
+    output_dir = 'output'
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+    
+    base_filename = output_dir + '/test.avi'
     video_writer = VideoWriter.OneSourcePerFileWriter(base_filename)
     video_writer.set_frame_source(source_wrapper)
 
