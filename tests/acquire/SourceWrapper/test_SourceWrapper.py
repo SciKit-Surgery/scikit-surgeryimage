@@ -74,7 +74,7 @@ def test_get_next_frames_from_file(source_wrapper):
 
     source_wrapper.get_next_frames()
 
-    expected_frame = 255 * np.ones((100,50,3), dtype=np.uint8)
+    expected_frame = np.zeros((100,50,3), dtype=np.uint8)
     actual_frame = source_wrapper.frames[0]
     np.testing.assert_array_equal(expected_frame, actual_frame)
 
