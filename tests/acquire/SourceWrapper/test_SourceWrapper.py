@@ -35,7 +35,7 @@ def test_validate_file_input(source_wrapper):
 
 def test_invalid_file_input_throws_error(source_wrapper):
 
-    invalid_filename = 1234
+    invalid_filename = '1234'
     with pytest.raises(ValueError):
         source_wrapper.validate_file_input(invalid_filename)
 
@@ -66,6 +66,23 @@ def test_add_source_from_camera(source_wrapper):
     except IndexError:
         # No cameras availble
         return
+
+
+def test_add_source_from_camera_custom_dimensions(source_wrapper):
+    """
+    Add a camera and pass in custom dimensions to cv2.VideoCapture.
+    """
+    try:
+        camera_input = 0
+        custom_dims = [320, 240] # default is 640 x 480
+        source_wrapper.add_camera(camera_input, custom_dims)
+        
+        expected_output_dims = (240, 320, 3)
+        assert source_wrapper.frames[0].shape == expected_output_dims
+
+    except IndexError:
+            return
+
 
 
 def test_get_next_frames_from_file(source_wrapper):

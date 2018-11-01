@@ -24,8 +24,7 @@ def save_all_cameras_and_one_file():
     
     num_cameras = utilities.count_cameras()
 
-    for camera in range(num_cameras):
-        source_wrapper.add_camera(camera)
+    source_wrapper.add_camera(0)
 
     output_dir = 'output'
     if not os.path.exists(output_dir):
