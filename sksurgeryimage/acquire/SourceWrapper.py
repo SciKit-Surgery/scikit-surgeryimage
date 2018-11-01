@@ -15,15 +15,16 @@ class VideoSourceWrapper():
         self.timestamps = []
         self.save_timestamps = True
 
-    def add_camera(self, camera_number):
+    def add_camera(self, camera_number, dims = None):
         """
          Create VideoCapture object from camera and add it to the list of sources.
+         dims is (width, height).
          """
         
         self.validate_camera_input(camera_number)
         
         LOGGER.info("Adding camera input: {}".format(camera_number))
-        self.add_source(camera_number)
+        self.add_source(camera_number, dims)
 
 
     def add_file(self, filename):
@@ -36,16 +37,24 @@ class VideoSourceWrapper():
         self.add_source(filename)
 
 
-    def add_source(self, source_num_or_file):
+    def add_source(self, source_num_or_file, dims = None):
         """
          Add a video source (camera or file) to the list of sources.
+        dims is (width, height).
+
         """     
 
         video_source = cv2.VideoCapture(source_num_or_file)
         self.sources.append(video_source)
 
-        width = int(video_source.get(3))
-        height = int(video_source.get(4))
+        if dims:
+            width, height = dims
+            video_source.set(3, width)
+            video_source.set(4, height)
+
+        else:
+            width = int(video_source.get(3))
+            height = int(video_source.get(4))
         
         LOGGER.info("Source dimensions %s %s", width, height)
 
