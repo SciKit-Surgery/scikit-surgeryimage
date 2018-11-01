@@ -4,31 +4,36 @@ import os, sys
 sys.path.append(os.getcwd())
 ###
 
-from sksurgeryimage.acquire import camera, utilities
+from sksurgeryimage.acquire import VideoWriter, SourceWrapper
+from sksurgeryimage.acquire import utilities
 import logging
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 LOGGER = logging.getLogger(__name__)
 
 def main():
-    save_camera_feeds()
+    save_all_cameras_and_one_file()
 
-def save_camera_feeds():
+def save_all_cameras_and_one_file():
     """
-    Saves a stacked feed from all connected cameras.
+    Saves a camera feed from all attached cameras and a file
     """
-    cam_wrapper = camera.CameraWrapper()
-    cam_wrapper.do_timestamps = True
-    cam_wrapper.do_stacking = True
-    cam_wrapper.stack_direction = "horizontal"
 
-    camera_inputs = range(utilities.count_cameras()) 
-    cam_wrapper.add_cameras(camera_inputs)
+    source_wrapper = SourceWrapper.VideoSourceWrapper()
+    source_wrapper.add_file('tests/data/acquire/100x50_100_frames.avi')
+    
+    num_cameras = utilities.count_cameras()
 
-    output_file = 'test.avi'
-    frames_to_grab = 100
-    cam_wrapper.save_to_file(output_file, frames_to_grab)
+    for camera in range(num_cameras):
+        source_wrapper.add_camera(camera)
 
+    base_filename = 'outputs/test.avi'
+    video_writer = VideoWriter.OneSourcePerFileWriter(base_filename)
+    video_writer.set_frame_source(source_wrapper)
+
+    num_frames = 100
+    video_writer.save_to_file(num_frames)
+    
 
 if __name__ == "__main__":
     main()
