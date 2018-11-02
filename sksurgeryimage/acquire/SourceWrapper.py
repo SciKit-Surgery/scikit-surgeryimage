@@ -13,7 +13,9 @@ class VideoSourceWrapper():
         self.frames = []
 
         self.timestamps = []
-        self.save_timestamps = True
+        self.save_timestamps = False
+
+        self.show_acquired_frames = True
 
     def add_camera(self, camera_number, dims = None):
         """
@@ -126,6 +128,19 @@ class VideoSourceWrapper():
 
             for i, source in enumerate(self.sources):
                 ret, self.frames[i] = source.retrieve()
+
+        if self.show_acquired_frames:
+            self.display_latest_frame()
+
+    
+    def display_latest_frame(self):
+        """
+        Show all of the frames using OpenCV.
+        """
+        for i, frame in enumerate(self.frames):
+            frame_title = str(i)
+            cv2.imshow(frame_title, frame)
+            cv2.waitKey(1)
 
 
     def add_timestamp_to_list(self, source_number):

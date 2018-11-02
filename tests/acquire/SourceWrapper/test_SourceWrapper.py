@@ -99,6 +99,7 @@ def test_get_next_frames_from_file(source_wrapper):
 def test_do_timestamps_with_frame_update(source_wrapper):
     filename = 'tests/data/acquire/100x50_100_frames.avi'
     source_wrapper.add_source(filename)
+    source_wrapper.save_timestamps = True
 
     n_frames = 5
     for i in range(n_frames):
@@ -110,6 +111,7 @@ def test_do_timestamps_with_frame_update(source_wrapper):
 def test_add_timestamps_from_two_sources(source_wrapper):
     # Pretend we have 2 sources connected
     source_wrapper.num_sources = 2
+    source_wrapper.save_timestamps = True
     
     # Source 0, 1st frame
     source_wrapper.add_timestamp_to_list(0)

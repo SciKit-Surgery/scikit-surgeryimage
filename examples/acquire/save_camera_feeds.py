@@ -20,6 +20,8 @@ def save_all_cameras_and_one_file():
     """
 
     source_wrapper = SourceWrapper.VideoSourceWrapper()
+    source_wrapper.show_acquired_frames = False
+    source_wrapper.save_timestamps = True
     source_wrapper.add_file('tests/data/acquire/100x50_100_frames.avi')
     
     num_cameras = utilities.count_cameras()
