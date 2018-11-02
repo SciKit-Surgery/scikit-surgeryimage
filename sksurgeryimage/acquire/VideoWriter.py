@@ -12,9 +12,10 @@ LOGGER = logging.getLogger(__name__)
 
 class VideoWriterBase():
 
-    def __init__(self, filename):
+    def __init__(self, filename = None):
         
-        self.set_filename(filename)
+        if filename:
+            self.set_filename(filename)
 
         self.fps = 30
         self.frame_source = None
@@ -91,7 +92,6 @@ class VideoWriterBase():
             self.video_writers[i].write(frame)
 
     
-
     def write_timestamps(self):
         """
         Write the timestamps from frame_source object to a file.
@@ -102,7 +102,7 @@ class VideoWriterBase():
         with open(timestamp_file, "w") as text_file:
             for line in self.frame_source.timestamps:
                 text_file.write(line + '\n')
-          
+
 
 class OneSourcePerFileWriter(VideoWriterBase):
     """
