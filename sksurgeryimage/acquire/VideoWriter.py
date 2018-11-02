@@ -20,10 +20,10 @@ class VideoWriterBase():
         self.fps = 30
         self.frame_source = None
 
+        self.frames_to_save = 0
+
         self.fourcc = cv2.VideoWriter_fourcc(*'XVID')
         self.video_writers = []
-
-        self.save_timestamps = True
 
     
     def set_frame_source(self, frame_source):
@@ -49,17 +49,19 @@ class VideoWriterBase():
         raise ValueError('Invalid filename passed')
 
 
-    def save_to_file(self, frames_to_save = 9999999):
+    def save_to_file(self, num_frames = None):
+
+        if num_frames:
+            self.frames_to_save = num_frames
 
         self.create_video_writers()
 
-        # if self.save_timestamps:
-        #     self.create_timestamp_array(frames_to_save)
+        logging.info("Saving {} frames to {}".format(self.frames_to_save, self.filename))
 
-        while frames_to_save > 0:
+        while self.frames_to_save > 0:
             self.frame_source.get_next_frames()
             self.write_frame()
-            frames_to_save -= 1
+            self.frames_to_save -= 1
 
         self.release_video_writers()
 
@@ -102,6 +104,7 @@ class VideoWriterBase():
         with open(timestamp_file, "w") as text_file:
             for line in self.frame_source.timestamps:
                 text_file.write(line + '\n')
+
 
 
 class OneSourcePerFileWriter(VideoWriterBase):

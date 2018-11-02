@@ -36,8 +36,7 @@ def save_all_cameras_and_one_file():
     video_writer = VideoWriter.OneSourcePerFileWriter(base_filename)
     video_writer.set_frame_source(source_wrapper)
 
-    num_frames = 100
-    video_writer.save_to_file(num_frames)
+    video_writer.save_to_file()
     
 
 if __name__ == "__main__":
