@@ -6,6 +6,7 @@ import cv2
 
 LOGGER = logging.getLogger(__name__)
 
+
 def count_cameras():
     """
     Count how many camera sources are available. 
@@ -44,34 +45,35 @@ def identify_cameras():
                 text_overlay_properties = prepare_cv2_text_overlay(i, frame)
                 cv2.putText(frame, *text_overlay_properties)
 
-                cv2.imshow(title_string,frame)
+                cv2.imshow(title_string, frame)
 
             else:
                 logging.info("Camera %s not grabbing", i)
-                
-                
+
         if cv2.waitKey(1) == ord('q'):
             break
-    
+
     for i in range(num_cameras):
         cameras[i].release()
 
 
-def prepare_cv2_text_overlay(overlay_text, frame, text_scale = 1):
+def prepare_cv2_text_overlay(overlay_text, frame, text_scale=1):
     """
     Return settings for text overlay on a cv2 frame
     """
-    
+
     validate_text_input(overlay_text)
 
     text = str(overlay_text)
     text_y_offset = 10
-    text_location = (0 , frame.shape[0] - text_y_offset) #Bottom left
+    text_location = (0, frame.shape[0] - text_y_offset)  # Bottom left
     text_colour = (255, 255, 255)
 
-    text_overlay_properties = (text, text_location, cv2.FONT_HERSHEY_COMPLEX, text_scale, text_colour)
+    text_overlay_properties = (
+        text, text_location, cv2.FONT_HERSHEY_COMPLEX, text_scale, text_colour)
 
     return text_overlay_properties
+
 
 def validate_text_input(overlay_text):
     """
@@ -79,6 +81,7 @@ def validate_text_input(overlay_text):
     """
     if not is_string_or_number(overlay_text):
         raise TypeError('Text overlay must be string or numeric')
+
 
 def is_string_or_number(var):
     """

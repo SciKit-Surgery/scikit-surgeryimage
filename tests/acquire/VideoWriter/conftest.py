@@ -3,15 +3,17 @@ from sksurgeryimage.acquire import VideoWriter
 import numpy as np
 import os
 
+
 class DummyFrameSource():
     """ Class to represent a frame_source,
     basically just a wrapper around a list of numpy arrays.
     """
+
     def __init__(self, all_dims):
         self.frames = self.generate_frames(all_dims)
         self.save_timestamps = False
 
-        self.timestamps = ["1","2","3","4"]
+        self.timestamps = ["1", "2", "3", "4"]
 
     def generate_frames(self, all_dims):
         """ Generate numpy arrays.
@@ -20,9 +22,9 @@ class DummyFrameSource():
         """
         frames = []
         for dims in all_dims:
-            
+
             dims_with_rgb = (dims[0], dims[1], 3)
-            array =  np.ones(dims_with_rgb, dtype=np.uint8)
+            array = np.ones(dims_with_rgb, dtype=np.uint8)
             frames.append(array)
 
         return frames
@@ -30,6 +32,7 @@ class DummyFrameSource():
     def get_next_frames(self):
         """ Mock function """
         return True
+
 
 def setup_video_writer(num_sources):
 
@@ -58,7 +61,7 @@ def delete_generated_files(video_writer):
 @pytest.fixture(scope="function")
 def video_writer_single_source():
     """ Return a VideoWriter object with a single source """
-    
+
     video_writer = setup_video_writer(1)
     yield video_writer
     delete_generated_files(video_writer)
@@ -71,9 +74,3 @@ def video_writer_five_sources():
     video_writer = setup_video_writer(5)
     yield video_writer
     delete_generated_files(video_writer)
-
-
-
-
-
-     

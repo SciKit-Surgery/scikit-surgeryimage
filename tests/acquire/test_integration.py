@@ -16,16 +16,16 @@ def test_save_a_file_and_all_cameras():
     num_frames_in_input_file = 100
 
     source_wrapper.add_file(input_file)
-    
+
     num_cameras = utilities.count_cameras()
-    
+
     for camera in range(num_cameras):
         source_wrapper.add_camera(camera)
 
     output_dir = 'output'
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
-    
+
     base_filename = output_dir + '/test.avi'
     video_writer = VideoWriter.OneSourcePerFileWriter(base_filename)
     video_writer.set_frame_source(source_wrapper)

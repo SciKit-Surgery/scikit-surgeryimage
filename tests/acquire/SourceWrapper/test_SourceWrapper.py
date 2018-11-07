@@ -1,7 +1,8 @@
 import cv2
-import numpy as np 
+import numpy as np
 import pytest
 from sksurgeryimage.acquire import SourceWrapper
+
 
 def test_validate_camera_input(source_wrapper):
 
@@ -50,6 +51,7 @@ def test_add_source_from_file(source_wrapper):
     source_wrapper.release_all_sources()
     assert not source_wrapper.are_all_sources_open()
 
+
 def test_add_source_from_camera(source_wrapper):
     """
     See if there is a camera available, if so run some tests.
@@ -61,8 +63,7 @@ def test_add_source_from_camera(source_wrapper):
 
         source_wrapper.release_all_sources()
         assert not source_wrapper.are_all_sources_open()
-    
-    
+
     except IndexError:
         # No cameras availble
         return
@@ -74,15 +75,14 @@ def test_add_source_from_camera_custom_dimensions(source_wrapper):
     """
     try:
         camera_input = 0
-        custom_dims = [320, 240] # default is 640 x 480
+        custom_dims = [320, 240]  # default is 640 x 480
         source_wrapper.add_camera(camera_input, custom_dims)
-        
+
         expected_output_dims = (240, 320, 3)
         assert source_wrapper.frames[0].shape == expected_output_dims
 
     except IndexError:
-            return
-
+        return
 
 
 def test_get_next_frames_from_file(source_wrapper):
@@ -91,7 +91,7 @@ def test_get_next_frames_from_file(source_wrapper):
 
     source_wrapper.get_next_frames()
 
-    expected_frame = np.zeros((100,50,3), dtype=np.uint8)
+    expected_frame = np.zeros((100, 50, 3), dtype=np.uint8)
     actual_frame = source_wrapper.frames[0]
     np.testing.assert_array_equal(expected_frame, actual_frame)
 
@@ -112,29 +112,15 @@ def test_add_timestamps_from_two_sources(source_wrapper):
     # Pretend we have 2 sources connected
     source_wrapper.num_sources = 2
     source_wrapper.save_timestamps = True
-    
+
     # Source 0, 1st frame
     source_wrapper.add_timestamp_to_list(0)
     assert source_wrapper.timestamps[0].startswith('0,0')
 
-    #source 1, 1st frame
+    # source 1, 1st frame
     source_wrapper.add_timestamp_to_list(1)
     assert source_wrapper.timestamps[1].startswith('1,0')
 
-    #source 2, 2nd frame
+    # source 2, 2nd frame
     source_wrapper.add_timestamp_to_list(0)
     assert source_wrapper.timestamps[2].startswith('0,1')
-
-       
-
-
-
-
-
-
-
-
-
-
-
-

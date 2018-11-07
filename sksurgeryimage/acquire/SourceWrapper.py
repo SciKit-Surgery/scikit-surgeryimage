@@ -6,6 +6,7 @@ import os
 
 LOGGER = logging.getLogger(__name__)
 
+
 class VideoSourceWrapper():
 
     def __init__(self):
@@ -17,17 +18,16 @@ class VideoSourceWrapper():
 
         self.show_acquired_frames = False
 
-    def add_camera(self, camera_number, dims = None):
+    def add_camera(self, camera_number, dims=None):
         """
          Create VideoCapture object from camera and add it to the list of sources.
          dims is (width, height).
          """
-        
+
         self.validate_camera_input(camera_number)
-        
+
         LOGGER.info("Adding camera input: {}".format(camera_number))
         self.add_source(camera_number, dims)
-
 
     def add_file(self, filename):
         """
@@ -38,13 +38,12 @@ class VideoSourceWrapper():
         LOGGER.info("Adding file input: {}".format(filename))
         self.add_source(filename)
 
-
-    def add_source(self, source_num_or_file, dims = None):
+    def add_source(self, source_num_or_file, dims=None):
         """
          Add a video source (camera or file) to the list of sources.
         dims is (width, height).
 
-        """     
+        """
 
         video_source = cv2.VideoCapture(source_num_or_file)
         self.sources.append(video_source)
@@ -57,10 +56,10 @@ class VideoSourceWrapper():
         else:
             width = int(video_source.get(3))
             height = int(video_source.get(4))
-        
+
         LOGGER.info("Source dimensions %s %s", width, height)
 
-        empty_frame = np.empty((height, width, 3), dtype = np.uint8)
+        empty_frame = np.empty((height, width, 3), dtype=np.uint8)
         self.frames.append(empty_frame)
 
         self.num_sources = len(self.sources)
@@ -70,16 +69,16 @@ class VideoSourceWrapper():
          Camera inputs should be an integer, throw error if not
           """
         if isinstance(camera_input, int):
-            
+
             cam = cv2.VideoCapture(camera_input)
             if cam.isOpened():
                 cam.release()
                 return True
-            
-            raise IndexError('No camera source exists with number: '.format(camera_input))
-        
-        raise TypeError('Integer expected for camera input')
 
+            raise IndexError(
+                'No camera source exists with number: '.format(camera_input))
+
+        raise TypeError('Integer expected for camera input')
 
     def validate_file_input(self, file_input):
         """
@@ -87,9 +86,8 @@ class VideoSourceWrapper():
         """
         if os.path.isfile(file_input):
             return True
-        
-        raise ValueError('Input file does not exist')
 
+        raise ValueError('Input file does not exist')
 
     def are_all_sources_open(self):
         """
@@ -101,7 +99,6 @@ class VideoSourceWrapper():
                 return False
 
         return True
-    
 
     def release_all_sources(self):
         """
@@ -110,7 +107,6 @@ class VideoSourceWrapper():
         logging.info("Releasing video sources")
         for source in self.sources:
             source.release()
-
 
     def get_next_frames(self):
         """
@@ -132,7 +128,6 @@ class VideoSourceWrapper():
         if self.show_acquired_frames:
             self.display_latest_frame()
 
-    
     def display_latest_frame(self):
         """
         Show all of the frames using OpenCV.
@@ -141,7 +136,6 @@ class VideoSourceWrapper():
             frame_title = str(i)
             cv2.imshow(frame_title, frame)
             cv2.waitKey(1)
-
 
     def add_timestamp_to_list(self, source_number):
         """
@@ -158,5 +152,4 @@ class VideoSourceWrapper():
         frame_num = idx // self.num_sources
 
         timestamp_entry = "{},{},{}".format(source_number, frame_num, now)
-        self.timestamps.append(timestamp_entry) 
-
+        self.timestamps.append(timestamp_entry)
