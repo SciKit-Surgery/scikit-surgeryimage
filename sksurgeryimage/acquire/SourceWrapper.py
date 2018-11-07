@@ -15,7 +15,7 @@ class VideoSourceWrapper():
         self.timestamps = []
         self.save_timestamps = False
 
-        self.show_acquired_frames = True
+        self.show_acquired_frames = False
 
     def add_camera(self, camera_number, dims = None):
         """
