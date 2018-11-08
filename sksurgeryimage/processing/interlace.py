@@ -99,7 +99,7 @@ def deinterlace(interlaced):
     if not isinstance(interlaced, np.ndarray):
         raise TypeError('interlaced is not a numpy array')
 
-    output_dims = (interlaced.shape[0]//2,
+    output_dims = (interlaced.shape[0] // 2,
                    interlaced.shape[1],
                    interlaced.shape[2])
 
@@ -122,8 +122,8 @@ def split_stacked_preallocated(stacked, top, bottom):
     """
     validate_interlaced_image_sizes(top, bottom, stacked)
 
-    top[:, :, :] = stacked[0:stacked.shape[0]//2, :, :]
-    bottom[:, :, :] = stacked[stacked.shape[0]//2:, :, :]
+    top[:, :, :] = stacked[0:stacked.shape[0] // 2, :, :]
+    bottom[:, :, :] = stacked[stacked.shape[0] // 2:, :, :]
 
 
 def split_stacked(stacked):
@@ -138,7 +138,7 @@ def split_stacked(stacked):
     if not isinstance(stacked, np.ndarray):
         raise TypeError('stacked is not a numpy array')
 
-    output_dims = (stacked.shape[0]//2,
+    output_dims = (stacked.shape[0] // 2,
                    stacked.shape[1],
                    stacked.shape[2])
 

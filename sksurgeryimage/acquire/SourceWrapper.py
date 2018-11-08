@@ -1,14 +1,23 @@
-import cv2
-import numpy as np
+# coding=utf-8
+
+"""
+Module for video source acquisition.
+Classes capture data from a video source in a numpy array.
+"""
+
 import logging
 import datetime
 import os
+import cv2
+import numpy as np
 
 LOGGER = logging.getLogger(__name__)
 
 
 class VideoSourceWrapper():
-
+    """
+    Capture data from one or more camera/file sources.
+    """
     def __init__(self):
         self.sources = []
         self.frames = []
@@ -17,16 +26,19 @@ class VideoSourceWrapper():
         self.save_timestamps = False
 
         self.show_acquired_frames = False
+        self.num_sources = 0
 
     def add_camera(self, camera_number, dims=None):
         """
-         Create VideoCapture object from camera and add it to the list of sources.
+         Create VideoCapture object from camera and add it to the list
+         of
+         sources.
          dims is (width, height).
          """
 
         self.validate_camera_input(camera_number)
 
-        LOGGER.info("Adding camera input: {}".format(camera_number))
+        LOGGER.info("Adding camera input: %s", camera_number)
         self.add_source(camera_number, dims)
 
     def add_file(self, filename):
@@ -35,7 +47,7 @@ class VideoSourceWrapper():
         """
 
         self.validate_file_input(filename)
-        LOGGER.info("Adding file input: {}".format(filename))
+        LOGGER.info("Adding file input: %s", filename)
         self.add_source(filename)
 
     def add_source(self, source_num_or_file, dims=None):
@@ -76,7 +88,7 @@ class VideoSourceWrapper():
                 return True
 
             raise IndexError(
-                'No camera source exists with number: '.format(camera_input))
+                'No camera source exists with number: {}'.format(camera_input))
 
         raise TypeError('Integer expected for camera input')
 
@@ -110,9 +122,11 @@ class VideoSourceWrapper():
 
     def get_next_frames(self):
         """
-        Do a grab() operation for each source, timestamp (if wanted) and then 
+        Do a grab() operation for each source, timestamp (if wanted) and then
         retrieve() for each device.
         """
+        # pylint: disable=unused-variable
+        # 'ret' isn't used at the moment, but keep it for convention.
 
         if self.are_all_sources_open():
 
@@ -147,8 +161,8 @@ class VideoSourceWrapper():
 
         idx = len(self.timestamps)
 
-        # If there is more than one video source, then we put one frame from each source
-        # in the list, before moving to next frame
+        # If there is more than one video source, then we put one frame from
+        #  each source in the list, before moving to next frame
         frame_num = idx // self.num_sources
 
         timestamp_entry = "{},{},{}".format(source_number, frame_num, now)

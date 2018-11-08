@@ -9,20 +9,22 @@ LOGGER = logging.getLogger(__name__)
 
 def count_cameras():
     """
-    Count how many camera sources are available. 
+    Count how many camera sources are available.
     """
     max_cameras = 10
 
+    found_cameras = 0
     for i in range(max_cameras):
         cam = cv2.VideoCapture(i)
         ret = cam.isOpened()
         cam.release()
 
         if not ret:
+            found_cameras = i
             break
 
-    logging.info("Found %d cameras", i)
-    return i
+    logging.info("Found %d cameras", found_cameras)
+    return found_cameras
 
 
 def identify_cameras():
@@ -36,7 +38,7 @@ def identify_cameras():
         cam = cv2.VideoCapture(i)
         cameras.append(cam)
 
-    while(True):
+    while True:
         for i in range(num_cameras):
             ret, frame = cameras[i].read()
             title_string = "Camera: " + str(i) + ". Press q to quit."

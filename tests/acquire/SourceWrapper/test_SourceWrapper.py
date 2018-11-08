@@ -1,6 +1,5 @@
-import cv2
-import numpy as np
 import pytest
+import numpy as np
 from sksurgeryimage.acquire import SourceWrapper
 
 

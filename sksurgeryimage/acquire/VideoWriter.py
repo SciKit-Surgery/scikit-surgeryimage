@@ -2,17 +2,17 @@
 
 """ Write stream of frames to file using OpenCV """
 
-import cv2
-import numpy as numpy
 import logging
-import datetime
 import os
+import cv2
 
 LOGGER = logging.getLogger(__name__)
 
 
 class VideoWriterBase():
-
+    """
+    Base Class for Video Writer
+    """
     def __init__(self, filename=None):
 
         if filename:
@@ -27,7 +27,7 @@ class VideoWriterBase():
         self.video_writers = []
 
     def set_frame_source(self, frame_source):
-        """ 
+        """
         Set the object's frame_source variable.
         """
         self.frame_source = frame_source
@@ -41,20 +41,25 @@ class VideoWriterBase():
             self.filename = filename
 
     def check_valid_filename(self, filename):
+        """
+        Return true if filename is a string.
+        """
         if isinstance(filename, str):
             return True
 
         raise ValueError('Invalid filename passed')
 
     def save_to_file(self, num_frames=None):
-
+        """
+        Acquire and write frames.
+        """
         if num_frames:
             self.frames_to_save = num_frames
 
         self.create_video_writers()
 
-        logging.info("Saving {} frames to {}".format(
-            self.frames_to_save, self.filename))
+        logging.info("Saving %s frames to %s",
+                     self.frames_to_save, self.filename)
 
         while self.frames_to_save > 0:
             self.frame_source.get_next_frames()
@@ -67,10 +72,14 @@ class VideoWriterBase():
             self.write_timestamps()
 
     def create_video_writers(self):
+        """
+        Subclasses should implement a funciton to create
+        one or more Open-CV VideoWriter objects.
+        """
         raise NotImplementedError('Should have implemented this method.')
 
     def release_video_writers(self):
-        """ 
+        """
         Close all video writer objects
         """
 
@@ -87,7 +96,7 @@ class VideoWriterBase():
         """
         for i, frame in enumerate(self.frame_source.frames):
 
-            logging.debug("Writing frame with dims {}".format(frame.shape))
+            logging.debug("Writing frame with dims %s", frame.shape)
             self.video_writers[i].write(frame)
 
     def write_timestamps(self):
@@ -120,8 +129,9 @@ class OneSourcePerFileWriter(VideoWriterBase):
                 filename, self.fourcc, self.fps, (width, height))
 
             self.video_writers.append(video_writer)
-            logging.debug("Created VideoWriter. Filename: {} codec: {} FPS:{} Width:{} Height:{}".format(
-                filename, self.fourcc, self.fps, width, height))
+            logging.debug(
+                "New VideoWriter. File:%s codec:%s FPS:%s Width:%s Height:%s",
+                filename, self.fourcc, self.fps, width, height)
 
     def generate_sequential_filenames(self):
         """
@@ -136,16 +146,3 @@ class OneSourcePerFileWriter(VideoWriterBase):
             filenames.append(new_filename)
 
         return filenames
-
-
-class StackedVideoWriter(VideoWriterBase):
-
-    def create_video_writers(self):
-
-        height, width = self.frame_source.get_dims()
-        self.video_writer = cv2.VideoWriter(
-            self.filename, self.fourcc, self.fps, (width, height))
-
-        LOGGER.info("Saving to : %s", self.filename)
-        logging.debug("Created VideoWriter. Filename: {} codec: {} FPS:{} Width:{} Height:{}".format(
-            self.filename, self.fourcc, self.fps, width, height))

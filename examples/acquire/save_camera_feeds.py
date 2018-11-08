@@ -1,5 +1,9 @@
 # Having some odd problem with import paths, this solves it for now
 # TODO: Fix this properly
+import os, sys
+sys.path.append(os.getcwd())
+sys.path.append('../scikit-surgeryimage')
+
 import logging
 from sksurgeryimage.acquire import utilities
 from sksurgeryimage.acquire import VideoWriter, SourceWrapper
@@ -9,7 +13,7 @@ sys.path.append(os.getcwd())
 ###
 
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.DEBUG)
 LOGGER = logging.getLogger(__name__)
 
 
@@ -39,7 +43,7 @@ def save_all_cameras_and_one_file():
     video_writer = VideoWriter.OneSourcePerFileWriter(base_filename)
     video_writer.set_frame_source(source_wrapper)
 
-    video_writer.save_to_file()
+    video_writer.save_to_file(100)
 
 
 if __name__ == "__main__":
