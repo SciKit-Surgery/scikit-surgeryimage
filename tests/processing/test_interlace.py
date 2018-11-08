@@ -4,20 +4,6 @@ import pytest
 from sksurgeryimage.processing import interlace
 
 
-@pytest.fixture
-def create_valid_inputs():
-
-    def _create_valid_inputs(rows, cols):
-        dims = (rows, cols, 3)
-
-        left = np.ones(dims, dtype=np.uint8)
-        right = np.zeros(dims, dtype=np.uint8)
-
-        return left, right
-
-    return _create_valid_inputs
-
-
 def test_empty_left():
 
     dims = (10, 10, 3)
@@ -26,7 +12,7 @@ def test_empty_left():
     right = np.ones(dims)
 
     with pytest.raises(TypeError):
-        interlaced = interlace.interlace(left, right)
+        interlace.interlace_to_new(left, right)
 
 
 def test_empty_right():
@@ -37,16 +23,16 @@ def test_empty_right():
     right = None
 
     with pytest.raises(TypeError):
-        interlaced = interlace.interlace(left, right)
+        interlace.interlace_to_new(left, right)
 
 
-def test_small_inputs(create_valid_inputs):
+def test_small_inputs(create_valid_deinterlace_inputs):
 
     rows = 10
     cols = 10
 
-    left, right = create_valid_inputs(rows, cols)
-    interlaced = interlace.interlace(left, right)
+    left, right = create_valid_deinterlace_inputs(rows, cols)
+    interlaced = interlace.interlace_to_new(left, right)
 
     for idx in range(rows):
         left_idx = idx * 2
@@ -56,13 +42,13 @@ def test_small_inputs(create_valid_inputs):
         np.testing.assert_array_equal(interlaced[right_idx, :, :], right[idx, :, :])
      
  
-def test_hd_inputs(create_valid_inputs):
+def test_hd_inputs(create_valid_deinterlace_inputs):
 
     rows = 1080
     cols = 1920
 
-    left, right = create_valid_inputs(rows, cols)
-    interlaced = interlace.interlace(left, right)
+    left, right = create_valid_deinterlace_inputs(rows, cols)
+    interlaced = interlace.interlace_to_new(left, right)
 
     for idx in range(rows):
         left_idx = idx * 2
@@ -76,5 +62,5 @@ def test_interlace_from_file():
     even = cv2.imread('tests/data/test-16x8-rgb-even.png')
     odd = cv2.imread('tests/data/test-16x8-rgb-odd.png')
     expected_interlaced = cv2.imread('tests/data/test-16x8-rgb.png')
-    interlaced = interlace.interlace(even, odd)
+    interlaced = interlace.interlace_to_new(even, odd)
     np.testing.assert_array_equal(interlaced, expected_interlaced)
