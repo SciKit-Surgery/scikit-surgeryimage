@@ -1,9 +1,14 @@
+# coding=utf-8
+
+"""
+Tests hooking together various camera acquisition functions.
+"""
 
 import os
 import cv2
 import numpy as np
 from sksurgeryimage.acquire import VideoWriter, SourceWrapper
-from sksurgeryimage.acquire import utilities
+from sksurgeryimage.utilities import utilities, camera_utilities
 
 
 def test_save_a_file_and_all_cameras():
@@ -17,12 +22,12 @@ def test_save_a_file_and_all_cameras():
 
     source_wrapper.add_file(input_file)
 
-    num_cameras = utilities.count_cameras()
+    num_cameras = camera_utilities.count_cameras()
 
     for camera in range(num_cameras):
         source_wrapper.add_camera(camera)
 
-    output_dir = 'output'
+    output_dir = 'tests/output'
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
 

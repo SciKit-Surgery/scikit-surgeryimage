@@ -1,13 +1,12 @@
+# coding=utf-8
+
+"""
+Tests for utilities.py
+"""
 import pytest
-import cv2
 import numpy as np
-from sksurgeryimage.acquire import utilities
-
-
-def test_count_cameras():
-    # Difficult to write a unit test as can't know how many cameras to expect.
-    # For now, make sure no exceptions are thrown
-    utilities.count_cameras()
+import cv2 
+from sksurgeryimage.utilities import utilities
 
 
 def test_is_string_or_number():
