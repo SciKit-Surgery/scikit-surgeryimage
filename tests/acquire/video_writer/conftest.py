@@ -39,7 +39,7 @@ def setup_video_writer(num_sources):
     frame_dims = [(640, 480)]
     all_frame_dims = frame_dims * num_sources
 
-    base_filename = 'output.avi'
+    base_filename = 'tests/output/output.avi'
     video_writer = vw.OneSourcePerFileWriter(base_filename)
 
     frame_source = DummyFrameSource(all_frame_dims)
