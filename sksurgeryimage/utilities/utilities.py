@@ -3,8 +3,8 @@
 """
 Various utilities, like checking strings, numbers, preparing overlay text etc.
 """
-import cv2
 import os
+import cv2
 
 
 def prepare_cv2_text_overlay(overlay_text, frame, text_scale=1):
