@@ -31,3 +31,21 @@ def count_cameras():
 
     logging.info("Found %d cameras", found_cameras)
     return found_cameras
+
+
+def validate_camera_input(camera_input):
+    """
+    Checks that camera_input is an integer, and it is a valid camera.
+    :param: camera_input - integer of camera
+    """
+    if not isinstance(camera_input, int):
+        raise TypeError('Integer expected for camera input')
+
+    cam = cv2.VideoCapture(camera_input)
+    if cam.isOpened():
+        cam.release()
+        return True
+
+    raise IndexError(
+        'No camera source exists with number: {}'.format(camera_input))
+

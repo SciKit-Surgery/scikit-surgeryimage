@@ -2,7 +2,7 @@
 
 """
 Module for video source acquisition.
-Classes capture data from a video source in a numpy array.
+Classes capture data from a video source into a numpy array.
 """
 
 import logging
@@ -14,7 +14,7 @@ import numpy as np
 LOGGER = logging.getLogger(__name__)
 
 
-class VideoSourceWrapper():
+class VideoSourceWrapper:
     """
     Capture data from one or more camera/file sources.
     """
@@ -31,9 +31,8 @@ class VideoSourceWrapper():
     def add_camera(self, camera_number, dims=None):
         """
          Create VideoCapture object from camera and add it to the list
-         of
-         sources.
-         dims is (width, height).
+         of sources.
+         :param: dims is (width, height).
          """
 
         self.validate_camera_input(camera_number)
@@ -43,18 +42,18 @@ class VideoSourceWrapper():
 
     def add_file(self, filename):
         """
-        Create videoCapture object from file and add it to the list of sources
+        Create videoCapture object from file and add it to the list of sources.
         """
 
         self.validate_file_input(filename)
+
         LOGGER.info("Adding file input: %s", filename)
         self.add_source(filename)
 
     def add_source(self, source_num_or_file, dims=None):
         """
          Add a video source (camera or file) to the list of sources.
-        dims is (width, height).
-
+        :param: dims is (width, height).
         """
 
         video_source = cv2.VideoCapture(source_num_or_file)
@@ -73,24 +72,7 @@ class VideoSourceWrapper():
 
         empty_frame = np.empty((height, width, 3), dtype=np.uint8)
         self.frames.append(empty_frame)
-
         self.num_sources = len(self.sources)
-
-    def validate_camera_input(self, camera_input):
-        """
-         Camera inputs should be an integer, throw error if not
-          """
-        if isinstance(camera_input, int):
-
-            cam = cv2.VideoCapture(camera_input)
-            if cam.isOpened():
-                cam.release()
-                return True
-
-            raise IndexError(
-                'No camera source exists with number: {}'.format(camera_input))
-
-        raise TypeError('Integer expected for camera input')
 
     def validate_file_input(self, file_input):
         """
