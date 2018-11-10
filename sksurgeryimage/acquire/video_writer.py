@@ -9,7 +9,7 @@ import cv2
 LOGGER = logging.getLogger(__name__)
 
 
-class VideoWriterBase():
+class VideoWriterBase:
     """
     Base Class for Video Writer
     """
@@ -36,7 +36,6 @@ class VideoWriterBase():
         """
         Set the filename to write to.
         """
-
         if self.check_valid_filename(filename):
             self.filename = filename
 
@@ -73,7 +72,7 @@ class VideoWriterBase():
 
     def create_video_writers(self):
         """
-        Subclasses should implement a funciton to create
+        Subclasses should implement a function to create
         one or more Open-CV VideoWriter objects.
         """
         raise NotImplementedError('Should have implemented this method.')
@@ -82,7 +81,6 @@ class VideoWriterBase():
         """
         Close all video writer objects
         """
-
         if len(self.video_writers) == 0:
             logging.info("No video writers to close")
             return
@@ -115,7 +113,6 @@ class OneSourcePerFileWriter(VideoWriterBase):
     """
     Class to writes to a separate video file for each input source.
     """
-
     def create_video_writers(self):
         """
         Create a VideoWriter object for each input source.

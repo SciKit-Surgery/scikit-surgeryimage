@@ -1,6 +1,6 @@
+# coding=utf-8
+
 import pytest
-import numpy as np
-import os
 from sksurgeryimage.acquire import video_writer as vw
 
 
@@ -46,7 +46,7 @@ def test_set_frame_source(video_writer_single_source):
     frame_source = video_writer.frame_source
     video_writer.set_frame_source(None)
 
-    assert video_writer.frame_source == None
+    assert video_writer.frame_source is None
 
     video_writer.set_frame_source(frame_source)
     assert video_writer.frame_source == frame_source

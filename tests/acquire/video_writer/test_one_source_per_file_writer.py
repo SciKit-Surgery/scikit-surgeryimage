@@ -9,7 +9,7 @@ def test_generate_single_filename(video_writer_single_source):
     video_writer = video_writer_single_source
 
     sequential_filenames = video_writer.generate_sequential_filenames()
-    expected_single_filenames = ['output_0.avi']
+    expected_single_filenames = ['tests/output/output_0.avi']
     assert sequential_filenames == expected_single_filenames
 
 
@@ -18,7 +18,11 @@ def test_generate_multiple_filenames(video_writer_five_sources):
     sequential_filenames = video_writer.generate_sequential_filenames()
 
     expected_single_filenames = [
-        'output_0.avi', 'output_1.avi', 'output_2.avi', 'output_3.avi', 'output_4.avi']
+        'tests/output/output_0.avi',
+        'tests/output/output_1.avi',
+        'tests/output/output_2.avi',
+        'tests/output/output_3.avi',
+        'tests/output/output_4.avi']
     assert sequential_filenames == expected_single_filenames
 
 
