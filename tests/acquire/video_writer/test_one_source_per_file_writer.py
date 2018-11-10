@@ -1,7 +1,7 @@
 import pytest
 import numpy as np
 import os
-from sksurgeryimage.acquire import VideoWriter
+from sksurgeryimage.acquire import video_writer as vw
 
 
 def test_generate_single_filename(video_writer_single_source):

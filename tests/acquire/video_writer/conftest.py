@@ -1,10 +1,10 @@
 import pytest
-from sksurgeryimage.acquire import VideoWriter
+from sksurgeryimage.acquire import video_writer as vw
 import numpy as np
 import os
 
 
-class DummyFrameSource():
+class DummyFrameSource:
     """ Class to represent a frame_source,
     basically just a wrapper around a list of numpy arrays.
     """
@@ -40,7 +40,7 @@ def setup_video_writer(num_sources):
     all_frame_dims = frame_dims * num_sources
 
     base_filename = 'output.avi'
-    video_writer = VideoWriter.OneSourcePerFileWriter(base_filename)
+    video_writer = vw.OneSourcePerFileWriter(base_filename)
 
     frame_source = DummyFrameSource(all_frame_dims)
     video_writer.frame_source = frame_source
