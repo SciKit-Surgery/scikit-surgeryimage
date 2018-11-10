@@ -147,8 +147,8 @@ def split_stacked_to_preallocated(stacked, top, bottom):
     """
     validate_interlaced_image_sizes(top, bottom, stacked)
 
-    top[:, :, :] = stacked[0:stacked.shape[0]//2, :, :]
-    bottom[:, :, :] = stacked[stacked.shape[0]//2:, :, :]
+    top[:, :, :] = stacked[0:stacked.shape[0] // 2, :, :]
+    bottom[:, :, :] = stacked[stacked.shape[0] // 2:, :, :]
 
 
 def split_stacked_to_view(stacked):

@@ -6,3 +6,7 @@
 .coverage
 *.pyc
 .pytest_cache/
+
+# Mac Finder:
+.DS_Store
+
