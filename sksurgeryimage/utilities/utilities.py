@@ -4,13 +4,13 @@
 Various utilities, like checking strings, numbers, preparing overlay text etc.
 """
 import cv2
+import os
 
 
 def prepare_cv2_text_overlay(overlay_text, frame, text_scale=1):
     """
     Return settings for text overlay on a cv2 frame.
     """
-
     validate_text_input(overlay_text)
 
     text = str(overlay_text)
@@ -43,3 +43,13 @@ def is_string_or_number(var):
         return True
 
     return False
+
+
+def validate_file_input(file_input):
+    """
+    Check if source file exists.
+    """
+    if os.path.isfile(file_input):
+        return True
+
+    raise ValueError('Input file:' + file_input + ' does not exist')

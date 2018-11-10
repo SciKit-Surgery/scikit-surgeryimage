@@ -1,13 +1,14 @@
 import pytest
 import numpy as np
 from sksurgeryimage.acquire import SourceWrapper
-
+import sksurgeryimage.utilities.camera_utilities as cu
+import sksurgeryimage.utilities.utilities as u
 
 def test_validate_camera_input(source_wrapper):
 
     try:
         valid_camera = 0
-        assert source_wrapper.validate_camera_input(valid_camera)
+        assert cu.validate_camera_input(valid_camera)
 
     except IndexError:
         # No cameras are available
@@ -18,26 +19,26 @@ def test_invalid_camera_input_throws_error(source_wrapper):
 
     invalid_camera = 'string.avi'
     with pytest.raises(TypeError):
-        source_wrapper.validate_camera_input(invalid_camera)
+        cu.validate_camera_input(invalid_camera)
 
 
 def test_camera_does_not_exist_throws_error(source_wrapper):
     not_a_camera = 1234
     with pytest.raises(IndexError):
-        source_wrapper.validate_camera_input(not_a_camera)
+        cu.validate_camera_input(not_a_camera)
 
 
 def test_validate_file_input(source_wrapper):
 
     file_that_exists = 'tox.ini'
-    assert source_wrapper.validate_file_input(file_that_exists)
+    assert u.validate_file_input(file_that_exists)
 
 
 def test_invalid_file_input_throws_error(source_wrapper):
 
     invalid_filename = '1234'
     with pytest.raises(ValueError):
-        source_wrapper.validate_file_input(invalid_filename)
+        u.validate_file_input(invalid_filename)
 
 
 def test_add_source_from_file(source_wrapper):

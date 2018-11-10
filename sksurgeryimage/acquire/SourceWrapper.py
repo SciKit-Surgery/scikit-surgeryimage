@@ -7,9 +7,10 @@ Classes capture data from a video source into a numpy array.
 
 import logging
 import datetime
-import os
 import cv2
 import numpy as np
+import sksurgeryimage.utilities.camera_utilities as cu
+import sksurgeryimage.utilities.utilities as u
 
 LOGGER = logging.getLogger(__name__)
 
@@ -30,12 +31,12 @@ class VideoSourceWrapper:
 
     def add_camera(self, camera_number, dims=None):
         """
-         Create VideoCapture object from camera and add it to the list
-         of sources.
-         :param: dims is (width, height).
-         """
+        Create VideoCapture object from camera and add it to the list
+        of sources.
+        :param: dims is (width, height).
+        """
 
-        self.validate_camera_input(camera_number)
+        cu.validate_camera_input(camera_number)
 
         LOGGER.info("Adding camera input: %s", camera_number)
         self.add_source(camera_number, dims)
@@ -45,7 +46,7 @@ class VideoSourceWrapper:
         Create videoCapture object from file and add it to the list of sources.
         """
 
-        self.validate_file_input(filename)
+        u.validate_file_input(filename)
 
         LOGGER.info("Adding file input: %s", filename)
         self.add_source(filename)
@@ -74,20 +75,10 @@ class VideoSourceWrapper:
         self.frames.append(empty_frame)
         self.num_sources = len(self.sources)
 
-    def validate_file_input(self, file_input):
-        """
-        Check if source file exists.
-        """
-        if os.path.isfile(file_input):
-            return True
-
-        raise ValueError('Input file does not exist')
-
     def are_all_sources_open(self):
         """
         Check all input sources are active/open.
         """
-
         for source in self.sources:
             if not source.isOpened():
                 return False
