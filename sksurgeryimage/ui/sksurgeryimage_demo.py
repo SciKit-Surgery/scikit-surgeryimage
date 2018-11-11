@@ -5,7 +5,7 @@ import six
 
 
 def run_demo(console, text):
-    """Show message"""
+    """Shows text message either on console or in a TkInter window."""
 
     six.print_(text)
 

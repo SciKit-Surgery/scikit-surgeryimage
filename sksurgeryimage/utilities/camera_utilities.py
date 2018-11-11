@@ -15,6 +15,7 @@ def count_cameras():
     This is done by trying to instantiate cameras 0..9,
     and presumes they are in order, sequential, starting
     from zero.
+
     :returns: int, number of cameras
     """
     max_cameras = 10
@@ -36,7 +37,8 @@ def count_cameras():
 def validate_camera_input(camera_input):
     """
     Checks that camera_input is an integer, and it is a valid camera.
-    :param: camera_input - integer of camera
+
+    :param: camera_input, integer of camera
     """
     if not isinstance(camera_input, int):
         raise TypeError('Integer expected for camera input')
