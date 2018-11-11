@@ -1,4 +1,6 @@
-/scikit-surgeryimage.rst
-/scikit-surgeryimage.*.rst
+/sksurgeryimage.rst
+/sksurgeryimage.*.rst
+/examples*.rst
 /modules.rst
+/versioneer.rst
 /build
