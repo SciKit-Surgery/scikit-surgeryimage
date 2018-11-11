@@ -30,9 +30,9 @@ class VideoSourceWrapper:
         """
         Create VideoCapture object from camera and add it to the list
         of sources.
+
         :param: dims is (width, height).
         """
-
         cu.validate_camera_input(camera_number)
 
         LOGGER.info("Adding camera input: %s", camera_number)
@@ -42,7 +42,6 @@ class VideoSourceWrapper:
         """
         Create videoCapture object from file and add it to the list of sources.
         """
-
         u.validate_file_input(filename)
 
         LOGGER.info("Adding file input: %s", filename)
@@ -51,6 +50,7 @@ class VideoSourceWrapper:
     def add_source(self, source_num_or_file, dims=None):
         """
          Add a video source (camera or file) to the list of sources.
+
         :param: dims is (width, height).
         """
 

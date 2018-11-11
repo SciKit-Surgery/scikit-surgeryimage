@@ -133,6 +133,7 @@ class OneSourcePerFileWriter(VideoWriterBase):
     def generate_sequential_filenames(self):
         """
         Take a filename e.g. video.avi and generate a filename for each camera.
+
         video1.avi, video2.avi video3.avi etc.
         """
         filenames = []

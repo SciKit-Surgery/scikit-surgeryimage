@@ -98,6 +98,7 @@ def deinterlace_to_view(interlaced):
     """
     Takes the interlaced image, and returns
     two new views of even_rows and odd_rows.
+
     :return: even_rows, odd_rows images
     """
     if not isinstance(interlaced, np.ndarray):
@@ -116,6 +117,7 @@ def deinterlace_to_new(interlaced):
     """
     Takes the interlaced image, and splits into two
     new images of even_rows and odd_rows.
+
     :return: even_rows, odd_rows images
     """
     if not isinstance(interlaced, np.ndarray):
@@ -155,6 +157,7 @@ def split_stacked_to_view(stacked):
     """
     Takes the input stacked image, and returns views that
     refer to the top and bottom half.
+
     :return: top_half, bottom_half images
     """
     if not isinstance(stacked, np.ndarray):
@@ -176,6 +179,7 @@ def split_stacked_to_new(stacked):
     Useful if you have stereo 1080x1920 inputs, into an AJA Hi5-3D
     which stacks them vertically into 2 frames of 540x1920 in the
     same image.
+
     :return: top_half and bottom_half images
     """
     if not isinstance(stacked, np.ndarray):
