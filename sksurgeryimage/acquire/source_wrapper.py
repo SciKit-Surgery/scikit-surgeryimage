@@ -13,10 +13,29 @@ import sksurgeryimage.utilities.camera_utilities as cu
 import sksurgeryimage.utilities.utilities as u
 
 LOGGER = logging.getLogger(__name__)
+class VideoSource(cv2.VideoCapture):
+    """
+    Capture and store data from camera/file source.
+    """
+    def __init__(self, source_num_or_file, dims=None):
+        super().init(source_num_or_file)
+
+        if dims:
+            width, height = dims
+            self.set(cv2.CV_CAP_PROP_FRAME_WIDTH, width)
+            self.set(cv2.CV_CAP_PROP_FRAME_HEIGHT, height)
+      
+        else:
+            width  = int(video_source.get(cv2.CV_CAP_PROP_FRAME_WIDTH))
+            height = int(video_source.get(cv2.CV_CAP_PROP_FRAME_HEIGHT))
+
+        LOGGER.info("Source dimensions %s %s", width, height)
+
+    self.frame = np.empty((height, width, 3), dtype=np.uint8)
 
 class VideoSourceWrapper:
     """
-    Capture data from one or more camera/file sources.
+    Wrapper for multiple VideoSource objects.
     """
     def __init__(self):
         self.sources = []
