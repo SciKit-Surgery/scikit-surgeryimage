@@ -32,8 +32,8 @@ class VideoSource(cv2.VideoCapture):
             self.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
       
         else:
-            width  = int(super().get(cv2.CAP_PROP_FRAME_WIDTH))
-            height = int(super().get(cv2.CAP_PROP_FRAME_HEIGHT))
+            width  = int(self.get(cv2.CAP_PROP_FRAME_WIDTH))
+            height = int(self.get(cv2.CAP_PROP_FRAME_HEIGHT))
 
         LOGGER.info("Source dimensions %s %s", width, height)
 
@@ -102,6 +102,7 @@ class VideoSourceWrapper:
         """
 
         video_source = VideoSource(source_num_or_file, dims)
+        self.sources.append(video_source)
         self.num_sources = len(self.sources)
 
     def are_all_sources_open(self):
