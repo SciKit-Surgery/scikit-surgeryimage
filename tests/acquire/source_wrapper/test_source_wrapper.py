@@ -46,7 +46,7 @@ def test_add_source_from_file(video_source):
     filename = 'tests/data/acquire/100x50_100_frames.avi'
     video_source.add_file(filename)
 
-    assert video_source.frames[0].shape == (100, 50, 3)
+    assert video_source.sources[0].frame.shape == (100, 50, 3)
     assert video_source.are_all_sources_open()
 
     video_source.release_all_sources()
@@ -92,13 +92,13 @@ def test_get_next_frames_from_file(video_source):
     video_source.get_next_frames()
 
     expected_frame = np.zeros((100, 50, 3), dtype=np.uint8)
-    actual_frame = video_source.frames[0]
+    actual_frame = video_source.sources[0].frame
     np.testing.assert_array_equal(expected_frame, actual_frame)
 
 
 def test_do_timestamps_with_frame_update(video_source):
     filename = 'tests/data/acquire/100x50_100_frames.avi'
-    video_source.add_source(filename)
+    video_source.add_file(filename)
     video_source.save_timestamps = True
 
     n_frames = 5
