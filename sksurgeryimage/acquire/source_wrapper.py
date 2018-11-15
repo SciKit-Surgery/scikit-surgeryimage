@@ -14,7 +14,6 @@ import sksurgeryimage.utilities.utilities as u
 
 LOGGER = logging.getLogger(__name__)
 
-
 class VideoSourceWrapper:
     """
     Capture data from one or more camera/file sources.
@@ -23,7 +22,7 @@ class VideoSourceWrapper:
         self.sources = []
         self.frames = []
         self.timestamps = []
-        self.save_timestamps = False
+        self.save_timestamps = True
         self.num_sources = 0
 
     def add_camera(self, camera_number, dims=None):
@@ -92,12 +91,19 @@ class VideoSourceWrapper:
 
     def get_next_frames(self):
         """
-        Do a grab() operation for each source, timestamp (if wanted) and then
-        retrieve() for each device.
+        Do a grab() operation for each sourcefollowed by a
+        retrieve().
+        """
+        self.grab()
+        self.retrieve()
+
+    def grab(self):
+        """
+        Perform a grab() operation for each source and timestamp
+        if required.
         """
         # pylint: disable=unused-variable
         # 'ret' isn't used at the moment, but keep it for convention.
-
         if self.are_all_sources_open():
 
             for i, source in enumerate(self.sources):
@@ -106,8 +112,16 @@ class VideoSourceWrapper:
                 if self.save_timestamps:
                     self.add_timestamp_to_list(i)
 
-            for i, source in enumerate(self.sources):
-                ret, self.frames[i] = source.retrieve()
+    def retrieve(self):
+        """
+        Perform a retrieve operaiton for each source.
+        Should only be run after a grab() operation.
+        """
+        # pylint: disable=unused-variable
+        # 'ret' isn't used at the moment, but keep it for convention.
+
+        for i, source in enumerate(self.sources):
+            ret, self.frames[i] = source.retrieve()
 
     def add_timestamp_to_list(self, source_number):
         """
