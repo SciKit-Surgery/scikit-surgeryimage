@@ -13,7 +13,7 @@ import sksurgeryimage.utilities.camera_utilities as cu
 import sksurgeryimage.utilities.utilities as u
 
 LOGGER = logging.getLogger(__name__)
-class VideoSource(cv2.VideoCapture):
+class VideoSource():
     """
     Capture and store data from camera/file source.
     Extends cv2.VideoCapture() to provide passing of
@@ -21,19 +21,19 @@ class VideoSource(cv2.VideoCapture):
     """
     def __init__(self, source_num_or_file, dims=None):
 
-        super().__init__(source_num_or_file)
+        self.source = cv2.VideoCapture(source_num_or_file)
 
         self.source_name = source_num_or_file
         LOGGER.info("Adding input from source: %s", self.source_name)
         
         if dims:
             width, height = dims
-            self.set(cv2.CAP_PROP_FRAME_WIDTH, width)
-            self.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
+            self.source.set(cv2.CAP_PROP_FRAME_WIDTH, width)
+            self.source.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
       
         else:
-            width  = int(self.get(cv2.CAP_PROP_FRAME_WIDTH))
-            height = int(self.get(cv2.CAP_PROP_FRAME_HEIGHT))
+            width = int(self.source.get(cv2.CAP_PROP_FRAME_WIDTH))
+            height = int(self.source.get(cv2.CAP_PROP_FRAME_HEIGHT))
 
         LOGGER.info("Source dimensions %s %s", width, height)
 
@@ -43,28 +43,39 @@ class VideoSource(cv2.VideoCapture):
 
     def grab(self):
         """
-        Call the superclass (cv2.VideoCapture) grab function.
+        Call the cv2.VideoCapture grab function.
         """
         LOGGER.debug("Grabbing from: %s", self.source_name)
-        self.ret = super().grab()
+        self.ret = self.source.grab()
         return self.ret
 
     def retrieve(self):
         """
-        Call the superclass (cv2.VideoCapture) grab function and
+        Call the cv2.VideoCapture grab function and
         store the returned frame.
         """
         LOGGER.debug("Retrieving from: %s", self.source_name)
-        self.ret, self.frame = super().retrieve()
+        self.ret, self.frame = self.source.retrieve()
         return self.ret, self.frame
 
     def read(self):
         """
-        Call the super class (cv2.VideoCapture) read funciton and
+        Call the cv2.VideoCapture read funciton and
         store the returned frame.
         """
-        self.ret, self.frame = super().read()
+        self.ret, self.frame = self.source.read()
         return self.ret, self.frame
+
+    def isOpened(self):
+        """ Call the cv2.VideoCapture isOpened function.
+        """
+        return self.source.isOpened()
+
+    def release(self):
+        """
+        Release the source.
+        """
+        self.source.release()
 
 class VideoSourceWrapper:
     """
