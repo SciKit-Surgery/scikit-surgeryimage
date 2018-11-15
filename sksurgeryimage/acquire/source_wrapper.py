@@ -16,22 +16,55 @@ LOGGER = logging.getLogger(__name__)
 class VideoSource(cv2.VideoCapture):
     """
     Capture and store data from camera/file source.
+    Extends cv2.VideoCapture() to provide passing of
+    camera dimensions in constructor, and storage of frame data.
     """
     def __init__(self, source_num_or_file, dims=None):
-        super().init(source_num_or_file)
 
+        super().__init__(source_num_or_file)
+
+        self.source_name = source_num_or_file
+        LOGGER.info("Adding input from source: %s", self.source_name)
+        
         if dims:
             width, height = dims
-            self.set(cv2.CV_CAP_PROP_FRAME_WIDTH, width)
-            self.set(cv2.CV_CAP_PROP_FRAME_HEIGHT, height)
+            self.set(cv2.CAP_PROP_FRAME_WIDTH, width)
+            self.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
       
         else:
-            width  = int(video_source.get(cv2.CV_CAP_PROP_FRAME_WIDTH))
-            height = int(video_source.get(cv2.CV_CAP_PROP_FRAME_HEIGHT))
+            width  = int(super().get(cv2.CAP_PROP_FRAME_WIDTH))
+            height = int(super().get(cv2.CAP_PROP_FRAME_HEIGHT))
 
         LOGGER.info("Source dimensions %s %s", width, height)
 
-    self.frame = np.empty((height, width, 3), dtype=np.uint8)
+        self.frame = np.empty((height, width, 3), dtype=np.uint8)
+        self.ret = None
+    
+
+    def grab(self):
+        """
+        Call the superclass (cv2.VideoCapture) grab function.
+        """
+        LOGGER.debug("Grabbing from: %s", self.source_name)
+        self.ret = super().grab()
+        return self.ret
+
+    def retrieve(self):
+        """
+        Call the superclass (cv2.VideoCapture) grab function and
+        store the returned frame.
+        """
+        LOGGER.debug("Retrieving from: %s", self.source_name)
+        self.ret, self.frame = super().retrieve()
+        return self.ret, self.frame
+
+    def read(self):
+        """
+        Call the super class (cv2.VideoCapture) read funciton and
+        store the returned frame.
+        """
+        self.ret, self.frame = super().read()
+        return self.ret, self.frame
 
 class VideoSourceWrapper:
     """
@@ -52,8 +85,6 @@ class VideoSourceWrapper:
         :param: dims is (width, height).
         """
         cu.validate_camera_input(camera_number)
-
-        LOGGER.info("Adding camera input: %s", camera_number)
         self.add_source(camera_number, dims)
 
     def add_file(self, filename):
@@ -61,8 +92,6 @@ class VideoSourceWrapper:
         Create videoCapture object from file and add it to the list of sources.
         """
         u.validate_file_input(filename)
-
-        LOGGER.info("Adding file input: %s", filename)
         self.add_source(filename)
 
     def add_source(self, source_num_or_file, dims=None):
@@ -72,22 +101,7 @@ class VideoSourceWrapper:
         :param: dims is (width, height).
         """
 
-        video_source = cv2.VideoCapture(source_num_or_file)
-        self.sources.append(video_source)
-
-        if dims:
-            width, height = dims
-            video_source.set(3, width)
-            video_source.set(4, height)
-
-        else:
-            width = int(video_source.get(3))
-            height = int(video_source.get(4))
-
-        LOGGER.info("Source dimensions %s %s", width, height)
-
-        empty_frame = np.empty((height, width, 3), dtype=np.uint8)
-        self.frames.append(empty_frame)
+        video_source = VideoSource(source_num_or_file, dims)
         self.num_sources = len(self.sources)
 
     def are_all_sources_open(self):
@@ -121,12 +135,10 @@ class VideoSourceWrapper:
         Perform a grab() operation for each source and timestamp
         if required.
         """
-        # pylint: disable=unused-variable
-        # 'ret' isn't used at the moment, but keep it for convention.
         if self.are_all_sources_open():
 
             for i, source in enumerate(self.sources):
-                ret = source.grab()
+                source.grab()
 
                 if self.save_timestamps:
                     self.add_timestamp_to_list(i)
@@ -136,11 +148,8 @@ class VideoSourceWrapper:
         Perform a retrieve operaiton for each source.
         Should only be run after a grab() operation.
         """
-        # pylint: disable=unused-variable
-        # 'ret' isn't used at the moment, but keep it for convention.
-
-        for i, source in enumerate(self.sources):
-            ret, self.frames[i] = source.retrieve()
+        for source in self.sources:
+            source.retrieve()
 
     def add_timestamp_to_list(self, source_number):
         """

@@ -12,7 +12,7 @@ import cv2
 
 ###
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.DEBUG)
 LOGGER = logging.getLogger(__name__)
 
 
@@ -28,14 +28,16 @@ def save_all_cameras_and_one_file():
     sources = source_wrapper.VideoSourceWrapper()
     sources.add_file('tests/data/acquire/100x50_100_frames.avi')
 
-    num_cameras = camera_utilities.count_cameras()
+    #num_cameras = camera_utilities.count_cameras()
 
     sources.add_camera(0)
 
     filename = 'outputs/test.avi'
+    print(1)
     writer = video_writer.OneSourcePerFileWriter(filename)
+    print(2)
     writer.set_frame_source(sources)
-
+    print(3)
     writer.save_to_file(100)
 
 

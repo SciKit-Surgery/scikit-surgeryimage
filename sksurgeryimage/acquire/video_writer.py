@@ -47,7 +47,7 @@ class VideoWriterBase:
         if isinstance(filename, str):
             return True
 
-        raise ValueError('Invalid filename passed')
+        raise ValueError('Invalid filename passed %s', filename)
 
     def create_output_dir_if_needed(self):
         """
@@ -107,8 +107,9 @@ class VideoWriterBase:
         """
         Write a frame to the output files.
         """
-        for i, frame in enumerate(self.frame_source.frames):
+        for i, source in enumerate(self.frame_source.sources):
 
+            frame = source.frame
             logging.debug("Writing frame with dims %s", frame.shape)
             self.video_writers[i].write(frame)
 
