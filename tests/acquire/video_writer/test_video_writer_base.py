@@ -20,7 +20,7 @@ def test_invalid_filename_raises_ValueError():
     with pytest.raises(ValueError):
         video_writer = vw.VideoWriterBase(invalid_name)
 
-def test_create_output_dir_if_doesnt_exist():
+def test_create_output_dir_if_needed():
         """
         Set output filename to a directory that doesn't exist.
         VideoWriter should create it.
@@ -47,7 +47,7 @@ def test_create_output_no_path_passed():
         """
         output_filename = 'test.avi'
         video_writer=vw.VideoWriterBase(output_filename)
-        assert not video_writer.create_output_dir_if_doesnt_exist()
+        assert not video_writer.create_output_dir_if_needed()
 
 def test_dont_create_output_dir_if_already_exists():
         """
@@ -56,7 +56,7 @@ def test_dont_create_output_dir_if_already_exists():
         """
         output_filename = 'sksurgeryimage/test.avi'
         video_writer=vw.VideoWriterBase(output_filename)
-        assert not video_writer.create_output_dir_if_doesnt_exist()
+        assert not video_writer.create_output_dir_if_needed()
 
 def test_release_video_writers_when_none_available():
     """ Check that calling release_video_writers when none are open returns False """

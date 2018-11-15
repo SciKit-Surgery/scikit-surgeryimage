@@ -38,29 +38,28 @@ class VideoWriterBase:
         """
         if self.check_valid_filename(filename):
             self.filename = filename
-            self.create_output_dir_if_doesnt_exist()
+            self.create_output_dir_if_needed()
 
     def check_valid_filename(self, filename):
         """
         Return true if filename is a string.
         """
         if isinstance(filename, str):
-            
             return True
 
         raise ValueError('Invalid filename passed')
 
-    def create_output_dir_if_doesnt_exist(self):
+    def create_output_dir_if_needed(self):
         """
         Check if the directory specified in file path exists
         and create if not.
         """
-        dir = os.path.dirname(self.filename)
+        directory = os.path.dirname(self.filename)
 
-        if dir and not os.path.exists(dir):
-                LOGGER.info("Creating directory: %s", dir)
-                os.makedirs(dir)
-                return True
+        if directory and not os.path.exists(directory):
+            LOGGER.info("Creating directory: %s", directory)
+            os.makedirs(directory)
+            return True
 
         return False
 

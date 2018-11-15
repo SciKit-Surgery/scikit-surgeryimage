@@ -6,7 +6,7 @@ sys.path.append('../scikit-surgeryimage')
 
 import logging
 from sksurgeryimage.acquire import utilities
-from sksurgeryimage.acquire import VideoWriter, SourceWrapper
+from sksurgeryimage.acquire import video_writer, source_wrapper
 import os
 import sys
 sys.path.append(os.getcwd())
@@ -20,7 +20,12 @@ LOGGER = logging.getLogger(__name__)
 def main():
     save_all_cameras_and_one_file()
 
+def save_two_camera_feeds():
+    """
+    Save the feeds from two cameras.
+    ""
 
+    source_wrapper = 
 def save_all_cameras_and_one_file():
     """
     Saves a camera feed from all attached cameras and a file
