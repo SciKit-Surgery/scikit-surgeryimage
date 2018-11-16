@@ -47,7 +47,7 @@ class VideoWriterBase:
         if isinstance(filename, str):
             return True
 
-        raise ValueError('Invalid filename passed %s', filename)
+        raise ValueError('Invalid filename passed {}'.format(filename))
 
     def create_output_dir_if_needed(self):
         """

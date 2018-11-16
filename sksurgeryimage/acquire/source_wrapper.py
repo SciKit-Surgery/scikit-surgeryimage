@@ -25,12 +25,12 @@ class VideoSource():
 
         self.source_name = source_num_or_file
         LOGGER.info("Adding input from source: %s", self.source_name)
-        
+
         if dims:
             width, height = dims
             self.source.set(cv2.CAP_PROP_FRAME_WIDTH, width)
             self.source.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
-      
+
         else:
             width = int(self.source.get(cv2.CAP_PROP_FRAME_WIDTH))
             height = int(self.source.get(cv2.CAP_PROP_FRAME_HEIGHT))
@@ -39,7 +39,7 @@ class VideoSource():
 
         self.frame = np.empty((height, width, 3), dtype=np.uint8)
         self.ret = None
-    
+
 
     def grab(self):
         """
@@ -69,6 +69,8 @@ class VideoSource():
     def isOpened(self):
         """ Call the cv2.VideoCapture isOpened function.
         """
+        #pylint: disable=invalid-name
+        # using isOpened to be consistent with OpenCV function name
         return self.source.isOpened()
 
     def release(self):
