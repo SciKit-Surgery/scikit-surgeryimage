@@ -30,12 +30,12 @@ def save_all_cameras_and_one_file():
 
     num_cameras = camera_utilities.count_cameras()
 
-    sources.add_camera(0)
+    for camera in range(num_cameras):
+        sources.add_camera(0)
 
     filename = 'outputs/test.avi'
     writer = video_writer.OneSourcePerFileWriter(filename)
     writer.set_frame_source(sources)
-
     writer.save_to_file(100)
 
 

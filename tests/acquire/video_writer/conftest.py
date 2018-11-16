@@ -1,33 +1,39 @@
 import pytest
 from sksurgeryimage.acquire import video_writer as vw
+
 import numpy as np
 import os
 
-
 class DummyFrameSource:
-    """ Class to represent a frame_source,
-    basically just a wrapper around a list of numpy arrays.
+    """
+    Class to represent frame source. Only contains a numpy array.
+    """
+    def __init__(self, frame):
+        self.frame = frame
+
+class DummyFrameSourceWrapper:
+    """
+    Mock class for VideoSourceWrapper.
     """
 
     def __init__(self, all_dims):
-        self.frames = self.generate_frames(all_dims)
+
+        self.generate_sources(all_dims)
         self.save_timestamps = False
 
         self.timestamps = ["1", "2", "3", "4"]
 
-    def generate_frames(self, all_dims):
+    def generate_sources(self, all_dims):
         """ Generate numpy arrays.
         Inputs: all_dims - list of dimensions for generated arrays 
         e.g. [(640, 480), (100, 100)] 
         """
-        frames = []
+        self.sources = []
         for dims in all_dims:
 
             dims_with_rgb = (dims[0], dims[1], 3)
             array = np.ones(dims_with_rgb, dtype=np.uint8)
-            frames.append(array)
-
-        return frames
+            self.sources.append(DummyFrameSource(array))
 
     def get_next_frames(self):
         """ Mock function """
@@ -42,7 +48,7 @@ def setup_video_writer(num_sources):
     base_filename = 'tests/output/output.avi'
     video_writer = vw.OneSourcePerFileWriter(base_filename)
 
-    frame_source = DummyFrameSource(all_frame_dims)
+    frame_source = DummyFrameSourceWrapper(all_frame_dims)
     video_writer.frame_source = frame_source
 
     return video_writer

@@ -3,7 +3,10 @@
 """
 Tests hooking together various camera acquisition functions.
 """
-
+import os
+import sys
+sys.path.append(os.getcwd())
+sys.path.append('../scikit-surgeryimage')
 import os
 import cv2
 import numpy as np
@@ -26,7 +29,7 @@ def test_save_a_file_and_all_cameras():
 
     for camera in range(num_cameras):
         sw.add_camera(camera)
-
+    
     output_dir = 'tests/output'
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
@@ -49,5 +52,7 @@ def test_save_a_file_and_all_cameras():
     for i in range(num_frames_in_input_file):
         ret, frame_in = input_video.read()
         ret, frame_out = output_video.read()
-
         np.testing.assert_array_equal(frame_in, frame_out)
+    
+    input_video.release()
+    output_video.release()

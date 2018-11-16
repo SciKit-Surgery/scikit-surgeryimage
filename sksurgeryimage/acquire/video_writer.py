@@ -47,7 +47,7 @@ class VideoWriterBase:
         if isinstance(filename, str):
             return True
 
-        raise ValueError('Invalid filename passed')
+        raise ValueError('Invalid filename passed {}'.format(filename))
 
     def create_output_dir_if_needed(self):
         """
@@ -107,8 +107,9 @@ class VideoWriterBase:
         """
         Write a frame to the output files.
         """
-        for i, frame in enumerate(self.frame_source.frames):
+        for i, source in enumerate(self.frame_source.sources):
 
+            frame = source.frame
             logging.debug("Writing frame with dims %s", frame.shape)
             self.video_writers[i].write(frame)
 
@@ -135,7 +136,8 @@ class OneSourcePerFileWriter(VideoWriterBase):
         filenames = self.generate_sequential_filenames()
         logging.info("Saving to: %s", filenames)
 
-        for filename, frame in zip(filenames, self.frame_source.frames):
+        for filename, source in zip(filenames, self.frame_source.sources):
+            frame = source.frame
             height, width = frame.shape[:2]
             video_writer = cv2.VideoWriter(
                 filename, self.fourcc, self.fps, (width, height))
@@ -152,9 +154,10 @@ class OneSourcePerFileWriter(VideoWriterBase):
         video1.avi, video2.avi video3.avi etc.
         """
         filenames = []
-        filename, extension = os.path.splitext(self.filename)
 
-        for i, _ in enumerate(self.frame_source.frames):
+        filename, extension = os.path.splitext(self.filename)
+        LOGGER.debug("Generating sequential filenames for: %s", filename)
+        for i, _ in enumerate(self.frame_source.sources):
             new_filename = "{}_{}{}".format(filename, i, extension)
             filenames.append(new_filename)
 
