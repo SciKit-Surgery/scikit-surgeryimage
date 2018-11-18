@@ -114,6 +114,8 @@ deploy pip to production:
   when: manual
   only:
     - tags
+    - master
+    
   environment:
     name: PyPI
     url: https://pypi.python.org/pypi/scikit-surgeryimage
