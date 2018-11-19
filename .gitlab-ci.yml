@@ -4,9 +4,6 @@ variables:
   PYPI_PASS: SECURE
 
 stages:
-  - build
-  - installer
-  - test
   - deploy
 
 
