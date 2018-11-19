@@ -114,7 +114,7 @@ deploy pip to production:
   #Tell Gitlab to load these environental vars from the variables list
   variables:
     PYPI_USER: SECURE
-    PYPI_PASSWORD: SECURE
+    PYPI_PASS: SECURE
 
   stage: deploy
   when: manual
