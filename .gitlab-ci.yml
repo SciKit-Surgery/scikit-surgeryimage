@@ -128,8 +128,10 @@ deploy pip to production:
     - dist/
     
   script:
-    # remove any previous distribution and build files
-    - rm -rf dist build
+    # Install packages required to build/publish
+    # remove any previous distribution files
+    - pip install wheel twine setuptools
+    - rm -rf dist
 
     # bundle installer
     - python setup.py bdist_wheel
