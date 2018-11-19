@@ -120,7 +120,6 @@ deploy pip to production:
   when: manual
   only:
     - tags
-    - master
     
   environment:
     name: PyPI
@@ -136,6 +135,7 @@ deploy pip to production:
   script:
     # Install packages required to build/publish
     # remove any previous distribution files
+    - echo $PYPI_USER
     - pip install wheel twine setuptools
     - rm -rf dist
 
