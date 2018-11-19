@@ -5,21 +5,7 @@ variables:
 
 stages:
   - deploy
-
-deploy docs to production:
-  stage: deploy
-  script:
-    # Note: the group/username directory must already exist on the server before calling this command
-    - rsync -avz -e'ssh -v' --numeric-ids --delete doc/build/html/* production_docs_rsync:WEISS/SoftwareRepositories/scikit-surgeryimage 2>&1
-  tags:
-    - docs-production
-  environment:
-    name: production
-  only:
-    - public
-  dependencies:
-    - build docs
-    
+  
     
 deploy pip to production:
 
