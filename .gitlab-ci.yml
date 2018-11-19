@@ -143,5 +143,5 @@ deploy pip to production:
     - python setup.py bdist_wheel
 
     # Upload to testpypi server
-    - twine upload --repository pypi dist/* --username $PYPI_USER --password $PYPI_PASS
+    - twine upload --repository pypi dist/* --username $PYPI_USER --password $PYPI_PASS --verbose
 
