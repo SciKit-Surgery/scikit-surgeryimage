@@ -1,17 +1,17 @@
 scikit-surgeryimage
 ===============================
 
-.. image:: https://weisslab.cs.ucl.ac.uk/WEISS/SoftwareRepositories/scikit-surgeryimage/raw/master/project-icon.png
+.. image:: https://weisslab.cs.ucl.ac.uk/WEISS/SoftwareRepositories/SNAPPY/scikit-surgeryimage/raw/master/project-icon.png
    :height: 128px
    :width: 128px
-   :target: https://weisslab.cs.ucl.ac.uk/WEISS/SoftwareRepositories/scikit-surgeryimage
+   :target: https://weisslab.cs.ucl.ac.uk/WEISS/SoftwareRepositories/SNAPPY/scikit-surgeryimage
 
-.. image:: https://weisslab.cs.ucl.ac.uk/WEISS/SoftwareRepositories/scikit-surgeryimage/badges/master/build.svg
-   :target: https://weisslab.cs.ucl.ac.uk/WEISS/SoftwareRepositories/scikit-surgeryimage/pipelines
+.. image:: https://weisslab.cs.ucl.ac.uk/WEISS/SoftwareRepositories/SNAPPY/scikit-surgeryimage/badges/master/build.svg
+   :target: https://weisslab.cs.ucl.ac.uk/WEISS/SoftwareRepositories/SNAPPY/scikit-surgeryimage/pipelines
    :alt: GitLab-CI test status
 
-.. image:: https://weisslab.cs.ucl.ac.uk/WEISS/SoftwareRepositories/scikit-surgeryimage/badges/master/coverage.svg
-    :target: https://weisslab.cs.ucl.ac.uk/WEISS/SoftwareRepositories/scikit-surgeryimage/commits/master
+.. image:: https://weisslab.cs.ucl.ac.uk/WEISS/SoftwareRepositories/SNAPPY/scikit-surgeryimage/badges/master/coverage.svg
+    :target: https://weisslab.cs.ucl.ac.uk/WEISS/SoftwareRepositories/SNAPPY/scikit-surgeryimage/commits/master
     :alt: Test coverage
 
 .. image:: https://readthedocs.org/projects/scikit-surgeryimage/badge/?version=latest
@@ -32,7 +32,7 @@ Installing
 You can pip install directly from the repository as follows:
 ::
 
-    pip install git+https://weisslab.cs.ucl.ac.uk/WEISS/SoftwareRepositories/scikit-surgeryimage
+    pip install git+https://weisslab.cs.ucl.ac.uk/WEISS/SoftwareRepositories/SNAPPY/scikit-surgeryimage
 
 
 Developing
@@ -42,7 +42,7 @@ You can clone the repository using the following command:
 
 ::
 
-    git clone https://weisslab.cs.ucl.ac.uk/WEISS/SoftwareRepositories/scikit-surgeryimage
+    git clone https://weisslab.cs.ucl.ac.uk/WEISS/SoftwareRepositories/SNAPPY/scikit-surgeryimage
 
 
 Running the tests
@@ -82,13 +82,13 @@ Supported by `Wellcome`_ and `EPSRC`_.
 
 
 .. _`Wellcome EPSRC Centre for Interventional and Surgical Sciences`: http://www.ucl.ac.uk/weiss
-.. _`source code repository`: https://weisslab.cs.ucl.ac.uk/WEISS/SoftwareRepositories/scikit-surgeryimage
+.. _`source code repository`: https://weisslab.cs.ucl.ac.uk/WEISS/SoftwareRepositories/SNAPPY/scikit-surgeryimage
 .. _`Documentation`: https://scikit-surgeryimage.readthedocs.io
 .. _`University College London (UCL)`: http://www.ucl.ac.uk/
 .. _`Wellcome`: https://wellcome.ac.uk/
 .. _`EPSRC`: https://www.epsrc.ac.uk/
-.. _`contributing guidelines`: https://weisslab.cs.ucl.ac.uk/WEISS/SoftwareRepositories/scikit-surgeryimage/blob/master/CONTRIBUTING.rst
-.. _`license file`: https://weisslab.cs.ucl.ac.uk/WEISS/SoftwareRepositories/scikit-surgeryimage/blob/master/LICENSE
+.. _`contributing guidelines`: https://weisslab.cs.ucl.ac.uk/WEISS/SoftwareRepositories/SNAPPY/scikit-surgeryimage/blob/master/CONTRIBUTING.rst
+.. _`license file`: https://weisslab.cs.ucl.ac.uk/WEISS/SoftwareRepositories/SNAPPY/scikit-surgeryimage/blob/master/LICENSE
 
 
 .. toctree::

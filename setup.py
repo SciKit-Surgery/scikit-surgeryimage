@@ -16,7 +16,7 @@ setup(
     cmdclass=versioneer.get_cmdclass(),
     description='scikit-surgeryimage',
     long_description=long_description,
-    url='https://weisslab.cs.ucl.ac.uk/WEISS/SoftwareRepositories/scikit-surgeryimage',
+    url='https://weisslab.cs.ucl.ac.uk/WEISS/SoftwareRepositories/SNAPPY/scikit-surgeryimage',
     author='Matt Clarkson',
     author_email='YOUR-EMAIL@ucl.ac.uk',
     license='BSD-3 license',
