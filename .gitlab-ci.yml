@@ -134,7 +134,8 @@ deploy pip to production:
   script:
     # Install packages required to build/publish
     # remove any previous distribution files
-    - pip install wheel twine setuptools --upgrade
+    - pip install wheel setuptools
+    - pip install twine --upgrade
     - rm -rf dist
 
     # bundle installer
