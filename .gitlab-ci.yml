@@ -139,6 +139,9 @@ deploy pip to production:
 
     # bundle installer
     - python setup.py bdist_wheel
+    
+    # Validate restuctured text (i.e. README.rst)
+    - twine check dist/*
 
     # Upload to testpypi server
     - twine upload --repository pypi dist/* --username $PYPI_USER --password $PYPI_PASS
