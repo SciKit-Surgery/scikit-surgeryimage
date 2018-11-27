@@ -134,16 +134,12 @@ deploy pip to production:
   script:
     # Install packages required to build/publish
     # remove any previous distribution files
-    - pip install wheel setuptools
-    - pip install twine --upgrade
+    - pip install wheel setuptools twine
     - rm -rf dist
 
     # bundle installer
     - python setup.py bdist_wheel
     
-    # Validate restuctured text (i.e. README.rst)
-    - twine check dist/*
-
     # Upload to testpypi server
     - twine upload --repository pypi dist/* --username $PYPI_USER --password $PYPI_PASS
 
