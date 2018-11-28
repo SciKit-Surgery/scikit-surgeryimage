@@ -70,6 +70,12 @@ def test_add_source_from_camera(video_source):
         return
 
 
+def test_add_source_from_invalid_camera(video_source):
+    camera_input = -1
+    with pytest.raises(IndexError):
+        video_source.add_camera(camera_input)
+
+
 def test_add_source_from_camera_custom_dimensions(video_source):
     """
     Add a camera and pass in custom dimensions to cv2.VideoCapture.

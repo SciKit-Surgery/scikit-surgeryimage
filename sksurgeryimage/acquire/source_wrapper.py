@@ -24,6 +24,11 @@ class VideoSource:
     def __init__(self, source_num_or_file, dims=None):
 
         self.source = cv2.VideoCapture(source_num_or_file)
+
+        if not self.source.isOpened():
+            raise RuntimeError("Failed to open Video camera:"
+                               + str(source_num_or_file))
+
         self.source_name = source_num_or_file
 
         LOGGER.info("Adding input from source: %s", self.source_name)
