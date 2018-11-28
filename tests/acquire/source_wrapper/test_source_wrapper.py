@@ -1,6 +1,5 @@
 import pytest
 import numpy as np
-from sksurgeryimage.acquire import source_wrapper
 import sksurgeryimage.utilities.camera_utilities as cu
 import sksurgeryimage.utilities.utilities as u
 
