@@ -29,10 +29,10 @@ scikit-surgeryimage was developed at the `Wellcome EPSRC Centre for Intervention
 Installing
 ~~~~~~~~~~
 
-You can pip install directly from the repository as follows:
+You can pip installas follows:
 ::
 
-    pip install git+https://weisslab.cs.ucl.ac.uk/WEISS/SoftwareRepositories/SNAPPY/scikit-surgeryimage
+    pip install scikit-surgeryimage
 
 
 Developing
