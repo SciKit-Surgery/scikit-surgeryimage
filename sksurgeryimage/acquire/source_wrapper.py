@@ -29,7 +29,18 @@ class VideoSource:
         LOGGER.info("Adding input from source: %s", self.source_name)
 
         if dims:
+
             width, height = dims
+
+            if not isinstance(width, int):
+                raise TypeError("Width must be an integer")
+            if not isinstance(height, int):
+                raise TypeError("Height must be an integer")
+            if width < 1:
+                raise ValueError("Width must be >= 1")
+            if height < 1:
+                raise ValueError("Height must be >= 1")
+
             self.source.set(cv2.CAP_PROP_FRAME_WIDTH, width)
             self.source.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
 
