@@ -22,7 +22,12 @@ class VideoSource:
     camera dimensions in constructor, and storage of frame data.
     """
     def __init__(self, source_num_or_file, dims=None):
+        """
+        Constructs a VideoSource.
 
+        :param source_num_or_file: integer camera number or file path
+        :param dims: optional (width, height) as a pair of integers
+        """
         self.source = cv2.VideoCapture(source_num_or_file)
 
         if not self.source.isOpened():
