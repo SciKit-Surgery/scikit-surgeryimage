@@ -30,22 +30,29 @@ class StereoVideo:
 
     Design Principles:
 
-        1. Fail early, throwing exceptions for all errors.
-        2. Works with or without camera parameters.
-        3. If no camera parameters, calling get_undistorted() or get_rectified() is an Error.
+    1. Fail early, throwing exceptions for all errors.
+    2. Works with or without camera parameters.
+    3. If no camera parameters, calling get_undistorted()
+       or get_rectified() is an Error.
     """
 
+    # pylint: disable=too-many-instance-attributes
     def __init__(self, layout, channels, dims=None):
         """
         Constructor, for stereo video sources of the same size.
 
         Originally designed for
 
-            Storz 3D laparoscope: two separate channels interlaced at 1920x1080, and fed into channel_1.
-            Viking 3D laparoscope: separate left and right channels, both at 1920x1080, fed into into AJA Hi5-3D,
-                stacking channels top and bottom each at 1920x540, resulting in 1920x1080, and fed into channel_1.
-            Viking 3D laparoscope: two separate 1920x1080 channels fed into channel_1 and channel_2.
-            DaVinci laparoscope: two separate channels (resolution?) fed into channel_1 and channel_2.
+        - Storz 3D laparoscope: two separate channels interlaced
+          at 1920x1080, and fed into channel_1.
+        - Viking 3D laparoscope: separate left and right channels,
+          both at 1920x1080, fed into into AJA Hi5-3D,
+          stacking channels top and bottom each at 1920x540,
+          resulting in 1920x1080, and fed into channel_1.
+        - Viking 3D laparoscope: two separate 1920x1080 channels
+          fed into channel_1 and channel_2.
+        - DaVinci laparoscope: two separate channels (resolution?)
+          fed into channel_1 and channel_2.
 
 
         :param layout: See StereoVideoLayouts.
@@ -63,22 +70,26 @@ class StereoVideo:
             raise ValueError("You must provide at least one channel of input.")
 
         if len(channels) != 1 and len(channels) != 2:
-            raise ValueError("You must provide either 1 or 2 channels of input.")
+            raise ValueError("You must provide either 1 or "
+                             + "2 channels of input.")
 
         if len(channels) >= 1:
             if channels[0] is None:
                 raise ValueError("First channel is None.")
             if not u.is_string_or_number(channels[0]):
-                raise TypeError("First channel descriptor is not a file path or camera index.")
+                raise TypeError("First channel descriptor is not a file path "
+                                + "or camera index.")
 
         if len(channels) == 2:
             if channels[1] is None:
                 raise ValueError("Second channel is None.")
             if not u.is_string_or_number(channels[1]):
-                raise TypeError("Second channel descriptor is not a file path or camera index.")
+                raise TypeError("Second channel descriptor is not a file path "
+                                + "or camera index.")
 
         if layout == StereoVideoLayouts.DUAL and len(channels) != 2:
-            raise ValueError("If you specify layout to be DUAL, you must provide 2 channels.")
+            raise ValueError("If you specify layout to be DUAL, "
+                             + "you must provide 2 channels.")
 
         # Further validation of (width, height)
         if dims is not None:
@@ -114,7 +125,7 @@ class StereoVideo:
 
         :param camera_matrices: list of 2, 3x3 numpy arrays.
         :param distortion_coefficients: list of 2, 1xN numpy arrays.
-        :return:
+        :raises: ValueError, TypeError
         """
         if len(camera_matrices) != 2:
             raise ValueError("There should be exactly 2 camera matrices.")
@@ -123,10 +134,10 @@ class StereoVideo:
                              + "sets of distortion coefficients.")
 
         # Further validation of camera matrices and distortion coefficients.
-        for c in camera_matrices:
-            u.validate_camera_matrix(c)
-        for d in distortion_coefficients:
-            u.validate_distortion_coefficients(d)
+        for matrix in camera_matrices:
+            u.validate_camera_matrix(matrix)
+        for coefficients in distortion_coefficients:
+            u.validate_distortion_coefficients(coefficients)
 
         self.camera_matrices = camera_matrices
         self.distortion_coefficients = distortion_coefficients
@@ -139,11 +150,11 @@ class StereoVideo:
         Sets the stereo extrinsic parameters.
 
         :param rotation: 3x3 numpy array representing rotation matrix.
-        :param translation:3x1 numpy array representing translation vector.
-        :raises ValueError, TypeError
+        :param translation: 3x1 numpy array representing translation vector.
+        :raises: ValueError, TypeError
         """
         u.validate_rotation_matrix(rotation)
-        u.validate_translation_matrix(translation)
+        u.validate_translation_column_vector(translation)
 
         self.stereo_rotation = rotation
         self.stereo_translation = translation
@@ -191,13 +202,13 @@ class StereoVideo:
         frames = self.get_images()
         scaled = []
         if len(self.channels) == 1:  # stereo frames provided in one image
-            for f in frames:
-                s = cv2.resize(f,
-                               None,
-                               fx=self.scaling[0],
-                               fy=self.scaling[1],
-                               interpolation=cv2.INTER_NEAREST)
-                scaled.append(s)
+            for frame in frames:
+                scaled_image = cv2.resize(frame,
+                                          None,
+                                          fx=self.scaling[0],
+                                          fy=self.scaling[1],
+                                          interpolation=cv2.INTER_NEAREST)
+                scaled.append(scaled_image)
         else:
             scaled = frames
         return scaled
@@ -207,14 +218,14 @@ class StereoVideo:
         Returns the 2 channels, undistorted, as a list of images.
 
         :return: list of images
-        :raises ValueError: if you haven't already provided camera parameters
+        :raises: ValueError - if you haven't already provided camera parameters
         """
         self._validate_intrinsic_params()
         frames = self.get_scaled()
         undistorted = []
         counter = 0
-        for f in frames:
-            undist = cv2.undistort(f,
+        for frame in frames:
+            undist = cv2.undistort(frame,
                                    self.camera_matrices[counter],
                                    self.distortion_coefficients[counter]
                                    )
@@ -227,11 +238,11 @@ class StereoVideo:
         Returns the 2 channels, rectified, as a list of images.
 
         :return: list of images
-        :raises ValueError, TypeError if camera parameters are not set.
+        :raises: ValueError, TypeError - if camera parameters are not set.
         """
         self._validate_intrinsic_params()
         u.validate_rotation_matrix(self.stereo_rotation)
-        u.validate_translation_matrix(self.stereo_translation)
+        u.validate_translation_column_vector(self.stereo_translation)
 
         frames = self.get_scaled()
 
@@ -259,25 +270,26 @@ class StereoVideo:
                                   )
             for image_index in [0, 1]:
                 self.rectify_dx[image_index], self.rectify_dy[image_index] = \
-                    cv2.initUndistortRectifyMap(self.camera_matrices[image_index],
-                                                self.distortion_coefficients[image_index],
-                                                self.rectify_rotation[image_index],
-                                                self.rectify_projection[image_index],
-                                                image_size,
-                                                cv2.CV_32FC1
-                                                )
+                    cv2.initUndistortRectifyMap(
+                        self.camera_matrices[image_index],
+                        self.distortion_coefficients[image_index],
+                        self.rectify_rotation[image_index],
+                        self.rectify_projection[image_index],
+                        image_size,
+                        cv2.CV_32FC1
+                        )
 
             self.rectify_initialised = True
 
         rectified = []
         counter = 0
-        for f in frames:
-            r = cv2.remap(f,
-                          self.rectify_dx[counter],
-                          self.rectify_dy[counter],
-                          cv2.INTER_LINEAR
-                          )
-            rectified.append(r)
+        for frame in frames:
+            rectified_image = cv2.remap(frame,
+                                        self.rectify_dx[counter],
+                                        self.rectify_dy[counter],
+                                        cv2.INTER_LINEAR
+                                        )
+            rectified.append(rectified_image)
             counter += 1
         return rectified
 
@@ -301,18 +313,19 @@ class StereoVideo:
         :return: either [top, bottom], or [even, odd] images
         """
         if not self.video_sources.frames:
-            raise RuntimeError("No frames present, did you call grab and retrieve yet?")
+            raise RuntimeError("No frames present, did you "
+                               + "call grab and retrieve yet?")
 
         if len(self.video_sources.frames) > 1:
             return self.video_sources.frames
-        else:
-            if self.layout == StereoVideoLayouts.INTERLACED:
-                even_rows, odd_rows \
-                    = i.deinterlace_to_view(self.video_sources.frames[0])
-                separated = [even_rows, odd_rows]
-                return separated
-            else:
-                top, bottom \
-                    = i.split_stacked_to_view(self.video_sources.frames[0])
-                separated = [top, bottom]
-                return separated
+
+        if self.layout == StereoVideoLayouts.INTERLACED:
+            even_rows, odd_rows \
+                = i.deinterlace_to_view(self.video_sources.frames[0])
+            separated = [even_rows, odd_rows]
+            return separated
+
+        top, bottom \
+            = i.split_stacked_to_view(self.video_sources.frames[0])
+        separated = [top, bottom]
+        return separated
