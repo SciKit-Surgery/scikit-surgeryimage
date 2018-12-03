@@ -292,17 +292,17 @@ def test_opencv_example_stereo_distortion_correction_and_rectification(two_chann
     with pytest.raises(ValueError):
         vs.get_undistorted()
 
-    vs.set_intrinsic_parameters([li, ri], [ld, rd])
-    vs.set_extrinsic_parameters(r, t)
-
     vs.video_sources.frames[0] = expected_original_left  # Hack for now, as colour space is changing !?!?
     vs.video_sources.frames[1] = expected_original_right  # Hack for now, as colour space is changing !?!?
 
+    vs.set_intrinsic_parameters([li, ri], [ld, rd])
     left, right = vs.get_undistorted()
 
     np.testing.assert_array_equal(left, expected_undistorted_left)
     np.testing.assert_array_equal(right, expected_undistorted_right)
 
+    vs.set_extrinsic_parameters(r, t, (vs.video_sources.frames[0].shape[1],
+                                       vs.video_sources.frames[0].shape[0]))
     rectified_left, rectified_right = vs.get_rectified()
 
     np.testing.assert_array_equal(rectified_left, expected_rectified_left)
@@ -334,7 +334,6 @@ def test_ucl_example_stereo_distortion_correction_and_rectification(two_channel_
 
     vs = two_channel_ucl_video_source
     vs.set_intrinsic_parameters([li, ri], [ld, rd])
-    vs.set_extrinsic_parameters(r, t)
     vs.grab()
     vs.retrieve()
 
@@ -346,8 +345,9 @@ def test_ucl_example_stereo_distortion_correction_and_rectification(two_channel_
     np.testing.assert_array_equal(left, expected_undistorted_left)
     np.testing.assert_array_equal(right, expected_undistorted_right)
 
-# TO DO.
-#    rectified_left, rectified_right = vs.get_rectified()
+    vs.set_extrinsic_parameters(r, t, (vs.video_sources.frames[0].shape[1],
+                                       vs.video_sources.frames[0].shape[0] * 2))  # double height
+    rectified_left, rectified_right = vs.get_rectified()
 
-#    np.testing.assert_array_equal(rectified_left, expected_rectified_left)
-#    np.testing.assert_array_equal(rectified_right, expected_rectified_right)
+    np.testing.assert_array_equal(rectified_left, expected_rectified_left)
+    np.testing.assert_array_equal(rectified_right, expected_rectified_right)

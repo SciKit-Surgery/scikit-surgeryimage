@@ -143,19 +143,24 @@ class StereoVideo:
 
     def set_extrinsic_parameters(self,
                                  rotation,
-                                 translation):
+                                 translation,
+                                 dims
+                                 ):
         """
         Sets the stereo extrinsic parameters.
 
         :param rotation: 3x3 numpy array representing rotation matrix.
         :param translation: 3x1 numpy array representing translation vector.
+        :param dims: new image size for rectification
         :raises: ValueError, TypeError
         """
         scvm.validate_rotation_matrix(rotation)
         scvm.validate_translation_column_vector(translation)
+        scv.validate_width_height(dims)
 
         self.stereo_rotation = rotation
         self.stereo_translation = translation
+        self.rectify_new_size = dims
         self.rectify_initialised = False
 
     def release(self):
@@ -257,7 +262,7 @@ class StereoVideo:
                                   self.stereo_translation,
                                   flags=cv2.CALIB_ZERO_DISPARITY,
                                   alpha=0,
-                                  newImageSize=image_size
+                                  newImageSize=self.rectify_new_size
                                   )
             for image_index in [0, 1]:
                 self.rectify_dx[image_index], self.rectify_dy[image_index] = \
@@ -266,7 +271,7 @@ class StereoVideo:
                         self.distortion_coefficients[image_index],
                         self.rectify_rotation[image_index],
                         self.rectify_projection[image_index],
-                        image_size,
+                        self.rectify_new_size,
                         cv2.CV_32FC1
                         )
 
