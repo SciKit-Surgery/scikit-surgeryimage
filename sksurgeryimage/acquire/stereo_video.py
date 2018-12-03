@@ -6,7 +6,6 @@ Module for stereo video source acquisition.
 
 import logging
 import cv2
-import numpy as np
 import sksurgeryimage.acquire.video_source as vs
 import sksurgeryimage.processing.interlace as i
 import sksurgeryimage.utilities.utilities as u
@@ -87,14 +86,15 @@ class StereoVideo:
 
         self.layout = layout
         self.channels = channels
+        self.scaling = [1, 2]
         self.camera_matrices = [None, None]
         self.distortion_coefficients = [None, None]
-
         self.video_sources = vs.VideoSourceWrapper()
 
         self.video_sources.add_source(channels[0], dims)
         if len(channels) == 2:
             self.video_sources.add_source(channels[1], dims)
+            self.scaling = [1, 1]
 
     def set_camera_parameters(self,
                               camera_matrices,
@@ -111,6 +111,8 @@ class StereoVideo:
         if len(distortion_coefficients) != 2:
             raise ValueError("There should be exactly 2 "
                              + "sets of distortion coefficients.")
+
+        # Further validation of camera matrices and distortion coefficients.
         for c in camera_matrices:
             u.validate_camera_matrix(c)
         for d in distortion_coefficients:
@@ -125,25 +127,48 @@ class StereoVideo:
         """
         self.video_sources.release_all_sources()
 
+    def read(self):
+        """
+        Simply wraps a call to grab() then retrieve() for convenience.
+        """
+        self.grab()
+        self.retrieve()
+
     def grab(self):
         """
-        Asks internal VideoSourceWrapper to grab images. This doesn't
-        actually do any decoding. You are expected to call get(),
-        get_undistorted(), get_rectified() next, depending on your use-case.
+        Asks internal VideoSourceWrapper to grab images.
         """
         self.video_sources.grab()
 
-    def get(self):
+    def retrieve(self):
+        """
+        Asks internal VideoSourceWrapper to retrieve images.
+        """
+        self.video_sources.retrieve()
+
+    def get_images(self):
+        """
+        Returns the 2 channels, unscaled, as a list of images.
+
+        :return: list of images
+        """
+        return self._extract_separate_views()
+
+    def get_scaled(self):
         """
         Returns the 2 channels, scaled, as a list of images.
 
         :return: list of images
         """
-        frames = self._extract_separate_views()
+        frames = self.get_images()
         scaled = []
-        if len(channels) == 1:  # stereo frames provided in one image
+        if len(self.channels) == 1:  # stereo frames provided in one image
             for f in frames:
-                s = cv2.resize(f, None, fx=1, fy=2, interpolation=cv2.INTER_LINEAR)
+                s = cv2.resize(f,
+                               None,
+                               fx=self.scaling[0],
+                               fy=self.scaling[1],
+                               interpolation=cv2.INTER_NEAREST)
                 scaled.append(s)
         else:
             scaled = frames
@@ -157,15 +182,15 @@ class StereoVideo:
         :raises ValueError: if you haven't already provided camera parameters
         """
         self._validate_camera_params()
-        frames = self.get_views()
+        frames = self.get_scaled()
         undistorted = []
         counter = 0
         for f in frames:
-            u = cv2.undistort(f,
-                              self.camera_matrices[counter],
-                              self.distortion_coefficients[counter]
-                              )
-            undistorted.append(u)
+            undist = cv2.undistort(f,
+                                   self.camera_matrices[counter],
+                                   self.distortion_coefficients[counter]
+                                   )
+            undistorted.append(undist)
             counter += 1
         return undistorted
 
@@ -177,7 +202,7 @@ class StereoVideo:
         :raises ValueError: if you haven't already provided camera parameters.
         """
         self._validate_camera_params()
-        frames = self._extract_separate_views()
+        frames = self.get_scaled()
         rectified = []
         counter = 0
         for f in frames:
@@ -205,6 +230,9 @@ class StereoVideo:
 
         :return: either [top, bottom], or [even, odd] images
         """
+        if not self.video_sources.frames:
+            raise RuntimeError("No frames present, did you call grab and retrieve yet?")
+
         if len(self.video_sources.frames) > 1:
             return self.video_sources.frames
         else:

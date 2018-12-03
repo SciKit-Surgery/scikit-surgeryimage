@@ -188,9 +188,14 @@ class VideoSourceWrapper:
         """
         Perform a retrieve operation for each source.
         Should only be run after a grab() operation.
+
+        :returns list of views on frames
         """
+        self.frames = []
         for source in self.sources:
             source.retrieve()
+            self.frames.append(source.frame)
+        return self.frames
 
     def add_timestamp_to_list(self, source_number):
         """
