@@ -1,5 +1,6 @@
 import pytest
 import numpy as np
+import sksurgerycore.utilities.validate_file as vf
 import sksurgeryimage.utilities.camera_utilities as cu
 import sksurgeryimage.utilities.utilities as u
 
@@ -31,14 +32,14 @@ def test_camera_does_not_exist_throws_error(video_source):
 def test_validate_file_input(video_source):
 
     file_that_exists = 'tox.ini'
-    assert u.validate_file_input(file_that_exists)
+    assert vf.validate_is_file(file_that_exists)
 
 
 def test_invalid_file_input_throws_error(video_source):
 
     invalid_filename = '1234'
     with pytest.raises(ValueError):
-        u.validate_file_input(invalid_filename)
+        vf.validate_is_file(invalid_filename)
 
 
 def test_add_source_from_file(video_source):

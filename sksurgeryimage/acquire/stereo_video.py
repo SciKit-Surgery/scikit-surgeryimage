@@ -6,9 +6,11 @@ Module for stereo video source acquisition.
 
 import logging
 import cv2
+import sksurgerycore.utilities.validate as scv
+import sksurgerycore.utilities.validate_matrix as scvm
 import sksurgeryimage.acquire.video_source as vs
 import sksurgeryimage.processing.interlace as i
-import sksurgeryimage.utilities.utilities as u
+
 
 LOGGER = logging.getLogger(__name__)
 
@@ -76,16 +78,12 @@ class StereoVideo:
         if len(channels) >= 1:
             if channels[0] is None:
                 raise ValueError("First channel is None.")
-            if not u.is_string_or_number(channels[0]):
-                raise TypeError("First channel descriptor is not a file path "
-                                + "or camera index.")
+            scv.validate_is_string_or_number(channels[0])
 
         if len(channels) == 2:
             if channels[1] is None:
                 raise ValueError("Second channel is None.")
-            if not u.is_string_or_number(channels[1]):
-                raise TypeError("Second channel descriptor is not a file path "
-                                + "or camera index.")
+            scv.validate_is_string_or_number(channels[1])
 
         if layout == StereoVideoLayouts.DUAL and len(channels) != 2:
             raise ValueError("If you specify layout to be DUAL, "
@@ -93,7 +91,7 @@ class StereoVideo:
 
         # Further validation of (width, height)
         if dims is not None:
-            u.validate_width_height(dims)
+            scv.validate_width_height(dims)
 
         self.layout = layout
         self.channels = channels
@@ -135,9 +133,9 @@ class StereoVideo:
 
         # Further validation of camera matrices and distortion coefficients.
         for matrix in camera_matrices:
-            u.validate_camera_matrix(matrix)
+            scvm.validate_camera_matrix(matrix)
         for coefficients in distortion_coefficients:
-            u.validate_distortion_coefficients(coefficients)
+            scvm.validate_distortion_coefficients(coefficients)
 
         self.camera_matrices = camera_matrices
         self.distortion_coefficients = distortion_coefficients
@@ -153,8 +151,8 @@ class StereoVideo:
         :param translation: 3x1 numpy array representing translation vector.
         :raises: ValueError, TypeError
         """
-        u.validate_rotation_matrix(rotation)
-        u.validate_translation_column_vector(translation)
+        scvm.validate_rotation_matrix(rotation)
+        scvm.validate_translation_column_vector(translation)
 
         self.stereo_rotation = rotation
         self.stereo_translation = translation
@@ -234,8 +232,8 @@ class StereoVideo:
         :raises: ValueError, TypeError - if camera parameters are not set.
         """
         self._validate_intrinsic_params()
-        u.validate_rotation_matrix(self.stereo_rotation)
-        u.validate_translation_column_vector(self.stereo_translation)
+        scvm.validate_rotation_matrix(self.stereo_rotation)
+        scvm.validate_translation_column_vector(self.stereo_translation)
 
         frames = self.get_scaled()
 

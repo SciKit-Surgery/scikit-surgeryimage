@@ -11,7 +11,7 @@ import os
 import cv2
 import numpy as np
 from sksurgeryimage.acquire import video_writer, video_source
-from sksurgeryimage.utilities import utilities, camera_utilities
+from sksurgeryimage.utilities import camera_utilities
 
 
 def test_save_a_file_and_all_cameras():

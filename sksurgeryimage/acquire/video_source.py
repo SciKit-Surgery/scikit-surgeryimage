@@ -9,8 +9,8 @@ import logging
 import datetime
 import cv2
 import numpy as np
+import sksurgerycore.utilities.validate_file as vf
 import sksurgeryimage.utilities.camera_utilities as cu
-import sksurgeryimage.utilities.utilities as u
 
 LOGGER = logging.getLogger(__name__)
 
@@ -129,8 +129,9 @@ class VideoSourceWrapper:
         Create videoCapture object from file and add it to the list of sources.
 
         :param filename: a string containing a valid file path
+        :param dims: (width, height) as integer numbers of pixels
         """
-        u.validate_file_input(filename)
+        vf.validate_is_file(filename)
         self.add_source(filename, dims)
 
     def add_source(self, camera_num_or_file, dims=None):
