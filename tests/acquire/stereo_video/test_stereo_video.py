@@ -204,6 +204,12 @@ def test_set_camera_params_invalid_because_not_rotation_matrix(interlaced_video_
         interlaced_video_source.set_extrinsic_parameters(1,2);
 
 
+def test_interlaced_invalid_to_extract_data_before_calling_grab_and_retrieve(interlaced_video_source):
+    vs = interlaced_video_source
+    with pytest.raises(RuntimeError):
+        vs.get_images()
+
+
 def test_interlaced_extract_original_images(interlaced_video_source):
     original = cv2.imread('tests/data/test-16x8-rgb.png')
     expected_even = cv2.imread('tests/data/test-16x8-rgb-even.png')
@@ -279,10 +285,15 @@ def test_opencv_example_stereo_distortion_correction_and_rectification(two_chann
     t = fs_t.getNode("calib_r2l_translation").mat()
 
     vs = two_channel_video_source
-    vs.set_intrinsic_parameters([li, ri], [ld, rd])
-    vs.set_extrinsic_parameters(r, t)
     vs.grab()
     vs.retrieve()
+
+    # Should fail, as we haven't set intrinsics yet.
+    with pytest.raises(ValueError):
+        vs.get_undistorted()
+
+    vs.set_intrinsic_parameters([li, ri], [ld, rd])
+    vs.set_extrinsic_parameters(r, t)
 
     vs.video_sources.frames[0] = expected_original_left  # Hack for now, as colour space is changing !?!?
     vs.video_sources.frames[1] = expected_original_right  # Hack for now, as colour space is changing !?!?
