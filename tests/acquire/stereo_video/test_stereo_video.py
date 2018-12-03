@@ -31,6 +31,16 @@ def test_create_stereo_video_invalid_because_null_channel():
         sv.StereoVideo(sv.StereoVideoLayouts.DUAL, None)
 
 
+def test_create_stereo_video_invalid_because_null_channel1():
+    with pytest.raises(ValueError):
+        sv.StereoVideo(sv.StereoVideoLayouts.DUAL, [None, 0])
+
+
+def test_create_stereo_video_invalid_because_null_channel2():
+    with pytest.raises(ValueError):
+        sv.StereoVideo(sv.StereoVideoLayouts.DUAL, [0, None])
+
+
 def test_create_stereo_video_invalid_because_too_few_channels():
     with pytest.raises(ValueError):
         sv.StereoVideo(sv.StereoVideoLayouts.INTERLACED, [])
@@ -55,6 +65,38 @@ def test_create_stereo_video_invalid_because_second_channel_not_correct_type():
 def test_create_stereo_video_invalid_because_too_few_channels_for_dual():
     with pytest.raises(ValueError):
         sv.StereoVideo(sv.StereoVideoLayouts.DUAL, [0])
+
+
+def test_create_stereo_video_invalid_because_width_invalid_type():
+    with pytest.raises(TypeError):
+        sv.StereoVideo(sv.StereoVideoLayouts.INTERLACED,
+                       ["tests/output/test-16x8-rgb.avi"],
+                       ("a", "b")
+                       )
+
+
+def test_create_stereo_video_invalid_because_height_invalid_type():
+    with pytest.raises(TypeError):
+        sv.StereoVideo(sv.StereoVideoLayouts.INTERLACED,
+                       ["tests/output/test-16x8-rgb.avi"],
+                       (1, "b")
+                       )
+
+
+def test_create_stereo_video_invalid_because_width_too_low():
+    with pytest.raises(ValueError):
+        sv.StereoVideo(sv.StereoVideoLayouts.INTERLACED,
+                       ["tests/output/test-16x8-rgb.avi"],
+                       (-1, 1)
+                       )
+
+
+def test_create_stereo_video_invalid_because_height_too_low():
+    with pytest.raises(ValueError):
+        sv.StereoVideo(sv.StereoVideoLayouts.INTERLACED,
+                       ["tests/output/test-16x8-rgb.avi"],
+                       (1, -1)
+                       )
 
 
 def test_set_camera_params_invalid_because_too_few_camera_matrices(interlaced_video_source):
@@ -254,6 +296,8 @@ def test_opencv_example_stereo_distortion_correction_and_rectification(two_chann
 
     np.testing.assert_array_equal(rectified_left, expected_rectified_left)
     np.testing.assert_array_equal(rectified_right, expected_rectified_right)
+
+    vs.release()  # Just ensuring code doesn't crash
 
 
 def test_ucl_example_stereo_distortion_correction_and_rectification(two_channel_ucl_video_source):

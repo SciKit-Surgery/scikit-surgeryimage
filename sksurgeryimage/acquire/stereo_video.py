@@ -166,13 +166,6 @@ class StereoVideo:
         """
         self.video_sources.release_all_sources()
 
-    def read(self):
-        """
-        Simply wraps a call to grab() then retrieve() for convenience.
-        """
-        self.grab()
-        self.retrieve()
-
     def grab(self):
         """
         Asks internal VideoSourceWrapper to grab images.
