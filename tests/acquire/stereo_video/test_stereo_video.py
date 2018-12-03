@@ -254,3 +254,45 @@ def test_opencv_example_stereo_distortion_correction_and_rectification(two_chann
 
     np.testing.assert_array_equal(rectified_left, expected_rectified_left)
     np.testing.assert_array_equal(rectified_right, expected_rectified_right)
+
+
+def test_ucl_example_stereo_distortion_correction_and_rectification(two_channel_ucl_video_source):
+    expected_original_left = cv2.imread('tests/data/calib-ucl-chessboard/leftImage.png')
+    expected_original_right = cv2.imread('tests/data/calib-ucl-chessboard/rightImage.png')
+    expected_undistorted_left = cv2.imread('tests/data/calib-ucl-chessboard/leftImageUndistorted.png')
+    expected_undistorted_right = cv2.imread('tests/data/calib-ucl-chessboard/rightImageUndistorted.png')
+    expected_rectified_left = cv2.imread('tests/data/calib-ucl-chessboard/leftImageRect.png')
+    expected_rectified_right = cv2.imread('tests/data/calib-ucl-chessboard/rightImageRect.png')
+    fs_li = cv2.FileStorage('tests/data/calib-ucl-chessboard/calib.left.intrinsic.xml', cv2.FILE_STORAGE_READ)
+    fs_ld = cv2.FileStorage('tests/data/calib-ucl-chessboard/calib.left.distortion.xml', cv2.FILE_STORAGE_READ)
+    fs_ri = cv2.FileStorage('tests/data/calib-ucl-chessboard/calib.right.intrinsic.xml', cv2.FILE_STORAGE_READ)
+    fs_rd = cv2.FileStorage('tests/data/calib-ucl-chessboard/calib.right.distortion.xml', cv2.FILE_STORAGE_READ)
+    fs_r = cv2.FileStorage('tests/data/calib-ucl-chessboard/calib.r2l.rotation.xml', cv2.FILE_STORAGE_READ)
+    fs_t = cv2.FileStorage('tests/data/calib-ucl-chessboard/calib.r2l.translation.xml', cv2.FILE_STORAGE_READ)
+
+    li = fs_li.getNode("calib_left_intrinsic").mat()
+    ld = fs_ld.getNode("calib_left_distortion").mat()
+    ri = fs_ri.getNode("calib_right_intrinsic").mat()
+    rd = fs_rd.getNode("calib_right_distortion").mat()
+    r = fs_r.getNode("calib_r2l_rotation").mat()
+    t = fs_t.getNode("calib_r2l_translation").mat()
+
+    vs = two_channel_ucl_video_source
+    vs.set_intrinsic_parameters([li, ri], [ld, rd])
+    vs.set_extrinsic_parameters(r, t)
+    vs.grab()
+    vs.retrieve()
+
+    vs.video_sources.frames[0] = expected_original_left  # Hack for now, as colour space is changing !?!?
+    vs.video_sources.frames[1] = expected_original_right  # Hack for now, as colour space is changing !?!?
+
+    left, right = vs.get_undistorted()
+
+    np.testing.assert_array_equal(left, expected_undistorted_left)
+    np.testing.assert_array_equal(right, expected_undistorted_right)
+
+# TO DO.
+#    rectified_left, rectified_right = vs.get_rectified()
+
+#    np.testing.assert_array_equal(rectified_left, expected_rectified_left)
+#    np.testing.assert_array_equal(rectified_right, expected_rectified_right)

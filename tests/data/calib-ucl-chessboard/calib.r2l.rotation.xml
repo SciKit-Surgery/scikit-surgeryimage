@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<opencv_storage>
+<calib_r2l_rotation type_id="opencv-matrix">
+  <rows>3</rows>
+  <cols>3</cols>
+  <dt>d</dt>
+  <data>
+    9.9998654509984819e-01 -4.0289369251237809e-03
+    -3.2676117460306965e-03 4.0291930116066648e-03
+    9.9999188019182839e-01 7.1791971146594814e-05 3.2672959683266610e-03
+    -8.4956843604492188e-05 9.9999465876543070e-01</data></calib_r2l_rotation>
+</opencv_storage>
