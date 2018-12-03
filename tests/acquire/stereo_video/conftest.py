@@ -17,6 +17,6 @@ def vertically_stacked_video_source():
 @pytest.fixture(scope="function")
 def two_channel_video_source():
     return sv.StereoVideo(sv.StereoVideoLayouts.DUAL,
-                          ["tests/data/opencv/left01.avi",
-                           "tests/data/opencv/right01.avi"
+                          ["tests/data/calib-opencv/left01.avi",
+                           "tests/data/calib-opencv/right01.avi"
                            ])
