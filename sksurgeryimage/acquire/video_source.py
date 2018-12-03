@@ -124,14 +124,14 @@ class VideoSourceWrapper:
         cu.validate_camera_input(camera_number)
         self.add_source(camera_number, dims)
 
-    def add_file(self, filename):
+    def add_file(self, filename, dims=None):
         """
         Create videoCapture object from file and add it to the list of sources.
 
         :param filename: a string containing a valid file path
         """
         u.validate_file_input(filename)
-        self.add_source(filename)
+        self.add_source(filename, dims)
 
     def add_source(self, camera_num_or_file, dims=None):
         """

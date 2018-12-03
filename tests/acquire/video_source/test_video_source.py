@@ -92,23 +92,23 @@ def test_add_source_from_camera_custom_dimensions(video_source):
 
 
 def test_add_source_from_camera_invalid_dims(video_source):
-    camera_input = 0
+    camera_input = 'tests/data/acquire/100x50_100_frames.avi'
 
     custom_dims = ["happy", "birthday"]
     with pytest.raises(TypeError):
-        video_source.add_camera(camera_input, custom_dims)
+        video_source.add_file(camera_input, custom_dims)
 
     custom_dims = [240, "birthday"]
     with pytest.raises(TypeError):
-        video_source.add_camera(camera_input, custom_dims)
+        video_source.add_file(camera_input, custom_dims)
 
     custom_dims = [0, 320]
     with pytest.raises(ValueError):
-        video_source.add_camera(camera_input, custom_dims)
+        video_source.add_file(camera_input, custom_dims)
 
     custom_dims = [240, 0]
     with pytest.raises(ValueError):
-        video_source.add_camera(camera_input, custom_dims)
+        video_source.add_file(camera_input, custom_dims)
 
 
 def test_get_next_frames_from_file(video_source):
