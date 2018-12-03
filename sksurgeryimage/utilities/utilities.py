@@ -88,7 +88,7 @@ def validate_camera_matrix(matrix):
     if not isinstance(matrix, np.ndarray):
         raise TypeError("Camera matrix is not a numpy ndarray.")
     if len(matrix.shape) != 2:
-        raise ValueError("Camera matrix should have 2 dimension.")
+        raise ValueError("Camera matrix should have 2 dimensions.")
     if matrix.shape[0] != 3:
         raise ValueError("Camera matrix should have 3 rows.")
     if matrix.shape[1] != 3:
@@ -99,9 +99,30 @@ def validate_distortion_coefficients(matrix):
     if not isinstance(matrix, np.ndarray):
         raise TypeError("Distortion coefficients are not a numpy ndarray.")
     if len(matrix.shape) != 2:
-        raise ValueError("Camera matrix should have 2 dimension.")
+        raise ValueError("Camera matrix should have 2 dimensions.")
     if matrix.shape[0] != 1:
-        raise ValueError("Distortion coefficients should have 1 rows.")
+        raise ValueError("Distortion coefficients should have 1 row.")
     if matrix.shape[1] not in [4, 5, 8, 12, 14]:  # See OpenCV docs
         raise ValueError("Distortion coefficients should have 4, 5, 8, 12 or 14 columns.")
 
+
+def validate_rotation_matrix(matrix):
+    if not isinstance(matrix, np.ndarray):
+        raise TypeError("Rotation matrix should be a numpy ndarray.")
+    if len(matrix.shape) != 2:
+        raise ValueError("Rotation matrix should have 2 dimensions.")
+    if matrix.shape[0] != 3:
+        raise ValueError("Rotation matrix should have 3 rows.")
+    if matrix.shape[1] != 3:
+        raise ValueError("Rotation matrix should have 3 columns.")
+
+
+def validate_translation_matrix(matrix):
+    if not isinstance(matrix, np.ndarray):
+        raise TypeError("Translation matrix should be a numpy ndarray.")
+    if len(matrix.shape) != 2:
+        raise ValueError("Translation matrix should have 2 dimensions.")
+    if matrix.shape[0] != 3:
+        raise ValueError("Translation matrix  should have 3 rows.")
+    if matrix.shape[1] != 1:
+        raise ValueError("Translation matrix  should have 1 column.")

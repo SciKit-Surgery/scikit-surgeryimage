@@ -137,3 +137,61 @@ def test_distortion_coefficients_invalid_because_number_of_columns_not_in_list()
     with pytest.raises(ValueError):
         # Should accept [4, 5, 8, 12, 14]
         utilities.validate_distortion_coefficients(np.ones((1, 6)))
+
+
+def test_rotation_matrix_invalid_because_wrong_type():
+    with pytest.raises(TypeError):
+        utilities.validate_rotation_matrix(1)
+
+
+def test_rotation_matrix_invalid_because_not_two_dimensional():
+    with pytest.raises(ValueError):
+        utilities.validate_rotation_matrix(np.ones((3, 3, 3)))
+
+
+def test_rotation_matrix_invalid_because_too_many_rows():
+    with pytest.raises(ValueError):
+        utilities.validate_rotation_matrix(np.ones((4, 3)))
+
+
+def test_rotation_matrix_invalid_because_too_many_columns():
+    with pytest.raises(ValueError):
+        utilities.validate_rotation_matrix(np.ones((3, 4)))
+
+
+def test_rotation_matrix_invalid_because_too_few_rows():
+    with pytest.raises(ValueError):
+        utilities.validate_rotation_matrix(np.ones((2, 3)))
+
+
+def test_rotation_matrix_invalid_because_too_few_columns():
+    with pytest.raises(ValueError):
+        utilities.validate_rotation_matrix(np.ones((3, 2)))
+
+
+def test_translation_matrix_invalid_because_wrong_type():
+    with pytest.raises(TypeError):
+        utilities.validate_translation_matrix(1)
+
+
+def test_translation_matrix_invalid_because_not_two_dimensional():
+    with pytest.raises(ValueError):
+        utilities.validate_translation_matrix(np.ones((3, 3, 3)))
+
+
+def test_translation_matrix_invalid_because_too_many_rows():
+    with pytest.raises(ValueError):
+        utilities.validate_translation_matrix(np.ones((4, 1)))
+
+
+def test_translation_matrix_invalid_because_too_many_columns():
+    with pytest.raises(ValueError):
+        utilities.validate_translation_matrix(np.ones((3, 4)))
+
+
+def test_translation_matrix_invalid_because_too_few_rows():
+    with pytest.raises(ValueError):
+        utilities.validate_translation_matrix(np.ones((2, 1)))
+
+
+

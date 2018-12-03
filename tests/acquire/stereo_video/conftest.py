@@ -12,3 +12,11 @@ def interlaced_video_source():
 def vertically_stacked_video_source():
     return sv.StereoVideo(sv.StereoVideoLayouts.VERTICAL,
                           ["tests/output/test-16x8-rgb.avi"])
+
+
+@pytest.fixture(scope="function")
+def two_channel_video_source():
+    return sv.StereoVideo(sv.StereoVideoLayouts.DUAL,
+                          ["tests/data/opencv/left01.avi",
+                           "tests/data/opencv/right01.avi"
+                           ])

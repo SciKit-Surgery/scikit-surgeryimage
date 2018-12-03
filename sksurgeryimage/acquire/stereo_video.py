@@ -89,21 +89,31 @@ class StereoVideo:
         self.scaling = [1, 2]
         self.camera_matrices = [None, None]
         self.distortion_coefficients = [None, None]
-        self.video_sources = vs.VideoSourceWrapper()
+        self.stereo_rotation = None
+        self.stereo_translation = None
+        self.rectify_rotation = [None, None]
+        self.rectify_projection = [None, None]
+        self.rectify_q = None
+        self.rectify_new_size = None
+        self.rectify_valid_roi = [None, None]
+        self.rectify_dx = [None, None]
+        self.rectify_dy = [None, None]
+        self.rectify_initialised = False
 
+        self.video_sources = vs.VideoSourceWrapper()
         self.video_sources.add_source(channels[0], dims)
         if len(channels) == 2:
             self.video_sources.add_source(channels[1], dims)
             self.scaling = [1, 1]
 
-    def set_camera_parameters(self,
-                              camera_matrices,
-                              distortion_coefficients):
+    def set_intrinsic_parameters(self,
+                                 camera_matrices,
+                                 distortion_coefficients):
         """
-        Sets stereo camera parameters.
+        Sets both sets of intrinsic parameters.
 
         :param camera_matrices: list of 2, 3x3 numpy arrays.
-        :param distortion_coefficients: list of 3, 1xN numpy arrays.
+        :param distortion_coefficients: list of 2, 1xN numpy arrays.
         :return:
         """
         if len(camera_matrices) != 2:
@@ -120,6 +130,24 @@ class StereoVideo:
 
         self.camera_matrices = camera_matrices
         self.distortion_coefficients = distortion_coefficients
+        self.rectify_initialised = False
+
+    def set_extrinsic_parameters(self,
+                                 rotation,
+                                 translation):
+        """
+        Sets the stereo extrinsic parameters.
+
+        :param rotation: 3x3 numpy array representing rotation matrix.
+        :param translation:3x1 numpy array representing translation vector.
+        :raises ValueError, TypeError
+        """
+        u.validate_rotation_matrix(rotation)
+        u.validate_translation_matrix(translation)
+
+        self.stereo_rotation = rotation
+        self.stereo_translation = translation
+        self.rectify_initialised = False
 
     def release(self):
         """
@@ -181,7 +209,7 @@ class StereoVideo:
         :return: list of images
         :raises ValueError: if you haven't already provided camera parameters
         """
-        self._validate_camera_params()
+        self._validate_intrinsic_params()
         frames = self.get_scaled()
         undistorted = []
         counter = 0
@@ -199,19 +227,61 @@ class StereoVideo:
         Returns the 2 channels, rectified, as a list of images.
 
         :return: list of images
-        :raises ValueError: if you haven't already provided camera parameters.
+        :raises ValueError, TypeError if camera parameters are not set.
         """
-        self._validate_camera_params()
+        self._validate_intrinsic_params()
+        u.validate_rotation_matrix(self.stereo_rotation)
+        u.validate_translation_matrix(self.stereo_translation)
+
         frames = self.get_scaled()
+
+        if not self.rectify_initialised:
+
+            image_size = (frames[0].shape[1], frames[0].shape[0])
+
+            self.rectify_rotation[0], \
+                self.rectify_rotation[1], \
+                self.rectify_projection[0], \
+                self.rectify_projection[1], \
+                self.rectify_q, \
+                self.rectify_valid_roi[0], \
+                self.rectify_valid_roi[1] = \
+                cv2.stereoRectify(self.camera_matrices[0],
+                                  self.distortion_coefficients[0],
+                                  self.camera_matrices[1],
+                                  self.distortion_coefficients[1],
+                                  image_size,
+                                  self.stereo_rotation,
+                                  self.stereo_translation,
+                                  flags=cv2.CALIB_ZERO_DISPARITY,
+                                  alpha=0,
+                                  newImageSize=image_size
+                                  )
+            for image_index in [0, 1]:
+                self.rectify_dx[image_index], self.rectify_dy[image_index] = \
+                    cv2.initUndistortRectifyMap(self.camera_matrices[image_index],
+                                                self.distortion_coefficients[image_index],
+                                                self.rectify_rotation[image_index],
+                                                self.rectify_projection[image_index],
+                                                image_size,
+                                                cv2.CV_32FC1
+                                                )
+
+            self.rectify_initialised = True
+
         rectified = []
         counter = 0
         for f in frames:
-            r = cv2.rectify(f)
+            r = cv2.remap(f,
+                          self.rectify_dx[counter],
+                          self.rectify_dy[counter],
+                          cv2.INTER_LINEAR
+                          )
             rectified.append(r)
             counter += 1
         return rectified
 
-    def _validate_camera_params(self):
+    def _validate_intrinsic_params(self):
         """
         Internal method to ensure we have camera parameters.
 
