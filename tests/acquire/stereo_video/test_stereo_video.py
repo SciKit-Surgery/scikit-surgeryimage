@@ -301,8 +301,8 @@ def test_opencv_example_stereo_distortion_correction_and_rectification(two_chann
     np.testing.assert_array_equal(left, expected_undistorted_left)
     np.testing.assert_array_equal(right, expected_undistorted_right)
 
-    vs.set_extrinsic_parameters(r, t, (vs.video_sources.frames[0].shape[1],
-                                       vs.video_sources.frames[0].shape[0]))
+    vs.set_extrinsic_parameters(r, t, (int(vs.video_sources.frames[0].shape[1]),
+                                       int(vs.video_sources.frames[0].shape[0])))
     rectified_left, rectified_right = vs.get_rectified()
 
     np.testing.assert_array_equal(rectified_left, expected_rectified_left)
@@ -345,8 +345,11 @@ def test_ucl_example_stereo_distortion_correction_and_rectification(two_channel_
     np.testing.assert_array_equal(left, expected_undistorted_left)
     np.testing.assert_array_equal(right, expected_undistorted_right)
 
-    vs.set_extrinsic_parameters(r, t, (vs.video_sources.frames[0].shape[1],
-                                       vs.video_sources.frames[0].shape[0] * 2))  # double height
+    vs.set_extrinsic_parameters(r, t,
+                                (int(vs.video_sources.frames[0].shape[1]),
+                                 int(vs.video_sources.frames[0].shape[0] * 2)
+                                 )
+                                )  # double height
     rectified_left, rectified_right = vs.get_rectified()
 
     np.testing.assert_array_equal(rectified_left, expected_rectified_left)
