@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<opencv_storage>
+<calib_left_distortion type_id="opencv-matrix">
+  <rows>1</rows>
+  <cols>4</cols>
+  <dt>d</dt>
+  <data>
+  -0.385815963861828	0.248748076374871 0.00151014631912082	-0.00110539463554876
+    </data></calib_left_distortion>
+</opencv_storage>

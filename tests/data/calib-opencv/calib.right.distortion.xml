@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<opencv_storage>
+<calib_right_distortion type_id="opencv-matrix">
+  <rows>1</rows>
+  <cols>4</cols>
+  <dt>d</dt>
+  <data>
+    -2.7963566547786411e-01 9.1161673200186019e-02
+    -5.2149236389788755e-04 1.0609758997255346e-03</data></calib_right_distortion>
+</opencv_storage>

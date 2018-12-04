@@ -10,8 +10,8 @@ sys.path.append('../scikit-surgeryimage')
 import os
 import cv2
 import numpy as np
-from sksurgeryimage.acquire import video_writer, source_wrapper
-from sksurgeryimage.utilities import utilities, camera_utilities
+from sksurgeryimage.acquire import video_writer, video_source
+from sksurgeryimage.utilities import camera_utilities
 
 
 def test_save_a_file_and_all_cameras():
@@ -19,7 +19,7 @@ def test_save_a_file_and_all_cameras():
     Saves a camera feed from all attached cameras and a file
     """
 
-    sw = source_wrapper.VideoSourceWrapper()
+    sw = video_source.VideoSourceWrapper()
     input_file = 'tests/data/acquire/100x50_100_frames.avi'
     num_frames_in_input_file = 100
 

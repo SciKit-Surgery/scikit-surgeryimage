@@ -1,6 +1,6 @@
 import pytest
 import numpy as np
-from sksurgeryimage.acquire import source_wrapper
+import sksurgerycore.utilities.validate_file as vf
 import sksurgeryimage.utilities.camera_utilities as cu
 import sksurgeryimage.utilities.utilities as u
 
@@ -32,14 +32,14 @@ def test_camera_does_not_exist_throws_error(video_source):
 def test_validate_file_input(video_source):
 
     file_that_exists = 'tox.ini'
-    assert u.validate_file_input(file_that_exists)
+    assert vf.validate_is_file(file_that_exists)
 
 
 def test_invalid_file_input_throws_error(video_source):
 
     invalid_filename = '1234'
     with pytest.raises(ValueError):
-        u.validate_file_input(invalid_filename)
+        vf.validate_is_file(invalid_filename)
 
 
 def test_add_source_from_file(video_source):
@@ -70,6 +70,12 @@ def test_add_source_from_camera(video_source):
         return
 
 
+def test_add_source_from_invalid_camera(video_source):
+    camera_input = -1
+    with pytest.raises(IndexError):
+        video_source.add_camera(camera_input)
+
+
 def test_add_source_from_camera_custom_dimensions(video_source):
     """
     Add a camera and pass in custom dimensions to cv2.VideoCapture.
@@ -84,6 +90,26 @@ def test_add_source_from_camera_custom_dimensions(video_source):
 
     except IndexError:
         return
+
+
+def test_add_source_from_camera_invalid_dims(video_source):
+    camera_input = 'tests/data/acquire/100x50_100_frames.avi'
+
+    custom_dims = ["happy", "birthday"]
+    with pytest.raises(TypeError):
+        video_source.add_file(camera_input, custom_dims)
+
+    custom_dims = [240, "birthday"]
+    with pytest.raises(TypeError):
+        video_source.add_file(camera_input, custom_dims)
+
+    custom_dims = [0, 320]
+    with pytest.raises(ValueError):
+        video_source.add_file(camera_input, custom_dims)
+
+    custom_dims = [240, 0]
+    with pytest.raises(ValueError):
+        video_source.add_file(camera_input, custom_dims)
 
 
 def test_get_next_frames_from_file(video_source):

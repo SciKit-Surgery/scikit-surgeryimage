@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<opencv_storage>
+<calib_left_intrinsic type_id="opencv-matrix">
+  <rows>3</rows>
+  <cols>3</cols>
+  <dt>d</dt>
+  <data>
+    5.3616480032959214e+02 0. 3.4207223508037902e+02 0.
+    5.3614876169057516e+02 2.3585741368414659e+02 0. 0. 1.</data></calib_left_intrinsic>
+</opencv_storage>

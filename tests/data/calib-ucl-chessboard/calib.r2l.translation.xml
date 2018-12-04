@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<opencv_storage>
+<calib_r2l_translation type_id="opencv-matrix">
+  <rows>3</rows>
+  <cols>1</cols>
+  <dt>d</dt>
+  <data>
+    -3.98904833843092	0.00535113409575866	0.0128510519797504
+  </data></calib_r2l_translation>
+</opencv_storage>

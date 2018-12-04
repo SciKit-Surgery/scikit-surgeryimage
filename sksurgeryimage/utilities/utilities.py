@@ -1,10 +1,11 @@
 # coding=utf-8
 
 """
-Various utilities, like checking strings, numbers, preparing overlay text etc.
+Various utilities, like preparing overlay text, validating image sizes,
+camera matrix sizes, distortion coefficient sizes etc.
 """
-import os
 import cv2
+import sksurgerycore.utilities.validate as scv
 
 
 def prepare_cv2_text_overlay(overlay_text, frame, text_scale=1):
@@ -27,29 +28,8 @@ def prepare_cv2_text_overlay(overlay_text, frame, text_scale=1):
 def validate_text_input(overlay_text):
     """
     Raises an error if input isn't a string or number.
+
     :raises: TypeError
     """
-    if not is_string_or_number(overlay_text):
+    if not scv.validate_is_string_or_number(overlay_text):
         raise TypeError('Text overlay must be string or numeric')
-
-
-def is_string_or_number(var):
-    """
-    Return True if the input variable is either a string or a numeric type.
-    Return False otherwise.s
-    """
-    valid_types = (str, int, float)
-    if isinstance(var, valid_types):
-        return True
-
-    return False
-
-
-def validate_file_input(file_input):
-    """
-    Check if source file exists.
-    """
-    if os.path.isfile(file_input):
-        return True
-
-    raise ValueError('Input file:' + file_input + ' does not exist')
