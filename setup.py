@@ -55,7 +55,6 @@ setup(
         'numpy>=1.11',
         'opencv-contrib-python>=3.4.4',
         'scikit-surgerycore>=0.1.0',
-        'pillow',
     ],
 
     entry_points={
