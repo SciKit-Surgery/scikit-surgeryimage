@@ -53,9 +53,8 @@ setup(
     install_requires=[
         'six>=1.10',
         'numpy>=1.11',
-        'opencv-python>=3.4.4',
+        'opencv-contrib-python>=3.4.4',
         'scikit-surgerycore>=0.1.0',
-        'pillow',
     ],
 
     entry_points={
