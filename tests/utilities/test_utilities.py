@@ -9,14 +9,6 @@ import cv2
 from sksurgeryimage.utilities import utilities
 
 
-def test_validate_text_input():
-
-    invalid = [1, 2, 3]
-
-    with pytest.raises(TypeError):
-        utilities.validate_text_input(invalid)
-
-
 def test_prepare_text_overlay():
 
     frame_dims = (100, 100, 3)
