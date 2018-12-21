@@ -45,12 +45,11 @@ def detect_charuco_points(dictionary, image, board,
     :return: marker_corners, marker_ids, chessboard_corners, chessboard_ids
     """
     marker_corners, marker_ids, _ = cv2.aruco.detectMarkers(image, dictionary)
-    number_of_markers = len(marker_corners)
 
     chessboard_corners = None
     chessboard_ids = None
 
-    if number_of_markers > 0:
+    if marker_corners:
 
         number_of_markers, chessboard_corners, chessboard_ids \
             = aruco.interpolateCornersCharuco(
@@ -62,8 +61,7 @@ def detect_charuco_points(dictionary, image, board,
                 distCoeffs=distortion_coefficients
                 )
 
-    return number_of_markers,\
-        marker_corners,\
+    return marker_corners,\
         marker_ids,\
         chessboard_corners,\
         chessboard_ids
