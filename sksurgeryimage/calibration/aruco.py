@@ -51,7 +51,7 @@ def detect_charuco_points(dictionary, image, board,
 
     if marker_corners:
 
-        number_of_markers, chessboard_corners, chessboard_ids \
+        _, chessboard_corners, chessboard_ids \
             = aruco.interpolateCornersCharuco(
                 markerCorners=marker_corners,
                 markerIds=marker_ids,
