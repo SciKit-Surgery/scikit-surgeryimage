@@ -30,7 +30,7 @@ def make_charuco_board(dictionary, number_of_squares, size, image_size):
     return image, board
 
 
-def detect_charuco_points(dictionary, image, board,
+def detect_charuco_points(dictionary, board, image,
                           camera_matrix=None,
                           distortion_coefficients=None):
     """
@@ -38,8 +38,8 @@ def detect_charuco_points(dictionary, image, board,
     it may be more accurate.
 
     :param dictionary: aruco dictionary definition
-    :param image: grey scale image in which to search
     :param board: aruco board definition
+    :param image: grey scale image in which to search
     :param camera_matrix: if specified, the 3x3 camera intrinsic matrix
     :param distortion_coefficients: if specified, the distortion coefficients
     :return: marker_corners, marker_ids, chessboard_corners, chessboard_ids

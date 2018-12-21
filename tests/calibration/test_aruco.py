@@ -4,6 +4,7 @@
 Tests for aruco.py
 """
 
+import numpy as np
 import cv2
 from cv2 import aruco
 import sksurgeryimage.calibration.aruco as ar
@@ -22,7 +23,7 @@ def test_extract_points():
 
     marker_corners, marker_ids, \
         chessboard_corners, chessboard_ids \
-        = ar.detect_charuco_points(dictionary, image, board)
+        = ar.detect_charuco_points(dictionary, board, image)
 
     expected_number = (nx - 1) * (ny - 1)
     assert len(chessboard_corners) == expected_number
@@ -31,14 +32,14 @@ def test_extract_points():
     assert image.shape[1] == sx
 
 
-def test_blank_charuco_board():
+def test_edit_out_charuco_board():
 
     dictionary = cv2.aruco.Dictionary_get(aruco.DICT_4X4_250)
     image, board = ar.make_charuco_board(dictionary, (13, 10), (3, 2), (1300, 1000))
 
     marker_corners, marker_ids, \
         chessboard_corners, chessboard_ids \
-        = ar.detect_charuco_points(dictionary, image, board)
+        = ar.detect_charuco_points(dictionary, board, image)
 
     assert len(chessboard_corners) == 12*9
 
@@ -48,3 +49,28 @@ def test_blank_charuco_board():
     cv2.imwrite('./tests/output/blanked_charuco_original.png', image)
     cv2.imwrite('./tests/output/blanked_charuco_edited.png', edited)
     cv2.imwrite('./tests/output/blanked_charuco_corners.png', corners)
+
+
+def test_dont_fail_if_no_markers_actually_present():
+
+    dictionary = cv2.aruco.Dictionary_get(aruco.DICT_4X4_250)
+    image, board = ar.make_charuco_board(dictionary,
+                                         (13, 10),
+                                         (3, 2),
+                                         (1300, 1000))
+
+    input_image_to_check = np.zeros((100, 50, 1), dtype=np.uint8)
+    marker_corners, marker_ids, \
+        chessboard_corners, chessboard_ids \
+        = ar.detect_charuco_points(dictionary, board, input_image_to_check)
+
+    assert not marker_corners
+    assert not marker_ids
+    assert not chessboard_corners
+    assert not chessboard_ids
+
+    annotated_image = ar.draw_charuco_corners(input_image_to_check,
+                                              chessboard_corners,
+                                              chessboard_ids)
+
+    assert annotated_image.shape == input_image_to_check.shape
