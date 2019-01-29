@@ -57,9 +57,9 @@ def test_small_image_split():
 
 
 def test_split_from_file():
-    stacked = cv2.imread('tests/data/test-16x8-rgb.png')
-    expected_top = cv2.imread('tests/data/test-16x8-rgb-top.png')
-    expected_bottom = cv2.imread('tests/data/test-16x8-rgb-bottom.png')
+    stacked = cv2.imread('tests/data/processing/test-16x8-rgb.png')
+    expected_top = cv2.imread('tests/data/processing/test-16x8-rgb-top.png')
+    expected_bottom = cv2.imread('tests/data/processing/test-16x8-rgb-bottom.png')
 
     # Testing creating views
     top_view, bottom_view = i.split_stacked_to_view(stacked)

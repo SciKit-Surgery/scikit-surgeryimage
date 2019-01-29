@@ -72,9 +72,9 @@ def test_big_input(create_valid_interlaced_input):
 
 
 def test_deinterlace_from_file():
-    interlaced = cv2.imread('tests/data/test-16x8-rgb.png')
-    expected_even = cv2.imread('tests/data/test-16x8-rgb-even.png')
-    expected_odd = cv2.imread('tests/data/test-16x8-rgb-odd.png')
+    interlaced = cv2.imread('tests/data/processing/test-16x8-rgb.png')
+    expected_even = cv2.imread('tests/data/processing/test-16x8-rgb-even.png')
+    expected_odd = cv2.imread('tests/data/processing/test-16x8-rgb-odd.png')
 
     # Testing creating views
     even_view, odd_view = interlace.deinterlace_to_view(interlaced)
