@@ -7,7 +7,6 @@ In many cases, these will just be convenience wrappers around OpenCV functions.
 """
 
 import cv2
-import numpy as np
 
 
 def erode_with_cross(src, dst=None, size=3, iterations=1):
@@ -40,4 +39,3 @@ def dilate_with_cross(src, dst=None, size=3, iterations=1):
     kernel = cv2.getStructuringElement(cv2.MORPH_CROSS, (size, size))
     dilated = cv2.dilate(src, dst=dst, kernel=kernel, iterations=iterations)
     return dilated
-
