@@ -121,8 +121,20 @@ def test_get_next_frames_from_file(video_source):
     actual_frame = video_source.sources[0].frame
     np.testing.assert_array_equal(expected_frame, actual_frame)
 
+def test_do_timestamps_in_source(video_source):
+    """ Get the video source to save timestamps"""
+    filename = 'tests/data/acquire/100x50_100_frames.avi'
+    video_source.add_file(filename)
+    video_source.sources[0].save_timestamps = True
 
-def test_do_timestamps_with_frame_update(video_source):
+    n_frames = 5
+    for i in range(n_frames):
+        video_source.get_next_frames()
+
+    assert len(video_source.sources[0].timestamps) == n_frames
+
+def test_do_timestamps_in_wrapper(video_source):
+    """Get the SourceWrapper to save timestamps"""
     filename = 'tests/data/acquire/100x50_100_frames.avi'
     video_source.add_file(filename)
     video_source.save_timestamps = True
