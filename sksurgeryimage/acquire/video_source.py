@@ -29,6 +29,8 @@ class VideoSource:
         :param dims: optional (width, height) as a pair of integers
         """
         self.source = cv2.VideoCapture(source_num_or_file)
+        self.timestamps = []
+        self.save_timestamps = False
 
         if not self.source.isOpened():
             raise RuntimeError("Failed to open Video camera:"
@@ -69,6 +71,10 @@ class VideoSource:
         """
         LOGGER.debug("Grabbing from: %s", self.source_name)
         self.ret = self.source.grab()
+
+        if self.save_timestamps:
+            self.add_timestamp_to_list()
+
         return self.ret
 
     def retrieve(self):
@@ -100,6 +106,16 @@ class VideoSource:
         Release the cv2.VideoCapture source.
         """
         self.source.release()
+
+
+    def add_timestamp_to_list(self):
+        """
+        Get the current time and append a timestamp to the list of
+        timestamps.
+        """
+        now = datetime.datetime.now().isoformat()
+        self.timestamps.append(now)
+
 
 
 class VideoSourceWrapper:
