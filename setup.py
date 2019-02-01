@@ -14,7 +14,7 @@ setup(
     name='scikit-surgeryimage',
     version=versioneer.get_version(),
     cmdclass=versioneer.get_cmdclass(),
-    description='scikit-surgeryimage',
+    description='scikit-surgeryimage implements image processing tools and alogrithms for Image Guided Surgery.',
     long_description=long_description,
     long_description_content_type='text/x-rst',
     url='https://weisslab.cs.ucl.ac.uk/WEISS/SoftwareRepositories/SNAPPY/scikit-surgeryimage',

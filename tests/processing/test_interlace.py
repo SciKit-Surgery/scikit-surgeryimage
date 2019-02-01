@@ -59,8 +59,8 @@ def test_hd_inputs(create_valid_deinterlace_inputs):
 
 
 def test_interlace_from_file():
-    even = cv2.imread('tests/data/test-16x8-rgb-even.png')
-    odd = cv2.imread('tests/data/test-16x8-rgb-odd.png')
-    expected_interlaced = cv2.imread('tests/data/test-16x8-rgb.png')
+    even = cv2.imread('tests/data/processing/test-16x8-rgb-even.png')
+    odd = cv2.imread('tests/data/processing/test-16x8-rgb-odd.png')
+    expected_interlaced = cv2.imread('tests/data/processing/test-16x8-rgb.png')
     interlaced = interlace.interlace_to_new(even, odd)
     np.testing.assert_array_equal(interlaced, expected_interlaced)

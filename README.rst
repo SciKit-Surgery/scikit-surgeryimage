@@ -25,6 +25,18 @@ that are useful for image-guided surgery.
 
 scikit-surgeryimage was developed at the `Wellcome EPSRC Centre for Interventional and Surgical Sciences`_ in `University College London (UCL)`_.
 
+Features
+--------
+
+requirements.txt specifies a dependency on opencv-contrib-python, so you can use any OpenCV python therein.
+In addition, this project provides:
+
+* Video read and write.
+* Utilities to detect the number of cameras and prepare text for overlay on video.
+* Functions to make charuco boards, and detect charuco markers.
+* Interlacing and deinterlacing.
+* Convenience wrappers for erosion and dilation.
+
 
 Installing
 ~~~~~~~~~~
@@ -32,7 +44,7 @@ Installing
 You can pip install directly from the repository as follows:
 ::
 
-    pip install git+https://weisslab.cs.ucl.ac.uk/WEISS/SoftwareRepositories/SNAPPY/scikit-surgeryimage
+    pip install scikit-surgeryimage
 
 
 Developing

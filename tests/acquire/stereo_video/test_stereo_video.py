@@ -7,7 +7,7 @@ import sksurgeryimage.acquire.stereo_video as sv
 
 
 def test_create_video_from_png():
-    original = cv2.imread('tests/data/test-16x8-rgb.png')
+    original = cv2.imread('tests/data/processing/test-16x8-rgb.png')
     output_name = 'tests/output/test-16x8-rgb.avi'
     writer = cv2.VideoWriter(output_name,
                              cv2.VideoWriter_fourcc(*'DIVX'),
@@ -211,9 +211,9 @@ def test_interlaced_invalid_to_extract_data_before_calling_grab_and_retrieve(int
 
 
 def test_interlaced_extract_original_images(interlaced_video_source):
-    original = cv2.imread('tests/data/test-16x8-rgb.png')
-    expected_even = cv2.imread('tests/data/test-16x8-rgb-even.png')
-    expected_odd = cv2.imread('tests/data/test-16x8-rgb-odd.png')
+    original = cv2.imread('tests/data/processing/test-16x8-rgb.png')
+    expected_even = cv2.imread('tests/data/processing/test-16x8-rgb-even.png')
+    expected_odd = cv2.imread('tests/data/processing/test-16x8-rgb-odd.png')
     vs = interlaced_video_source
     vs.grab()
     vs.retrieve()
@@ -230,7 +230,7 @@ def test_interlaced_extract_original_images(interlaced_video_source):
 
 
 def test_interlaced_extract_scaled_images(interlaced_video_source):
-    original = cv2.imread('tests/data/test-16x8-rgb.png')
+    original = cv2.imread('tests/data/processing/test-16x8-rgb.png')
     vs = interlaced_video_source
     vs.grab()
     vs.retrieve()
@@ -245,9 +245,9 @@ def test_interlaced_extract_scaled_images(interlaced_video_source):
 
 
 def test_vertically_stacked_extract_original_images(vertically_stacked_video_source):
-    original = cv2.imread('tests/data/test-16x8-rgb.png')
-    expected_top = cv2.imread('tests/data/test-16x8-rgb-top.png')
-    expected_bottom = cv2.imread('tests/data/test-16x8-rgb-bottom.png')
+    original = cv2.imread('tests/data/processing/test-16x8-rgb.png')
+    expected_top = cv2.imread('tests/data/processing/test-16x8-rgb-top.png')
+    expected_bottom = cv2.imread('tests/data/processing/test-16x8-rgb-bottom.png')
     vs = vertically_stacked_video_source
     vs.grab()
     vs.retrieve()
