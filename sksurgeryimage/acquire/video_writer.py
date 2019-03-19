@@ -8,29 +8,35 @@ import cv2
 
 LOGGER = logging.getLogger(__name__)
 
-
-class VideoWriterBase:
+class VideoWriter:
     """
-    Base Class for Video Writer
+    Class to write images to disk using cv2.VideoWriter.
+
+    :param fps: Frames per second to save to disk.
+    :param filename: Filename to save output video to.
+    :param frame: frame of output data, used to set dimensions of VideoWriter
     """
-    def __init__(self, filename=None):
+    def __init__(self, filename, fps, dims):
 
-        if filename:
-            self.set_filename(filename)
+        self.set_filename(filename)
 
-        self.fps = 30
-        self.frame_source = None
+        fourcc = cv2.VideoWriter_fourcc(*'MJPG')
+        width, height = dims
 
-        self.frames_to_save = 0
+        self.video_writer = cv2.VideoWriter(
+            filename, fourcc, fps, (width, height))
 
-        self.fourcc = cv2.VideoWriter_fourcc(*'XVID')
-        self.video_writers = []
+        logging.debug(
+            "New VideoWriter. File:%s codec:%s FPS:%s Width:%s Height:%s",
+            filename, fourcc, fps, width, height)
 
-    def set_frame_source(self, frame_source):
-        """
-        Set the object's frame_source variable.
-        """
-        self.frame_source = frame_source
+    def __del__(self):
+        """ Call close method on deletion, in case not called manually. """
+        self.close()
+
+    def close(self):
+        """ Close/release the output file for video. """
+        self.video_writer.release()
 
     def set_filename(self, filename):
         """
@@ -57,108 +63,42 @@ class VideoWriterBase:
         directory = os.path.dirname(self.filename)
 
         if directory and not os.path.exists(directory):
-            LOGGER.info("Creating directory: %s", directory)
+            logging.info("Creating directory: %s", directory)
             os.makedirs(directory)
             return True
 
         return False
 
-    def save_to_file(self, num_frames=None):
+    def write_frame(self, frame):
         """
-        Acquire and write frames.
+        Write a frame to the output file.
         """
-        if num_frames:
-            self.frames_to_save = num_frames
-
-        self.create_video_writers()
-
-        logging.info("Saving %s frames to %s",
-                     self.frames_to_save, self.filename)
-
-        while self.frames_to_save > 0:
-            self.frame_source.get_next_frames()
-            self.write_frame()
-            self.frames_to_save -= 1
-
-        self.release_video_writers()
-
-        if self.frame_source.save_timestamps:
-            self.write_timestamps()
-
-    def create_video_writers(self):
-        """
-        Subclasses should implement a function to create
-        one or more Open-CV VideoWriter objects.
-        """
-        raise NotImplementedError('Should have implemented this method.')
-
-    def release_video_writers(self):
-        """
-        Close all video writer objects
-        """
-        if len(self.video_writers) == 0:
-            logging.info("No video writers to close")
-            return
-
-        for video_writer in self.video_writers:
-            video_writer.release()
-
-    def write_frame(self):
-        """
-        Write a frame to the output files.
-        """
-        for i, source in enumerate(self.frame_source.sources):
-
-            frame = source.frame
-            logging.debug("Writing frame with dims %s", frame.shape)
-            self.video_writers[i].write(frame)
-
-    def write_timestamps(self):
-        """
-        Write the timestamps from frame_source object to a file.
-        """
-        timestamp_file = self.filename + '.timestamps'
-        logging.info("Writing timestamps to %s", timestamp_file)
-
-        with open(timestamp_file, "w") as text_file:
-            for line in self.frame_source.timestamps:
-                text_file.write(line + '\n')
+        self.video_writer.write(frame)
 
 
-class OneSourcePerFileWriter(VideoWriterBase):
+class TimestampedVideoWriter(VideoWriter):
     """
-    Class to writes to a separate video file for each input source.
+    Class to write images and timestamps to disk, inherits from VideoWriter.
+
+    :param fps: Frames per second to save to disk.
+    :param filename: Filename to save output video to.
+                     Timestamp file is "filename + 'timestamps'"
     """
-    def create_video_writers(self):
+    def __init__(self, filename, fps, frame):
+        super(TimestampedVideoWriter, self).__init__(filename, fps, frame)
+
+        timestamp_filename = filename + '.timestamps'
+        self.timestamp_file = open(timestamp_filename, 'w')
+
+    def close(self):
+        """ Close/release the output files for video and timestamps. """
+        self.video_writer.release()
+        self.timestamp_file.close()
+
+    def write_frame(self, frame, timestamp):
         """
-        Create a VideoWriter object for each input source.
+        Write a frame and timestamp to the output files.
         """
-        filenames = self.generate_sequential_filenames()
-        logging.info("Saving to: %s", filenames)
+        self.video_writer.write(frame)
+        self.timestamp_file.write(timestamp + '\n')
 
-        for filename, source in zip(filenames, self.frame_source.sources):
-            frame = source.frame
-            height, width = frame.shape[:2]
-            video_writer = cv2.VideoWriter(
-                filename, self.fourcc, self.fps, (width, height))
-
-            self.video_writers.append(video_writer)
-            logging.debug(
-                "New VideoWriter. File:%s codec:%s FPS:%s Width:%s Height:%s",
-                filename, self.fourcc, self.fps, width, height)
-
-    def generate_sequential_filenames(self):
-        """
-        Take a filename e.g. video.avi and generate a filename for each camera.
-
-        video1.avi, video2.avi video3.avi etc.
-        """
-        filenames = []
-
-        filename, extension = os.path.splitext(self.filename)
-        LOGGER.debug("Generating sequential filenames for: %s", filename)
-        for i, _ in enumerate(self.frame_source.sources):
-            new_filename = "{}_{}{}".format(filename, i, extension)
-            filenames.append(new_filename)
-
-        return filenames
