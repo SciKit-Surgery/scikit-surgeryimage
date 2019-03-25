@@ -28,7 +28,7 @@ class StereoVideo:
     """
     Provides a convenient object to manage various stereo input styles.
     Developed firstly for laparoscopic surgery, but broadly applicable
-    to any stereo setup using our VideoSource and VideoSourceWrapper.
+    to any stereo setup using our TimestampedVideoSource and VideoSourceWrapper.
 
     Design Principles:
 

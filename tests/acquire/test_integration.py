@@ -30,24 +30,49 @@ def test_save_a_file_and_all_cameras():
     for camera in range(num_cameras):
         sw.add_camera(camera)
     
-    output_dir = 'tests/output'
-    if not os.path.exists(output_dir):
-        os.makedirs(output_dir)
+    output_dir = 'tests/output/acquire/'
 
-    base_filename = output_dir + '/test.avi'
-    vw = video_writer.OneSourcePerFileWriter(base_filename)
-    vw.set_frame_source(sw)
+    fps = 25
 
-    vw.save_to_file(num_frames_in_input_file)
+    # Create video writer for file input
+    output_for_video_file = output_dir + 'video_from_file.avi'
+    width, height  = (sw.sources[0].frame.shape[1],  sw.sources[0].frame.shape[0])
+    video_writer_from_file = video_writer.TimestampedVideoWriter(output_for_video_file, fps, width, height)
 
-    output_file_name = 'test_0.avi'
-    output_file_full_path = output_dir + '/' + output_file_name
+    # Create video writer(s) for all camera inputs
+    cam_writers = []
+    for i in range(num_cameras):
+        fname = output_dir + 'camera' + str(i) + '.avi'
+        width, height = 640, 480 #Default width/height in OpenCV
+        cam_writers.append(video_writer.TimestampedVideoWriter(fname, fps, width, height))
+
+    ###############################
+    # Capture and write some frames
+    num_frames = 100
+    for i in range(num_frames):
+        sw.get_next_frames()
+        frame = sw.sources[0].frame
+        timestamp = sw.sources[0].timestamp
+        video_writer_from_file.write_frame(frame, timestamp)
+
+        for j in range(num_cameras):
+            frame = sw.sources[j].frame
+            timestamp = sw.sources[j].timestamp
+            cam_writers[j].write_frame(frame, timestamp)
+
+    # Close sources and writers
     sw.release_all_sources()
 
+    video_writer_from_file.close()
+    for i in range(num_cameras):
+        cam_writers[i].close()
+
+    ########################
+    # Do the actual test
     # The input and output files should be identical
 
     input_video = cv2.VideoCapture(input_file)
-    output_video = cv2.VideoCapture(output_file_full_path)
+    output_video = cv2.VideoCapture(output_for_video_file)
 
     for i in range(num_frames_in_input_file):
         ret, frame_in = input_video.read()
