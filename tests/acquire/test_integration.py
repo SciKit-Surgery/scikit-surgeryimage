@@ -30,24 +30,38 @@ def test_save_a_file_and_all_cameras():
     for camera in range(num_cameras):
         sw.add_camera(camera)
     
-    output_dir = 'tests/output'
+    output_dir = 'tests/output/acquire/'
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
 
-    base_filename = output_dir + '/test.avi'
-    vw = video_writer.OneSourcePerFileWriter(base_filename)
-    vw.set_frame_source(sw)
+    fps = 25
+    output_for_video_file = output_dir + 'video_from_file.avi'
+    width, height  = (sw.sources[0].frame.shape[1],  sw.sources[0].frame.shape[0])
+    video_writer_from_file = video_writer.TimestampedVideoWriter(output_for_video_file, fps, width, height)
 
-    vw.save_to_file(num_frames_in_input_file)
+    cam_writers = []
+    for i in range(num_cameras):
+        fname = output_dir + 'camera' + str(i) + '.avi'
+        width, height = (sw.sources[i+1].frame.shape[1], sw.sources[i+1].frame.shape[0])
+        cam_writers.append(video_writer.TimestampedVideoWriter(fname, fps, width, height))
 
-    output_file_name = 'test_0.avi'
-    output_file_full_path = output_dir + '/' + output_file_name
+    for i in range(100):
+        sw.get_next_frames()
+        video_writer_from_file.write_frame(sw.sources[0].frame, sw.sources[0].timestamp)
+
+        for j in range(num_cameras):
+            cam_writers[j].write_frame(sw.sources[j+1].frame, sw.sources[j+1].timestamp)
+
     sw.release_all_sources()
+
+    video_writer_from_file.close()
+    for i in range(num_cameras):
+        cam_writers[i].close()
 
     # The input and output files should be identical
 
     input_video = cv2.VideoCapture(input_file)
-    output_video = cv2.VideoCapture(output_file_full_path)
+    output_video = cv2.VideoCapture(output_for_video_file)
 
     for i in range(num_frames_in_input_file):
         ret, frame_in = input_video.read()
