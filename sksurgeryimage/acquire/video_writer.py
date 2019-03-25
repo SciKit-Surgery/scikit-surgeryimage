@@ -8,7 +8,7 @@ import cv2
 
 LOGGER = logging.getLogger(__name__)
 
-class VideoWriter:
+class VideoWriter(object):
     """
     Class to write images to disk using cv2.VideoWriter.
 
