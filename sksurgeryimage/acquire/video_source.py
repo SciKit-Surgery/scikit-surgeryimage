@@ -9,7 +9,6 @@ Classes capture data from a video source into a numpy array.
 import logging
 import datetime
 import cv2
-from cv2 import VideoCapture
 import numpy as np
 import sksurgerycore.utilities.validate_file as vf
 import sksurgeryimage.utilities.camera_utilities as cu

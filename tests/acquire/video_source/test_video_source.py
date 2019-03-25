@@ -122,6 +122,11 @@ def test_get_next_frames_from_file(video_source_wrapper):
     actual_frame = video_source_wrapper.sources[0].frame
     np.testing.assert_array_equal(expected_frame, actual_frame)
 
+    # Same test, but use .read() rather than separate .grab() and .retrieve()
+    video_source_wrapper.sources[0].read()
+    actual_frame = video_source_wrapper.sources[0].frame
+    np.testing.assert_array_equal(expected_frame, actual_frame)
+
 def test_do_timestamps_in_source(video_source_wrapper):
     """ Get the video source to save a timestamp"""
     filename = 'tests/data/acquire/100x50_100_frames.avi'

@@ -85,7 +85,8 @@ class TimestampedVideoWriter(VideoWriter):
                      Timestamp file is "filename + 'timestamps'"
     """
     def __init__(self, filename, fps, width, height):
-        super(TimestampedVideoWriter, self).__init__(filename, fps, width, height)
+        super(TimestampedVideoWriter, self).__init__(filename, fps,
+                                                     width, height)
 
         timestamp_filename = filename + '.timestamps'
         self.timestamp_file = open(timestamp_filename, 'w')
@@ -101,4 +102,3 @@ class TimestampedVideoWriter(VideoWriter):
         """
         self.video_writer.write(frame)
         self.timestamp_file.write(timestamp.isoformat() + '\n')
-
