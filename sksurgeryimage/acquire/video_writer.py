@@ -7,7 +7,7 @@ import os
 import cv2
 
 LOGGER = logging.getLogger(__name__)
-
+#pylint:disable=useless-object-inheritance
 class VideoWriter(object):
     """
     Class to write images to disk using cv2.VideoWriter.
