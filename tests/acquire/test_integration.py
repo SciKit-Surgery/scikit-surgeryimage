@@ -44,7 +44,6 @@ def test_save_a_file_and_all_cameras():
     for i in range(num_cameras):
         fname = output_dir + 'camera' + str(i) + '.avi'
         width, height = (sw.sources[i+1].frame.shape[1],  sw.sources[i+1].frame.shape[0])
-        print(f"w:{width} h{height}")
         cam_writers.append(video_writer.TimestampedVideoWriter(fname, fps, width, height))
 
     ###############################
