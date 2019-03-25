@@ -15,7 +15,7 @@ import sksurgeryimage.utilities.camera_utilities as cu
 LOGGER = logging.getLogger(__name__)
 
 
-class VideoSource:
+class TimestampedVideoSource:
     """
     Capture and store data from camera/file source.
     Augments the cv2.VideoCapture() to provide passing of
@@ -23,14 +23,13 @@ class VideoSource:
     """
     def __init__(self, source_num_or_file, dims=None):
         """
-        Constructs a VideoSource.
+        Constructs a TimestampedVideoSource.
 
         :param source_num_or_file: integer camera number or file path
         :param dims: optional (width, height) as a pair of integers
         """
         self.source = cv2.VideoCapture(source_num_or_file)
-        self.timestamps = []
-        self.save_timestamps = False
+        self.timestamp = None
 
         if not self.source.isOpened():
             raise RuntimeError("Failed to open Video camera:"
@@ -67,13 +66,12 @@ class VideoSource:
 
     def grab(self):
         """
-        Call the cv2.VideoCapture grab function.
+        Call the cv2.VideoCapture grab function and get a timestamp.
         """
         LOGGER.debug("Grabbing from: %s", self.source_name)
         self.ret = self.source.grab()
 
-        if self.save_timestamps:
-            self.add_timestamp_to_list()
+        self.timestamp = datetime.datetime.now()
 
         return self.ret
 
@@ -89,9 +87,12 @@ class VideoSource:
     def read(self):
         """
         Call the cv2.VideoCapture read function and
-        store the returned frame.
+        store the returned frame. Also get a timestamp after acquision.
         """
-        self.ret, self.frame = self.source.read()
+        self.grab()
+        self.timestamp = datetime.datetime.now()
+        self.retrieve()
+
         return self.ret, self.frame
 
     def isOpened(self):
@@ -107,20 +108,9 @@ class VideoSource:
         """
         self.source.release()
 
-
-    def add_timestamp_to_list(self):
-        """
-        Get the current time and append a timestamp to the list of
-        timestamps.
-        """
-        now = datetime.datetime.now().isoformat()
-        self.timestamps.append(now)
-
-
-
 class VideoSourceWrapper:
     """
-    Wrapper for multiple VideoSource objects.
+    Wrapper for multiple TimestampedVideoSource objects.
     """
     def __init__(self):
         self.sources = []
@@ -158,7 +148,7 @@ class VideoSourceWrapper:
         :param dims: (width, height) as integer numbers of pixels
         """
 
-        video_source = VideoSource(camera_num_or_file, dims)
+        video_source = TimestampedVideoSource(camera_num_or_file, dims)
         self.sources.append(video_source)
         self.num_sources = len(self.sources)
 
@@ -191,15 +181,13 @@ class VideoSourceWrapper:
     def grab(self):
         """
         Perform a grab() operation for each source
-        and timestamp if required.
         """
         if self.are_all_sources_open():
 
-            for i, source in enumerate(self.sources):
+            for source in self.sources:
                 source.grab()
 
-                if self.save_timestamps:
-                    self.add_timestamp_to_list(i)
+
 
     def retrieve(self):
         """
@@ -213,20 +201,3 @@ class VideoSourceWrapper:
             source.retrieve()
             self.frames.append(source.frame)
         return self.frames
-
-    def add_timestamp_to_list(self, source_number):
-        """
-        Get the current time and append a timestamp to the list of
-        timestamps in format:
-        source_num,frame_num,timestamp
-        """
-        now = datetime.datetime.now().isoformat()
-
-        idx = len(self.timestamps)
-
-        # If there is more than one video source, then we put one frame from
-        # each source in the list, before moving to next frame
-        frame_num = idx // self.num_sources
-
-        timestamp_entry = "{},{},{}".format(source_number, frame_num, now)
-        self.timestamps.append(timestamp_entry)
