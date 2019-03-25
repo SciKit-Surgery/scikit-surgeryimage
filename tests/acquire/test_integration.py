@@ -43,7 +43,8 @@ def test_save_a_file_and_all_cameras():
     cam_writers = []
     for i in range(num_cameras):
         fname = output_dir + 'camera' + str(i) + '.avi'
-        width, height = 640, 480 #Default width/height in OpenCV
+        width, height = (sw.sources[i+1].frame.shape[1],  sw.sources[i+1].frame.shape[0])
+        print(f"w:{width} h{height}")
         cam_writers.append(video_writer.TimestampedVideoWriter(fname, fps, width, height))
 
     ###############################
@@ -56,8 +57,8 @@ def test_save_a_file_and_all_cameras():
         video_writer_from_file.write_frame(frame, timestamp)
 
         for j in range(num_cameras):
-            frame = sw.sources[j].frame
-            timestamp = sw.sources[j].timestamp
+            frame = sw.sources[j+1].frame
+            timestamp = sw.sources[j+1].timestamp
             cam_writers[j].write_frame(frame, timestamp)
 
     # Close sources and writers
