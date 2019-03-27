@@ -5,6 +5,8 @@
 import logging
 import os
 import cv2
+from queue import Queue
+from threading import Thread
 
 LOGGER = logging.getLogger(__name__)
 #pylint:disable=useless-object-inheritance
@@ -102,3 +104,38 @@ class TimestampedVideoWriter(VideoWriter):
         """
         self.video_writer.write(frame)
         self.timestamp_file.write(timestamp.isoformat() + '\n')
+
+
+class ThreadedTimestampedVideoWriter(TimestampedVideoWriter):
+    """ TimestampedVideoWriter that can be run in a thread. 
+    Uses Queue.Queue() to store data, which is thread safe. """
+
+    def __init__(self, filename, fps, width, height):
+        super(ThreadedTimestampedVideoWriter, self).__init__(filename, fps,
+                                                             width, height)
+        self.queue = Queue()
+    
+    def start(self):
+        """ Start the thread running. """
+        logging.debug("Starting ThreadedTimestampedVideoWriter thread")
+        self.started = True
+        Thread(target=self.run, args=()).start()
+        return self
+
+    def stop(self):
+        """ Stop thread running. """
+        logging.debug("Stopping ThreadedTimestampedVideoWriter thread")
+        self.started = False
+        
+    def run(self):
+        """ Write data from the queue to the output file(s). """
+        # TODO: Validate that queue contains correct type?
+        while self.started or not self.queue.empty():
+
+            logging.debug("Writing frame")
+            frame, timestamp = self.queue.get()
+            self.write_frame(frame, timestamp)
+    
+        self.close()
+
+    
