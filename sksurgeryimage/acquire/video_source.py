@@ -68,7 +68,6 @@ class TimestampedVideoSource:
         """
         Call the cv2.VideoCapture grab function and get a timestamp.
         """
-        LOGGER.debug("Grabbing from: %s", self.source_name)
         self.ret = self.source.grab()
 
         self.timestamp = datetime.datetime.now()
@@ -80,7 +79,6 @@ class TimestampedVideoSource:
         Call the cv2.VideoCapture retrieve function and
         store the returned frame.
         """
-        LOGGER.debug("Retrieving from: %s", self.source_name)
         self.ret, self.frame = self.source.retrieve()
         return self.ret, self.frame
 
