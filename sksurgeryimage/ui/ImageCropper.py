@@ -1,6 +1,7 @@
 #coding=utf-8
 """ Class to crop an image. """
 
+import logging
 import cv2
 import numpy as np
 
@@ -37,8 +38,10 @@ class ImageCropper():
         """ Crop an image by selecting a rectaungular region with the mouse.
         :param img: input image.
         :type img: numpy array
-        :return: roi - length 2 array of tuples,
-                        [ (start_x, start_y), (end_x, end_y)]
+        :return: roi - If valid roi selected, return array of tuples,
+                        [(start_x, start_y), (end_x, end_y)]
+                       Otherwise (invalid ROI selected, or operation aborted),
+                       return None
         """
         self.img = np.copy(img)
         self.window_name = "Crop Image (Press a to abort/reset crop area)"
@@ -49,13 +52,13 @@ class ImageCropper():
         while not self.done:
             key = cv2.waitKey(1)
             if key == ord('a'): # Abort key pressed
-                self.set_roi_to_input_image_shape()
+                self.roi = []
                 self.done = True
-
 
         cv2.destroyWindow(self.window_name)
 
-        self.validate_roi()
+        if self.done and self.roi:
+            self.validate_roi()
 
         return self.roi
 
@@ -81,7 +84,7 @@ class ImageCropper():
 
     def validate_roi(self):
         """ Check that a valid roi has been selected:
-        1. Must have dimensions > 0, otherwise set the roi to the entire image.
+        1. Must have dimensions > 0, otherwise set roi to [].
         2. Order the x/y point in asecnding order. e.g. if the second point
         has x/y coorindates that are less than the first point, swap them. """
 
@@ -90,8 +93,8 @@ class ImageCropper():
 
         # Check that dimensions are > 0
         if start_x == end_x or start_y == end_y:
-            print("Cropping area has dimension 0, setting ROI to entire image")
-            self.set_roi_to_input_image_shape()
+            logging.info("Cropping area has dimension 0, cannot set ROI.")
+            self.roi = []
             return
 
         # Check that end_x/y > start_x/y
@@ -103,12 +106,3 @@ class ImageCropper():
 
         self.roi[0] = (start_x, start_y)
         self.roi[1] = (end_x, end_y)
-
-    def set_roi_to_input_image_shape(self):
-        """ Set the ROI to the size of the input image. i.e. Don't actually
-        crop anything."""
-
-        self.roi = [(0, 0)]
-
-        height, width, _ = self.img.shape
-        self.roi.append((width, height))

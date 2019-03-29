@@ -15,11 +15,10 @@ def test_check_start_end_not_equal(img):
     # done variables as if an roi has been selected.
     cropper.roi = roi_same_values
     cropper.done = True
-    cropper.crop(img)
+    roi = cropper.crop(img)
 
-    height, width, _ = img.shape
-    assert cropper.roi == [(0, 0), (width, height)]
-
+    assert roi == []
+    
 def test_reorder_start_end_points(img):
 
     cropper = ImageCropper()
