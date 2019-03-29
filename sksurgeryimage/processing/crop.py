@@ -13,12 +13,7 @@ class ImageCropper():
         self.window_name = None
         self.done = False
         self.selecting = False
-        self.start_x = 0
-        self.end_x = 0
-        self.start_y = 0
-        self.end_y = 0
         self.roi = []
-
 
     def crop(self, img):
         """ Crop an image by selecting a rectaungular region with the mouse.
@@ -30,7 +25,7 @@ class ImageCropper():
         self.img = np.copy(img)
         self.window_name = "Crop Image"
         cv2.namedWindow(self.window_name)
-        cv2.setMouseCallback(self.window_name, self.click_to_crop)
+        cv2.setMouseCallback(self.window_name, self.mouse_click_callback)
         cv2.imshow(self.window_name, self.img)
 
         while not self.done:
@@ -38,58 +33,54 @@ class ImageCropper():
 
         cv2.destroyWindow(self.window_name)
 
-        self.check_start_and_end_not_equal()
-        self.check_order_of_start_end_points()
-
-        self.roi = []
-        start_xy = (self.start_x, self.start_y)
-        end_xy = (self.end_x, self.end_y)
-        self.roi.append(start_xy)
-        self.roi.append(end_xy)
+        self.validate_roi()
 
         return self.roi
 
-    def click_to_crop(self, event, x, y, flags, param):
+    def mouse_click_callback(self, event, x, y, flags, param):
         #pylint:disable=unused-argument, invalid-name
         """ Callback to select the start/end points of roi.
         Left button down starts drawing, left button up stops drawing. """
         if event == cv2.EVENT_LBUTTONDOWN:
-            self.start_x = x
-            self.start_y = y
+            self.roi.append((x, y))
             self.selecting = True
 
         elif self.selecting and event == cv2.EVENT_MOUSEMOVE:
             self.img_with_rect = np.copy(self.img)
             cv2.rectangle(self.img_with_rect,
-                          (self.start_x, self.start_y),
-                          (x, y), (0, 255, 0))
+                          (self.roi[0]), (x, y), (0, 255, 0))
 
             cv2.imshow(self.window_name, self.img_with_rect)
             cv2.waitKey(1)
 
         elif event == cv2.EVENT_LBUTTONUP:
-            self.end_x = x
-            self.end_y = y
-
+            self.roi.append((x, y))
             self.done = True
 
-    def check_start_and_end_not_equal(self):
-        """ If the start and end coordinates are the same, set the ROI
-        to the entire image (don't do any cropping). """
+    def validate_roi(self):
+        """ Check that a valid roi has been selected:
+        1. Must have dimensions > 0, otherwise set the roi to the entire image.
+        2. Order the x/y point in asecnding order. e.g. if the second point
+        has x/y coorindates that are less than the first point, swap them. """
 
-        if self.start_x == self.end_x or self.start_y == self.end_y:
+        start_x, start_y = self.roi[0]
+        end_x, end_y = self.roi[1]
+
+        # Check that dimensions are > 0
+        if start_x == end_x or start_y == end_y:
             print("Cropping area has dimension 0, setting ROI to entire image")
-            self.start_x = 0
-            self.start_y = 0
-            self.end_y, self.end_x = self.img.shape[:2]
+            self.roi[0] = (0, 0)
 
-    def check_order_of_start_end_points(self):
-        """ The end x/y coordintates of the rectangle could be less
-        than the start x/y. If so, swap them round, otherwise we can't use
-        start_x:end_x as a slice to a numpy array. """
+            height, width, _ = self.img.shape
+            self.roi[1] = (width, height)
+            return
 
-        if self.end_x < self.start_x:
-            self.start_x, self.end_x = self.end_x, self.start_x
+        # Check that end_x/y > start_x/y
+        if end_x < start_x:
+            start_x, end_x = end_x, start_x
 
-        if self.end_y < self.start_y:
-            self.start_y, self.end_y = self.end_y, self.start_y
+        if end_y < start_y:
+            start_y, end_y = end_y, start_y
+
+        self.roi[0] = (start_x, start_y)
+        self.roi[1] = (end_x, end_y)

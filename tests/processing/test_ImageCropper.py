@@ -10,36 +10,41 @@ def img():
 def test_check_start_end_not_equal(img):
 
     cropper = ImageCropper()
-    cropper.img = img
+    roi_same_values = [(1, 1), (1, 1)]
+    # Too fiddly to simulate mouse clicks, so set roi and 
+    # done variables as if an roi has been selected.
+    cropper.roi = roi_same_values
+    cropper.done = True
+    cropper.crop(img)
 
-    cropper.start_x = 1
-    cropper.start_y = 1
+    height, width, _ = img.shape
+    assert cropper.roi == [(0, 0), (width, height)]
 
-    cropper.end_x = 1
-    cropper.end_y = 1
-
-    cropper.check_start_and_end_not_equal()
-
-    assert cropper.start_x == 0
-    assert cropper.start_y == 0
-    assert cropper.end_x == 100
-    assert cropper.end_y == 100
-
-def test_return_ok(img):
+def test_reorder_start_end_points(img):
 
     cropper = ImageCropper()
 
-    # Too fiddly to simulate mouse clicks, so set values as if
-    # this has be done.
-    # start_x > end_x ensures that
-    # cropper.check_order_of_start_end_points() is executed in full
-    cropper.start_x = 75
-    cropper.end_x = 25
-    
-    cropper.start_y = 75
-    cropper.end_y = 25
+    roi_wrong_order = [(75, 75), (25, 25)]
+    roi_right_order = [(25, 25), (75, 75)]
+    # Too fiddly to simulate mouse clicks, so set roi and 
+    # done variables as if an roi has been selected.
+    cropper.roi = roi_wrong_order
     cropper.done = True
 
     roi = cropper.crop(img)
 
-    assert roi == [(25, 25), (75, 75)]
+    assert roi == roi_right_order
+
+def test_valid_roi(img):
+
+    cropper = ImageCropper()
+
+    roi_right_order = [(25, 25), (75, 75)]
+    # Too fiddly to simulate mouse clicks, so set roi and 
+    # done variables as if an roi has been selected.
+    cropper.roi = roi_right_order
+    cropper.done = True
+
+    roi = cropper.crop(img)
+
+    assert roi == roi_right_order
