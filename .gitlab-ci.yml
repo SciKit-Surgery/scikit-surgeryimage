@@ -9,98 +9,92 @@ stages:
   - test
   - deploy
 
+.build-install-template: &build-install-template
+  stage: build
+  except:
+    variables:
+      - $CI_COMMIT_MESSAGE =~ /\[skip[ _-]build?\]/i
+  script:
+    - tox -e installer
+  artifacts:
+    paths:
+      - dist/
+    expire_in: 1 week
 
 build docs:
   stage: build
+  except:
+    variables:
+      - $CI_COMMIT_MESSAGE =~ /\[skip[ _-]build?\]/i
   script:
     - tox -e docs
   tags:
-    - shared-linux
+    - shared-linux, gui
   artifacts:
     paths:
-    - doc/
+      - doc/
     expire_in: 1 week
-
 
 build linux installer:
-  stage: build
-  script:
-    - tox -e installer
+  <<: *build-install-template
   tags:
-    - shared-linux
-  artifacts:
-    paths:
-    - dist/
-    expire_in: 1 week
-
+    - shared-linux, gui
 
 build mac installer:
-  stage: build
-  script:
-    - tox -e installer
+  <<: *build-install-template
   tags:
-    - shared-mac
-  artifacts:
-    paths:
-    - dist/
-    expire_in: 1 week
-
+    - shared-mac, gui
 
 build windows installer:
-  stage: build
-  script:
-    - tox -e installer
+  <<: *build-install-template
   tags:
-    - shared-win
-  artifacts:
-    paths:
-    - dist/
-    expire_in: 1 week
-
+    - shared-win, gui
 
 test Linux:
   stage: test
+  variables:
+    LD_LIBRARY_PATH: ${CI_PROJECT_DIR}/.tox/py36/lib/python3.6/site-packages/PySide2/Qt/plugins/platforms
+    DISPLAY: localhost:1
   script:
-      - tox
+    - echo "LD_LIBRARY_PATH=${LD_LIBRARY_PATH}"
+    - echo "DISPLAY=${DISPLAY}"
+    - tox
   tags:
-    - shared-linux
+    - shared-linux, gui
   coverage: '/^TOTAL.*\s+(\d+\%)$/'
-
 
 test macOS:
   stage: test
   script:
-      - tox
+    - tox
   tags:
-    - shared-mac
-
+    - shared-mac, gui
 
 test Windows:
   stage: test
   script:
-      - tox
+    - tox
   tags:
-    - shared-win
+    - shared-win, gui
 
 
 deploy pip to production:
-
   stage: deploy
   when: manual
   only:
     - tags
-    
+
   environment:
     name: PyPI
     url: https://pypi.python.org/pypi/scikit-surgeryimage
-    
+
   tags:
     - pip-production
-    
+
   artifacts:
     paths:
-    - dist/
-    
+      - dist/
+
   script:
     # Install packages required to build/publish
     # remove any previous distribution files
@@ -109,7 +103,6 @@ deploy pip to production:
 
     # bundle installer
     - python setup.py bdist_wheel
-    
+
     # Upload to testpypi server
     - twine upload --repository pypi dist/* --username $PYPI_USER --password $PYPI_PASS
-

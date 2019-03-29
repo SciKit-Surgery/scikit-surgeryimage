@@ -40,6 +40,7 @@ class VideoWriter(object):
 
     def close(self):
         """ Close/release the output file for video. """
+        logging.debug("Closing VideoWriter")
         self.video_writer.release()
 
     def set_filename(self, filename):
@@ -67,7 +68,7 @@ class VideoWriter(object):
         directory = os.path.dirname(self.filename)
 
         if directory and not os.path.exists(directory):
-            logging.info("Creating directory: %s", directory)
+            logging.debug("Creating directory: %s", directory)
             os.makedirs(directory)
             return True
 
@@ -80,6 +81,8 @@ class VideoWriter(object):
         if not isinstance(frame, np.ndarray):
             raise TypeError("frame should be numpy array")
         self.video_writer.write(frame)
+        logging.debug("Writing frame with dimensions: %i x %i",
+                      frame.shape[1], frame.shape[0])
 
 
 class TimestampedVideoWriter(VideoWriter):
@@ -102,6 +105,7 @@ class TimestampedVideoWriter(VideoWriter):
         logging.debug("Closing video writer")
         self.video_writer.release()
         self.timestamp_file.close()
+        logging.debug("Closing TimestampedVideoWriter.")
 
     def write_frame(self, frame, timestamp):
         """
@@ -112,7 +116,6 @@ class TimestampedVideoWriter(VideoWriter):
 
         super(TimestampedVideoWriter, self).write_frame(frame)
         self.timestamp_file.write(timestamp.isoformat() + '\n')
-
 
 class ThreadedTimestampedVideoWriter(TimestampedVideoWriter):
     """ TimestampedVideoWriter that can be run in a thread.
