@@ -1,4 +1,4 @@
-from sksurgeryimage.processing.crop import ImageCropper
+from sksurgeryimage.ui.ImageCropper import ImageCropper
 import numpy as np
 import pytest
 
