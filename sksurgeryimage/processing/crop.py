@@ -5,7 +5,25 @@ import cv2
 import numpy as np
 
 class ImageCropper():
-    """ Class to crop an image. """
+    """ Class to crop an image.
+    Example usage using Opencv to capture/display image:
+
+        cam = cv2.VideoCapture(0)
+        ret, img = cam.read()
+
+        cropper = ImageCropper()
+        roi = cropper.crop(img)
+
+        start_x, start_y = roi[0]
+        end_x, end_y = roi[1]
+
+        cv2.imshow('Cropped image', img[start_y:end_y,
+                                        start_x:end_x,
+                                        :])
+
+        cv2.waitKey(1000) # Display for 1 second
+
+        """
     def __init__(self):
 
         self.img = None
