@@ -4,7 +4,11 @@
 
 import logging
 import os
+import datetime
+from queue import Queue
+from threading import Thread
 import cv2
+import numpy as np
 
 LOGGER = logging.getLogger(__name__)
 #pylint:disable=useless-object-inheritance
@@ -73,6 +77,8 @@ class VideoWriter(object):
         """
         Write a frame to the output file.
         """
+        if not isinstance(frame, np.ndarray):
+            raise TypeError("frame should be numpy array")
         self.video_writer.write(frame)
 
 
@@ -93,6 +99,7 @@ class TimestampedVideoWriter(VideoWriter):
 
     def close(self):
         """ Close/release the output files for video and timestamps. """
+        logging.debug("Closing video writer")
         self.video_writer.release()
         self.timestamp_file.close()
 
@@ -100,5 +107,71 @@ class TimestampedVideoWriter(VideoWriter):
         """
         Write a frame and timestamp to the output files.
         """
-        self.video_writer.write(frame)
+        if not isinstance(timestamp, datetime.datetime):
+            raise TypeError("Timestamp should be datetime.datetime object")
+
+        super(TimestampedVideoWriter, self).write_frame(frame)
         self.timestamp_file.write(timestamp.isoformat() + '\n')
+
+
+class ThreadedTimestampedVideoWriter(TimestampedVideoWriter):
+    """ TimestampedVideoWriter that can be run in a thread.
+    Uses Queue.Queue() to store data, which is thread safe.
+
+    Frames will be processed as they are added to the queue:
+
+    threaded_vw = ThreadedTimestampedVideoWriter(file, fps, w, h)
+    threaded_vw.start()
+
+    threaded_vw.add_to_queue(frame, timestamp)
+    threaded_vw.add_to_queue(frame, timestamp)
+    threaded_vw.add_to_queue(frame, timestamp)
+
+    threaded_vw.stop() """
+
+    def __init__(self, filename, fps, width, height):
+        super(ThreadedTimestampedVideoWriter, self).__init__(filename, fps,
+                                                             width, height)
+        self.started = False
+        self.queue = Queue()
+
+    def start(self):
+        """ Start the thread running. """
+        logging.debug("Starting ThreadedTimestampedVideoWriter thread")
+        self.started = True
+        Thread(target=self.run, args=()).start()
+        return self
+
+    def stop(self):
+        """ Stop thread running. """
+        logging.debug("Stopping ThreadedTimestampedVideoWriter thread")
+        self.started = False
+
+    def add_to_queue(self, frame, timestamp):
+        """ Add a frame and a timestamp to the queue for writing.
+        :param frame: Image frame
+        :type frame: numpy array
+        :param timestamp: Frame timestamp
+        :type timestamp: datetime.datetime object """
+
+        self.queue.put((frame, timestamp))
+
+    def run(self):
+        """ Write data from the queue to the output file(s). """
+
+        # Write frames in the queue as they arrive
+        while self.started:
+            if not self.queue.empty():
+                self.write_next_frame_and_timestamp()
+
+        # Write any remaining frames in the queue
+        while not self.queue.empty():
+            self.write_next_frame_and_timestamp()
+
+        self.close()
+
+    def write_next_frame_and_timestamp(self):
+        """ Get frame and timestamp from queue, then write to output. """
+        logging.debug("Writing frame")
+        frame, timestamp = self.queue.get()
+        self.write_frame(frame, timestamp)
