@@ -77,6 +77,7 @@ test Windows:
   tags:
     - shared-win, gui
 
+
 deploy pip to production:
   stage: deploy
   when: manual
