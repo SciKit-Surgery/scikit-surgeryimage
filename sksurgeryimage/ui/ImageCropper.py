@@ -41,13 +41,17 @@ class ImageCropper():
                         [ (start_x, start_y), (end_x, end_y)]
         """
         self.img = np.copy(img)
-        self.window_name = "Crop Image"
+        self.window_name = "Crop Image (Press a to abort/reset crop area)"
         cv2.namedWindow(self.window_name)
         cv2.setMouseCallback(self.window_name, self.mouse_click_callback)
         cv2.imshow(self.window_name, self.img)
 
         while not self.done:
-            cv2.waitKey(1)
+            key = cv2.waitKey(1)
+            if key == ord('a'): # Abort key pressed
+                self.set_roi_to_input_image_shape()
+                self.done = True
+
 
         cv2.destroyWindow(self.window_name)
 
@@ -87,10 +91,7 @@ class ImageCropper():
         # Check that dimensions are > 0
         if start_x == end_x or start_y == end_y:
             print("Cropping area has dimension 0, setting ROI to entire image")
-            self.roi[0] = (0, 0)
-
-            height, width, _ = self.img.shape
-            self.roi[1] = (width, height)
+            self.set_roi_to_input_image_shape()
             return
 
         # Check that end_x/y > start_x/y
@@ -102,3 +103,12 @@ class ImageCropper():
 
         self.roi[0] = (start_x, start_y)
         self.roi[1] = (end_x, end_y)
+
+    def set_roi_to_input_image_shape(self):
+        """ Set the ROI to the size of the input image. i.e. Don't actually
+        crop anything."""
+
+        self.roi = [(0, 0)]
+
+        height, width, _ = self.img.shape
+        self.roi.append((width, height))
