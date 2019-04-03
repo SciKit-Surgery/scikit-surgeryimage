@@ -5,7 +5,6 @@ ArUco implementation of PointDetector.
 """
 
 import logging
-import cv2 as c
 from cv2 import aruco
 import numpy as np
 from sksurgeryimage.processing.point_detector import PointDetector
@@ -13,26 +12,26 @@ from sksurgeryimage.processing.point_detector import PointDetector
 LOGGER = logging.getLogger(__name__)
 
 
-def get_intersect(a1, a2, b1, b2):
+def get_intersect(a_1, a_2, b_1, b_2):
     """
     Returns the point of intersection of the lines
     passing through a2,a1 and b2,b1.
 
     See https://stackoverflow.com/questions/3252194/numpy-and-line-intersections
 
-    a1: [x, y] a point on the first line
-    a2: [x, y] another point on the first line
-    b1: [x, y] a point on the second line
-    b2: [x, y] another point on the second line
+    :param a_1: [x, y] a point on the first line
+    :param a_2: [x, y] another point on the first line
+    :param b_1: [x, y] a point on the second line
+    :param b_2: [x, y] another point on the second line
     """
-    s = np.vstack([a1, a2, b1, b2])
-    h = np.hstack((s, np.ones((4, 1))))
-    l1 = np.cross(h[0], h[1])
-    l2 = np.cross(h[2], h[3])
-    x, y, z = np.cross(l1, l2)
-    if z == 0: # lines are parallel
+    stacked = np.vstack([a_1, a_2, b_1, b_2])
+    homogenous = np.hstack((stacked, np.ones((4, 1))))
+    line_1 = np.cross(homogenous[0], homogenous[1])
+    line_2 = np.cross(homogenous[2], homogenous[3])
+    p_x, p_y, p_z = np.cross(line_1, line_2)
+    if p_z == 0:  # lines are parallel
         return float('inf'), float('inf')
-    return x/z, y/z
+    return p_x/p_z, p_y/p_z
 
 
 class ArucoPointDetector(PointDetector):
@@ -70,21 +69,22 @@ class ArucoPointDetector(PointDetector):
         :param image: numpy 2D grey scale image.
         :return: ids, object_points, image_points
         """
-        corners, ids, rejectedImgPoints = \
+        corners, ids, _ = \
             aruco.detectMarkers(image,
                                 self.dictionary,
                                 parameters=self.parameters)
 
-        image_points = np.zeros((len(corners), 2))
-        object_points = np.zeros((len(corners), 3))
+        number_of_points = len(corners)
+        image_points = np.zeros((number_of_points, 2))
+        object_points = np.zeros((number_of_points, 3))
 
         if self.model is None:
             object_points = np.zeros((0, 3))
 
-        if len(corners) > 0:
+        if number_of_points > 0:
 
-            for i in range(len(corners)):
-                centre = get_intersect(corners[i][0][0], # intersect diagonals
+            for i in range(number_of_points):
+                centre = get_intersect(corners[i][0][0],  # intersect diagonals
                                        corners[i][0][2],
                                        corners[i][0][1],
                                        corners[i][0][3],
@@ -102,6 +102,4 @@ class ArucoPointDetector(PointDetector):
 
             return ids, object_points, image_points
 
-        else:
-            return np.zeros((0, 1)), object_points, image_points
-
+        return np.zeros((0, 1)), object_points, image_points

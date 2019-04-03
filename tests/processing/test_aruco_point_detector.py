@@ -7,6 +7,7 @@ Tests for Aruco implementation of PointDetector.
 import cv2 as cv2
 from cv2 import aruco
 import numpy as np
+import six
 import pytest
 from sksurgeryimage.processing.aruco_point_detector import ArucoPointDetector
 
@@ -47,6 +48,9 @@ def test_aruco_detector_with_model():
     assert object_points.shape[1] == 3
     assert image_points.shape[0] == 12
     assert image_points.shape[1] == 2
+    six.print_('ArUco ids=' + str(ids))
+    six.print_('ArUco object_points=' + str(object_points))
+    six.print_('ArUco image_points=' + str(image_points))
 
 
 def test_aruco_detector_with_point_not_in_model():
