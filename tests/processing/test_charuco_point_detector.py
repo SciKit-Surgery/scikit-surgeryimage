@@ -35,6 +35,3 @@ def test_charuco_detector_with_masked_image():
     assert object_points.shape[1] == 3
     assert image_points.shape[0] == 45
     assert image_points.shape[1] == 2
-    six.print_('ChArUco ids=' + str(ids))
-    six.print_('ChArUco object_points=' + str(object_points))
-    six.print_('ChArUco image_points=' + str(image_points))

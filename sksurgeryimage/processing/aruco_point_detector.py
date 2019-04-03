@@ -55,8 +55,8 @@ class ArucoPointDetector(PointDetector):
 
         :param dictionary: aruco dictionary
         :param parameters: aruco parameters
-        :param model: map of id : 3D point as numpy 1x3 array
-        :param scale: if you want to resize the image, specify scale factors
+        :param model: dictionary of {id : 3D point as numpy 1x3 array}
+        :param scale: if you want to cv::resize the image, specify scale factors
         """
         super(ArucoPointDetector, self).__init__(scale=scale)
         self.dictionary = dictionary
@@ -78,6 +78,9 @@ class ArucoPointDetector(PointDetector):
         image_points = np.zeros((len(corners), 2))
         object_points = np.zeros((len(corners), 3))
 
+        if self.model is None:
+            object_points = np.zeros((0, 3))
+
         if len(corners) > 0:
 
             for i in range(len(corners)):
@@ -88,6 +91,14 @@ class ArucoPointDetector(PointDetector):
                                        )
                 image_points[i][0] = centre[0]
                 image_points[i][1] = centre[1]
+
+                if self.model is not None:
+                    point_id = ids[i][0]
+                    object_point = self.model[point_id]
+
+                    object_points[i][0] = object_point[0][0]
+                    object_points[i][1] = object_point[0][1]
+                    object_points[i][2] = object_point[0][2]
 
             return ids, object_points, image_points
 
