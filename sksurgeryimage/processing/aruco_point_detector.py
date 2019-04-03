@@ -5,24 +5,23 @@ ArUco implementation of PointDetector.
 """
 
 import logging
-import cv2
+from sksurgeryimage.processing.point_detector import PointDetector
 
 LOGGER = logging.getLogger(__name__)
 
 
-class ArucoPointDetector:
+class ArucoPointDetector(PointDetector):
     """
     Class to detect ArUco points in a 2D grey scale video image.
     """
     def __init__(self):
         super(ArucoPointDetector, self).__init__()
 
-    def __internal_get_points(self, image):
+    def _internal_get_points(self, image):
         """
         Extracts points using OpenCV's ArUco implementation.
 
         :param image: numpy 2D grey scale image.
-        :return: Nx1 array of ids, Nx2 ndarray of points
+        :return: ids, object_points, image_points
         """
-        pass
-
+        raise NotImplementedError()

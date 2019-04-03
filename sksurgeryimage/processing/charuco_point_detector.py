@@ -5,24 +5,69 @@ ChArUco implementation of PointDetector.
 """
 
 import logging
-import cv2
+import numpy as np
+from sksurgeryimage.processing.point_detector import PointDetector
+import sksurgeryimage.calibration.aruco as ar
 
 LOGGER = logging.getLogger(__name__)
 
+# pylint: disable=too-many-instance-attributes
 
-class CharucoPointDetector:
+
+class CharucoPointDetector(PointDetector):
     """
     Class to detect ChArUco points in a 2D grey scale video image.
-    """
-    def __init__(self):
-        super(CharucoPointDetector, self).__init__()
 
-    def __internal_get_points(self, image):
+    :param dictionary: aruco dictionary definition
+    :param number_of_squares: tuple of (number in x, number in y)
+    :param size: tuple of (size of chessboard square, size of internal tag)
+    """
+    def __init__(self, dictionary,
+                 number_of_squares,
+                 size,
+                 scale=(1, 1),
+                 camera_matrix=None,
+                 distortion_coefficients=None):
+        super(CharucoPointDetector, self).__init__(scale=scale)
+
+        self.dictionary = dictionary
+        self.number_of_squares = number_of_squares
+        self.number_in_x, self.number_in_y = self.number_of_squares
+        self.total_number_of_points = self.number_in_x * self.number_in_y
+        self.size = size
+        self.camera_matrix = camera_matrix
+        self.distortion_coefficients = distortion_coefficients
+        self.image, self.board = \
+            ar.make_charuco_board(self.dictionary,
+                                  self.number_of_squares,
+                                  self.size,
+                                  (self.number_of_squares[0] * 100,
+                                   self.number_of_squares[1] * 100
+                                   )
+                                  )
+        self.object_points = np.zeros((self.total_number_of_points, 3))
+        for i in range(0, self.total_number_of_points):
+            self.object_points[i][0] = (i % self.number_in_y) \
+                                       * self.size[0]
+            self.object_points[i][1] = (i // self.number_in_y) \
+                                       * self.size[0]
+            self.object_points[i][2] = 0
+
+    def _internal_get_points(self, image):
         """
         Extracts points using OpenCV's ChArUco implementation.
 
         :param image: numpy 2D grey scale image.
-        :return: Nx1 array of ids, Nx2 ndarray of points
+        :return: ids, object_points, image_points as Nx[1,3,2] ndarrays
         """
-        pass
-
+        _, \
+        _, \
+        chessboard_corners, \
+        chessboard_ids = ar.detect_charuco_points(self.dictionary,
+                                                  self.board,
+                                                  image,
+                                                  self.camera_matrix,
+                                                  self.distortion_coefficients)
+        points_3d = \
+            np.take(self.object_points, chessboard_ids, axis=0).squeeze()
+        return chessboard_ids, points_3d, chessboard_corners.squeeze()
