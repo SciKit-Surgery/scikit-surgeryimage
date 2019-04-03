@@ -17,7 +17,13 @@ class ChessboardPointDetector(PointDetector):
     Class to detect chessboard points in a 2D grey scale video image.
     """
     def __init__(self, number_of_corners, square_size_in_mm, scale=(1, 1)):
+        """
+        Constructs a ChessboardPointDetector.
 
+        :param number_of_corners: tuple of (number in x, number in y)
+        :param square_size_in_mm: physical size of chessboard squares in mm
+        :param scale: if you want to resize the image, specify scale factors
+        """
         super(ChessboardPointDetector, self).__init__(scale=scale)
 
         self.number_of_corners = number_of_corners

@@ -17,10 +17,6 @@ LOGGER = logging.getLogger(__name__)
 class CharucoPointDetector(PointDetector):
     """
     Class to detect ChArUco points in a 2D grey scale video image.
-
-    :param dictionary: aruco dictionary definition
-    :param number_of_squares: tuple of (number in x, number in y)
-    :param size: tuple of (size of chessboard square, size of internal tag)
     """
     def __init__(self, dictionary,
                  number_of_squares,
@@ -28,6 +24,16 @@ class CharucoPointDetector(PointDetector):
                  scale=(1, 1),
                  camera_matrix=None,
                  distortion_coefficients=None):
+        """
+        Constructs a CharucoPointDetector.
+
+        :param dictionary: aruco dictionary
+        :param number_of_squares: tuple of (number in x, number in y)
+        :param size: tuple of (size of squares, size of internal tag) in mm
+        :param scale: if you want to resize the image, specify scale factors
+        :param camera_matrix: OpenCV 3x3 camera calibration matrix
+        :param distortion_coefficients: OpenCV distortion coefficients
+        """
         super(CharucoPointDetector, self).__init__(scale=scale)
 
         self.dictionary = dictionary
