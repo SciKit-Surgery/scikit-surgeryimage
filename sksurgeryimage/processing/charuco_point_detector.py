@@ -7,7 +7,7 @@ ChArUco implementation of PointDetector.
 import logging
 import numpy as np
 from sksurgeryimage.processing.point_detector import PointDetector
-import sksurgeryimage.calibration.aruco as ar
+import sksurgeryimage.calibration.charuco as ar
 
 LOGGER = logging.getLogger(__name__)
 

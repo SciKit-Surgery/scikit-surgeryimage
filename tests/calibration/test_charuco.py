@@ -1,13 +1,13 @@
 # coding=utf-8
 
 """
-Tests for aruco.py
+Tests for charuco.py
 """
 
 import numpy as np
 import cv2
 from cv2 import aruco
-import sksurgeryimage.calibration.aruco as ar
+import sksurgeryimage.calibration.charuco as ar
 
 
 def test_extract_points():
