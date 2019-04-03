@@ -25,20 +25,8 @@ def test_videowriter_create_dir(mocked_makedirs):
     mocked_makedirs.assert_called_with('new_dir')
 
 
-@pytest.fixture()
-def create_timestamped_videowriter_output_files():
-    filename = 'tests/generated_data/test.avi'
-    vw.TimestampedVideoWriter(filename, fps, width, height)
-
-    yield
-
-    os.remove(filename)
-    os.remove(filename + '.timestamps')
-    os.rmdir('tests/generated_data')
-
-
-def test_timestamp_videowriter_creates_timestamp_file(create_timestamped_videowriter_output_files):
-    filename = 'tests/generated_data/test.avi'
+def test_timestamp_videowriter_creates_timestamp_file(tmpdir):
+    filename = os.path.join(tmpdir.dirname, 'test.avi')
     vw.TimestampedVideoWriter(filename, fps, width, height)
 
     assert os.path.isfile(filename)
@@ -47,9 +35,8 @@ def test_timestamp_videowriter_creates_timestamp_file(create_timestamped_videowr
     # Video writer is tested further in test_integration
 
 
-def test_invalid_data_types_raise_errors():
-   
-    fname = 'tests/generated_data/test_raises_error.avi'
+def test_invalid_data_types_raise_errors(tmpdir):
+    fname = os.path.join(tmpdir.dirname, 'test_raises_error.avi')
 
     # These values don't matter
     fps = 25
