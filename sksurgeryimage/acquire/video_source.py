@@ -84,11 +84,9 @@ class TimestampedVideoSource:
 
     def read(self):
         """
-        Call the cv2.VideoCapture read function and
-        store the returned frame. Also get a timestamp after acquision.
+        Do a grab(), then retrieve() operation.
         """
         self.grab()
-        self.timestamp = datetime.datetime.now()
         self.retrieve()
 
         return self.ret, self.frame

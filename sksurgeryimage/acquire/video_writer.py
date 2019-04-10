@@ -80,9 +80,12 @@ class VideoWriter(object):
         """
         if not isinstance(frame, np.ndarray):
             raise TypeError("frame should be numpy array")
-        self.video_writer.write(frame)
+
         logging.debug("Writing frame with dimensions: %i x %i",
                       frame.shape[1], frame.shape[0])
+
+        self.video_writer.write(frame)
+
 
 
 class TimestampedVideoWriter(VideoWriter):
@@ -99,6 +102,8 @@ class TimestampedVideoWriter(VideoWriter):
 
         timestamp_filename = filename + '.timestamps'
         self.timestamp_file = open(timestamp_filename, 'w')
+        self.default_timestamp_message = "NO_TIMESTAMP"
+
 
     def close(self):
         """ Close/release the output files for video and timestamps. """
@@ -107,14 +112,26 @@ class TimestampedVideoWriter(VideoWriter):
         self.timestamp_file.close()
         logging.debug("Closing TimestampedVideoWriter.")
 
-    def write_frame(self, frame, timestamp):
+    def write_frame(self, frame, timestamp=None):
         """
         Write a frame and timestamp to the output files.
+        If no timestamp provided, write a defualt value.
+        :param frame: Image data
+        :type frame: numpy array
+        :param timestamp: Timestamp data
+        :type timestamp: datetime.datetime object
         """
-        if not isinstance(timestamp, datetime.datetime):
-            raise TypeError("Timestamp should be datetime.datetime object")
-
         super(TimestampedVideoWriter, self).write_frame(frame)
+
+        if not timestamp:
+            timestamp = self.default_timestamp_message
+            self.timestamp_file.write(timestamp + '\n')
+            return
+
+        if not isinstance(timestamp, datetime.datetime):
+            raise TypeError("Timestamp should be a datetime.datetimeobject")
+
+        # Convert datetime object to string
         self.timestamp_file.write(timestamp.isoformat() + '\n')
 
 class ThreadedTimestampedVideoWriter(TimestampedVideoWriter):
@@ -150,7 +167,7 @@ class ThreadedTimestampedVideoWriter(TimestampedVideoWriter):
         logging.debug("Stopping ThreadedTimestampedVideoWriter thread")
         self.started = False
 
-    def add_to_queue(self, frame, timestamp):
+    def add_to_queue(self, frame, timestamp=None):
         """ Add a frame and a timestamp to the queue for writing.
         :param frame: Image frame
         :type frame: numpy array
