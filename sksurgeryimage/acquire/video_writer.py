@@ -21,7 +21,7 @@ class VideoWriter(object):
     :param width: width of input frame
     :param height: height of input frame
     """
-    def __init__(self, filename, fps, width, height):
+    def __init__(self, filename, fps=25, width=640, height=480):
 
         self.set_filename(filename)
 
@@ -96,7 +96,7 @@ class TimestampedVideoWriter(VideoWriter):
     :param filename: Filename to save output video to.
                      Timestamp file is "filename + 'timestamps'"
     """
-    def __init__(self, filename, fps, width, height):
+    def __init__(self, filename, fps=25, width=640, height=480):
         super(TimestampedVideoWriter, self).__init__(filename, fps,
                                                      width, height)
 
@@ -149,7 +149,7 @@ class ThreadedTimestampedVideoWriter(TimestampedVideoWriter):
 
     threaded_vw.stop() """
 
-    def __init__(self, filename, fps, width, height):
+    def __init__(self, filename, fps=25, width=640, height=480):
         super(ThreadedTimestampedVideoWriter, self).__init__(filename, fps,
                                                              width, height)
         self.started = False
