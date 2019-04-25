@@ -32,19 +32,18 @@ def test_save_a_file_and_all_cameras():
     
     output_dir = 'tests/output/acquire/'
 
-    fps = 25
 
     # Create video writer for file input
     output_for_video_file = output_dir + 'video_from_file.avi'
     width, height  = (sw.sources[0].frame.shape[1],  sw.sources[0].frame.shape[0])
-    video_writer_from_file = video_writer.TimestampedVideoWriter(output_for_video_file, fps, width, height)
+    video_writer_from_file = video_writer.TimestampedVideoWriter(output_for_video_file, width=width, height=height)
 
     # Create video writer(s) for all camera inputs
     cam_writers = []
     for i in range(num_cameras):
         fname = output_dir + 'camera' + str(i) + '.avi'
         width, height = (sw.sources[i+1].frame.shape[1],  sw.sources[i+1].frame.shape[0])
-        cam_writers.append(video_writer.TimestampedVideoWriter(fname, fps, width, height))
+        cam_writers.append(video_writer.TimestampedVideoWriter(fname, width=width, height=height))
 
     ###############################
     # Capture and write some frames
@@ -97,12 +96,11 @@ def test_save_file_using_threaded_video_writer():
 
     # Create video writer for file input
     output_for_video_file = output_dir + 'threaded_video_writer_from_file.avi'
-    fps = 25
     width, height  = (sw.sources[0].frame.shape[1],  sw.sources[0].frame.shape[0])
    
     threaded_vw = \
         video_writer.ThreadedTimestampedVideoWriter(output_for_video_file,
-                                                    fps, width, height)
+                                                    width=width, height=height)
 
     threaded_vw.start()
 
