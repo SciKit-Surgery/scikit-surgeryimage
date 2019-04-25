@@ -21,11 +21,11 @@ class VideoWriter(object):
     :param width: width of input frame
     :param height: height of input frame
     """
-    def __init__(self, filename, fps=25, width=640, height=480):
+    def __init__(self, filename, fps=25, width=640, height=480, codec='MJPG'):
 
         self.set_filename(filename)
 
-        fourcc = cv2.VideoWriter_fourcc(*'MJPG')
+        fourcc = cv2.VideoWriter_fourcc(*codec)
 
         self.video_writer = cv2.VideoWriter(
             filename, fourcc, fps, (width, height))
@@ -96,9 +96,11 @@ class TimestampedVideoWriter(VideoWriter):
     :param filename: Filename to save output video to.
                      Timestamp file is "filename + 'timestamps'"
     """
-    def __init__(self, filename, fps=25, width=640, height=480):
+    def __init__(self, filename, fps=25, width=640,
+                 height=480, codec='MJPG'):
+
         super(TimestampedVideoWriter, self).__init__(filename, fps,
-                                                     width, height)
+                                                     width, height, codec)
 
         timestamp_filename = filename + '.timestamps'
         self.timestamp_file = open(timestamp_filename, 'w')
@@ -149,9 +151,12 @@ class ThreadedTimestampedVideoWriter(TimestampedVideoWriter):
 
     threaded_vw.stop() """
 
-    def __init__(self, filename, fps=25, width=640, height=480):
+    def __init__(self, filename, fps=25, width=640,
+                 height=480, codec='MJPG'):
+
         super(ThreadedTimestampedVideoWriter, self).__init__(filename, fps,
-                                                             width, height)
+                                                             width, height,
+                                                             codec)
         self.started = False
         self.queue = Queue()
 
