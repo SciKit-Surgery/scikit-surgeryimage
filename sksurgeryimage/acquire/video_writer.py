@@ -5,6 +5,7 @@
 import logging
 import os
 import datetime
+import time
 from queue import Queue
 from threading import Thread
 import cv2
@@ -21,7 +22,7 @@ class VideoWriter(object):
     :param width: width of input frame
     :param height: height of input frame
     """
-    def __init__(self, filename, fps, width, height):
+    def __init__(self, filename, fps=25, width=640, height=480):
 
         self.set_filename(filename)
 
@@ -96,7 +97,7 @@ class TimestampedVideoWriter(VideoWriter):
     :param filename: Filename to save output video to.
                      Timestamp file is "filename + 'timestamps'"
     """
-    def __init__(self, filename, fps, width, height):
+    def __init__(self, filename, fps=25, width=640, height=480):
         super(TimestampedVideoWriter, self).__init__(filename, fps,
                                                      width, height)
 
@@ -149,11 +150,12 @@ class ThreadedTimestampedVideoWriter(TimestampedVideoWriter):
 
     threaded_vw.stop() """
 
-    def __init__(self, filename, fps, width, height):
+    def __init__(self, filename, fps=25, width=640, height=480):
         super(ThreadedTimestampedVideoWriter, self).__init__(filename, fps,
                                                              width, height)
         self.started = False
         self.queue = Queue()
+        self.sleep_time = 1 / 1E5
 
     def start(self):
         """ Start the thread running. """
@@ -183,6 +185,7 @@ class ThreadedTimestampedVideoWriter(TimestampedVideoWriter):
         while self.started:
             if not self.queue.empty():
                 self.write_next_frame_and_timestamp()
+            time.sleep(self.sleep_time)
 
         # Write any remaining frames in the queue
         while not self.queue.empty():
