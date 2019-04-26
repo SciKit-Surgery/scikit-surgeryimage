@@ -159,6 +159,7 @@ class ThreadedTimestampedVideoWriter(TimestampedVideoWriter):
                                                              codec)
         self.started = False
         self.queue = Queue()
+        self.sleep_time = 1 / 1E5
 
     def start(self):
         """ Start the thread running. """
@@ -188,6 +189,7 @@ class ThreadedTimestampedVideoWriter(TimestampedVideoWriter):
         while self.started:
             if not self.queue.empty():
                 self.write_next_frame_and_timestamp()
+            time.sleep(self.sleep_time)
 
         # Write any remaining frames in the queue
         while not self.queue.empty():
