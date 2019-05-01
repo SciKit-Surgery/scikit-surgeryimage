@@ -38,7 +38,8 @@ class CharucoPointDetector(PointDetector):
 
         self.dictionary = dictionary
         self.number_of_squares = number_of_squares
-        self.number_in_x, self.number_in_y = self.number_of_squares
+        self.number_in_x = self.number_of_squares[0] - 1
+        self.number_in_y = self.number_of_squares[1] - 1
         self.total_number_of_points = self.number_in_x * self.number_in_y
         self.size = size
         self.camera_matrix = camera_matrix
@@ -53,9 +54,9 @@ class CharucoPointDetector(PointDetector):
                                   )
         self.object_points = np.zeros((self.total_number_of_points, 3))
         for i in range(0, self.total_number_of_points):
-            self.object_points[i][0] = (i % self.number_in_y) \
+            self.object_points[i][0] = (i % self.number_in_x + 1) \
                                        * self.size[0]
-            self.object_points[i][1] = (i // self.number_in_y) \
+            self.object_points[i][1] = (i // self.number_in_x + 1) \
                                        * self.size[0]
             self.object_points[i][2] = 0
 
