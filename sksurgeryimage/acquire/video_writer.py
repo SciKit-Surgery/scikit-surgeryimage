@@ -162,6 +162,8 @@ class ThreadedTimestampedVideoWriter(TimestampedVideoWriter):
         self.queue = Queue()
         self.sleep_time = 1 / 1E5
 
+        self.start()
+
     def start(self):
         """ Start the thread running. """
         logging.debug("Starting ThreadedTimestampedVideoWriter thread")
@@ -174,8 +176,10 @@ class ThreadedTimestampedVideoWriter(TimestampedVideoWriter):
         logging.debug("Stopping ThreadedTimestampedVideoWriter thread")
         self.started = False
 
-    def add_to_queue(self, frame, timestamp=None):
+    def write_frame(self, frame, timestamp=None):
         """ Add a frame and a timestamp to the queue for writing.
+        Named for consistency with the non-threaded version.
+        Actual writing to disk is done by write_frame_to_disk()
         :param frame: Image frame
         :type frame: numpy array
         :param timestamp: Frame timestamp
@@ -189,17 +193,35 @@ class ThreadedTimestampedVideoWriter(TimestampedVideoWriter):
         # Write frames in the queue as they arrive
         while self.started:
             if not self.queue.empty():
-                self.write_next_frame_and_timestamp()
+                self.write_frame_to_disk()
             time.sleep(self.sleep_time)
 
         # Write any remaining frames in the queue
         while not self.queue.empty():
-            self.write_next_frame_and_timestamp()
+            self.write_frame_to_disk()
 
         self.close()
 
-    def write_next_frame_and_timestamp(self):
+    def write_frame_to_disk(self):
         """ Get frame and timestamp from queue, then write to output. """
-        logging.debug("Writing frame")
+        logging.debug("Writing frame and timestamp to disk")
         frame, timestamp = self.queue.get()
-        self.write_frame(frame, timestamp)
+
+        if not isinstance(frame, np.ndarray):
+            raise TypeError("frame should be numpy array")
+
+        logging.debug("Writing frame with dimensions: %i x %i",
+                      frame.shape[1], frame.shape[0])
+
+        self.video_writer.write(frame)
+
+        if not timestamp:
+            timestamp = self.default_timestamp_message
+            self.timestamp_file.write(timestamp + '\n')
+            return
+
+        if not isinstance(timestamp, datetime.datetime):
+            raise TypeError("Timestamp should be a datetime.datetimeobject")
+
+        # Convert datetime object to string
+        self.timestamp_file.write(timestamp.isoformat() + '\n')

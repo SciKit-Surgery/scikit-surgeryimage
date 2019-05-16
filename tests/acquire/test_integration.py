@@ -102,15 +102,13 @@ def test_save_file_using_threaded_video_writer():
         video_writer.ThreadedTimestampedVideoWriter(output_for_video_file,
                                                     width=width, height=height)
 
-    threaded_vw.start()
-
     ###############################
     # Capture and write some frames
     for i in range(num_frames_in_input_file):
         sw.get_next_frames()
         frame = sw.sources[0].frame
         timestamp = sw.sources[0].timestamp
-        threaded_vw.add_to_queue(frame, timestamp)
+        threaded_vw.write_frame(frame, timestamp)
 
     # Close sources and writers
     threaded_vw.stop()
