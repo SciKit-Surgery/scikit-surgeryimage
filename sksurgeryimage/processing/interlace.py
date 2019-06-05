@@ -137,6 +137,28 @@ def deinterlace_to_new(interlaced):
 
     return even_rows, odd_rows
 
+def stack_to_new(left, right):
+    """ Vertically stack left and right array into single output array.
+    Left and right images should have the same dimensions.
+
+    :param left: left image
+    :param right: right image
+    :type left: numpy array
+    :type right: numpy array.
+    """
+
+    if not isinstance(left, np.ndarray):
+        raise TypeError('Left input is not a numpy array')
+
+    if not isinstance(right, np.ndarray):
+        raise TypeError('Right input is not a numpy array')
+
+    if left.shape != right.shape:
+        raise ValueError('Left and right inputs have different dimensions')
+
+    stacked = np.vstack((left, right))
+
+    return stacked
 
 def split_stacked_to_preallocated(stacked, top, bottom):
     """
