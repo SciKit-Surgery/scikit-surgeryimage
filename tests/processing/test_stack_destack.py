@@ -3,6 +3,33 @@ import cv2 as cv2
 import pytest
 from sksurgeryimage.processing import interlace as i
 
+def test_stack():
+    
+    dims = (10, 10)
+    left = np.ones(dims)
+    right = np.zeros(dims)
+
+    stacked = i.stack_to_new(left, right)
+
+    np.array_equal(stacked[:10, :], left)
+    np.array_equal(stacked[10:, :], right)
+
+def test_stack_throws_errors():
+    dims = (10, 10)
+    other_dims = (20, 10)
+    left = np.ones(dims)
+    right = np.zeros(dims)
+
+    invalid_array = np.ones(other_dims)
+
+    with pytest.raises(TypeError):
+        i.stack_to_new(left,'invalid')
+
+    with pytest.raises(TypeError):
+        i.stack_to_new('invalid', right)
+
+    with pytest.raises(ValueError):
+        i.stack_to_new(left, invalid_array)
 
 def test_empty_input_to_split_stacked_to_new():
 
