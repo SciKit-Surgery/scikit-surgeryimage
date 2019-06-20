@@ -26,7 +26,7 @@ def make_charuco_board(dictionary, number_of_squares, size, image_size):
                                       size_of_square,
                                       size_of_tag,
                                       dictionary)
-    image = board.draw(image_size, 100, 1)
+    image = board.draw(image_size, 1, 0)
     return image, board
 
 
@@ -44,7 +44,13 @@ def detect_charuco_points(dictionary, board, image,
     :param distortion_coefficients: if specified, the distortion coefficients
     :return: marker_corners, marker_ids, chessboard_corners, chessboard_ids
     """
-    marker_corners, marker_ids, _ = cv2.aruco.detectMarkers(image, dictionary)
+    detection_parameters = aruco.DetectorParameters_create()
+    detection_parameters.maxErroneousBitsInBorderRate = 0.1
+    detection_parameters.perspectiveRemovePixelPerCell = 30
+    detection_parameters.perspectiveRemoveIgnoredMarginPerCell = 0.3
+    marker_corners, marker_ids, _ =\
+        aruco.detectMarkers(image, dictionary,
+                            parameters=detection_parameters)
 
     chessboard_corners = None
     chessboard_ids = None
