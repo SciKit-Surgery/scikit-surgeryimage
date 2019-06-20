@@ -26,7 +26,7 @@ def make_charuco_board(dictionary, number_of_squares, size, image_size):
                                       size_of_square,
                                       size_of_tag,
                                       dictionary)
-    image = board.draw(image_size, 100, 1)
+    image = board.draw(image_size, 1, 0)
     return image, board
 
 
