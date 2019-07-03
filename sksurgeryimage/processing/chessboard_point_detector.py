@@ -32,7 +32,7 @@ class ChessboardPointDetector(PointDetector):
         self.square_size_in_mm = square_size_in_mm
 
         self.object_points = np.zeros((self.expected_number_of_points, 3))
-        self.ids = np.zeros((self.expected_number_of_points, 1))
+        self.ids = np.zeros((self.expected_number_of_points, 1), dtype=np.int16)
         for i in range(0, self.expected_number_of_points):
             self.object_points[i][0] = (i % self.number_in_x) \
                                        * self.square_size_in_mm
