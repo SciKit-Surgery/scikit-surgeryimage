@@ -22,3 +22,13 @@ def prepare_cv2_text_overlay(overlay_text, frame, text_scale=1):
         text, text_location, cv2.FONT_HERSHEY_COMPLEX, text_scale, text_colour)
 
     return text_overlay_properties
+
+def noisy_image(image, mean=0, stddev=(50, 5, 5)):
+    """
+    Creates a noise image, based on the dimensions of the
+    passed image.
+    param: the image to define size and channels of output
+    returns: a noisy image
+    """
+    cv2.randn(image, (mean), (stddev))
+    return image

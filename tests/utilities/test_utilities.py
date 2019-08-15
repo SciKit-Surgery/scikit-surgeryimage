@@ -30,3 +30,12 @@ def test_prepare_text_overlay():
 
     assert expected_large == large_text_overlay_properties
 
+
+def test_noisy():
+    """
+    tests function to add noise to a colour image.
+    """
+    timage = np.zeros((10, 10, 1), np.uint8)
+    image = utilities.noisy_image(timage)
+
+    assert image.shape == (10, 10, 1) 
