@@ -1,6 +1,6 @@
 # coding=utf-8
 
-"""snappysonic tests"""
+"""weiss logo tests"""
 
 from numpy import uint8 
 from sksurgeryimage.utilities.weisslogo import WeissLogo
