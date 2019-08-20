@@ -7,7 +7,7 @@ ChArUco implementation of PointDetector.
 import logging
 import numpy as np
 from sksurgeryimage.processing.point_detector import PointDetector
-import sksurgeryimage.calibration.charuco as ar
+import sksurgeryimage.calibration.charuco as charuco
 
 LOGGER = logging.getLogger(__name__)
 
@@ -45,13 +45,12 @@ class CharucoPointDetector(PointDetector):
         self.camera_matrix = camera_matrix
         self.distortion_coefficients = distortion_coefficients
         self.image, self.board = \
-            ar.make_charuco_board(self.dictionary,
-                                  self.number_of_squares,
-                                  self.size,
-                                  (self.number_of_squares[0] * 100,
-                                   self.number_of_squares[1] * 100
-                                   )
-                                  )
+            charuco.make_charuco_board(self.dictionary,
+                                       self.number_of_squares,
+                                       self.size,
+                                       (self.number_of_squares[0] * 100,
+                                        self.number_of_squares[1] * 100)
+                                       )
         self.object_points = np.zeros((self.total_number_of_points, 3))
         for i in range(0, self.total_number_of_points):
             self.object_points[i][0] = (i % self.number_in_x + 1) \
@@ -70,11 +69,12 @@ class CharucoPointDetector(PointDetector):
         _, \
         _, \
         chessboard_corners, \
-        chessboard_ids = ar.detect_charuco_points(self.dictionary,
-                                                  self.board,
-                                                  image,
-                                                  self.camera_matrix,
-                                                  self.distortion_coefficients)
+        chessboard_ids = \
+            charuco.detect_charuco_points(self.dictionary,
+                                          self.board,
+                                          image,
+                                          self.camera_matrix,
+                                          self.distortion_coefficients)
         points_3d = \
             np.take(self.object_points, chessboard_ids, axis=0).squeeze()
         return chessboard_ids, points_3d, chessboard_corners.squeeze()
