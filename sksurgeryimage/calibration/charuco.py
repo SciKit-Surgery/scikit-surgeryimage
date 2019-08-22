@@ -71,7 +71,7 @@ def filter_out_wrong_markers(marker_corners,
         obj_point_2d = board.chessboardCorners[i, 0:2].astype(np.float32)
         obj_point_2d = np.reshape(obj_point_2d, (-1, 1, 2))
         projected_positions = []
-        nearest_markers = []
+        neighbour_markers = []
 
         number_of_nearest_markers = len(board.nearestMarkerIdx[i])
         assert number_of_nearest_markers == 2
@@ -88,13 +88,13 @@ def filter_out_wrong_markers(marker_corners,
                 out = cv2.perspectiveTransform(obj_point_2d,
                                                transformations[marker_index])
                 projected_positions.append(out)
-                nearest_markers.append(marker_index)
+                neighbour_markers.append(marker_index)
 
         if len(projected_positions) > 1:
             dis = np.linalg.norm(projected_positions[0]
                                  - projected_positions[1])
             if dis > 20:
-                mask[nearest_markers] = False
+                mask[neighbour_markers] = False
 
     marker_ids = marker_ids[mask]
     marker_corners = np.array(marker_corners)
