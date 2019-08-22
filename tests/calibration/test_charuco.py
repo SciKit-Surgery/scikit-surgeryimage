@@ -88,7 +88,7 @@ def test_detect_charuco_points_with_png_files():
     dictionary = cv2.aruco.Dictionary_get(aruco.DICT_4X4_250)
     _, board = charuco.make_charuco_board(dictionary, (nx, ny), (ss, ts), (sx, sy))
 
-    # All markers are correct
+    # All markers in the image are at the correct positions.
     image = cv2.imread('./tests/data/processing/pattern_4x4_19x26_5_4_with_inset_13x18.png')
     marker_corners, marker_ids, \
         chessboard_corners, chessboard_ids \
@@ -100,8 +100,8 @@ def test_detect_charuco_points_with_png_files():
     assert image.shape[0] == sy
     assert image.shape[1] == sx
 
-    # Marker No.228 was replaced by another marker so not detected.
-    # No id=0 and id=18. No marker was filtered out.
+    # In this image Marker 228 is replaced by another marker so not detected,
+    # so corners id=0 and id=18. No marker was filtered out.
     image = cv2.imread('./tests/data/processing/pattern_4x4_19x26_5_4_with_inset_13x18_corrupted1.png')
     marker_corners, marker_ids, \
         chessboard_corners, chessboard_ids \
@@ -113,9 +113,9 @@ def test_detect_charuco_points_with_png_files():
     assert image.shape[0] == sy
     assert image.shape[1] == sx
 
-    # Marker No.0 was replaced by No.228 which was first detected
-    # to be at the wrong place so filtered out together with No.238
-    # The No.228 at the right place is actually not filtered out.
+    # In this image Marker 0 was replaced by Marker 228 which was first detected
+    # to be at the wrong place so filtered out together with Marker 238
+    # The Marker 228 at the right place is actually not filtered out.
     image = cv2.imread('./tests/data/processing/pattern_4x4_19x26_5_4_with_inset_13x18_corrupted2.png')
     marker_corners, marker_ids, \
         chessboard_corners, chessboard_ids \
