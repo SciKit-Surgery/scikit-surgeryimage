@@ -23,7 +23,8 @@ class CharucoPointDetector(PointDetector):
                  size,
                  scale=(1, 1),
                  camera_matrix=None,
-                 distortion_coefficients=None):
+                 distortion_coefficients=None,
+                 filtering=False):
         """
         Constructs a CharucoPointDetector.
 
@@ -44,6 +45,8 @@ class CharucoPointDetector(PointDetector):
         self.size = size
         self.camera_matrix = camera_matrix
         self.distortion_coefficients = distortion_coefficients
+        self.filtering = filtering
+
         self.image, self.board = \
             charuco.make_charuco_board(self.dictionary,
                                        self.number_of_squares,
@@ -74,7 +77,8 @@ class CharucoPointDetector(PointDetector):
                                           self.board,
                                           image,
                                           self.camera_matrix,
-                                          self.distortion_coefficients)
+                                          self.distortion_coefficients,
+                                          self.filtering)
         points_3d = \
             np.take(self.object_points, chessboard_ids, axis=0).squeeze()
         return chessboard_ids, points_3d, chessboard_corners.squeeze()

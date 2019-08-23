@@ -105,7 +105,8 @@ def filter_out_wrong_markers(marker_corners,
 
 def detect_charuco_points(dictionary, board, image,
                           camera_matrix=None,
-                          distortion_coefficients=None):
+                          distortion_coefficients=None,
+                          filtering=False):
     """
     Extracts ChArUco points. If you can provide camera matrices,
     it may be more accurate.
@@ -115,6 +116,8 @@ def detect_charuco_points(dictionary, board, image,
     :param image: grey scale image in which to search
     :param camera_matrix: if specified, the 3x3 camera intrinsic matrix
     :param distortion_coefficients: if specified, the distortion coefficients
+    :param filtering: whether or not check and filter out wrongly detected
+    markers
     :return: marker_corners, marker_ids, chessboard_corners, chessboard_ids
     """
     detection_parameters = aruco.DetectorParameters_create()
@@ -130,8 +133,9 @@ def detect_charuco_points(dictionary, board, image,
 
     if marker_corners:
 
-        marker_corners, marker_ids = \
-            filter_out_wrong_markers(marker_corners, marker_ids, board)
+        if filtering:
+            marker_corners, marker_ids = \
+                filter_out_wrong_markers(marker_corners, marker_ids, board)
 
         _, chessboard_corners, chessboard_ids \
             = aruco.interpolateCornersCharuco(
