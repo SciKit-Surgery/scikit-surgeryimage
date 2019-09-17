@@ -266,10 +266,10 @@ def test_vertically_stacked_extract_original_images(vertically_stacked_video_sou
 def test_opencv_example_stereo_distortion_correction_and_rectification(two_channel_video_source):
     expected_original_left = cv2.imread('tests/data/calib-opencv/left01.jpg')
     expected_original_right = cv2.imread('tests/data/calib-opencv/right01.jpg')
-    expected_undistorted_left = cv2.imread('tests/data/calib-opencv/left01-undistorted.png')
-    expected_undistorted_right = cv2.imread('tests/data/calib-opencv/right01-undistorted.png')
-    expected_rectified_left = cv2.imread('tests/data/calib-opencv/left01-rectified.png')
-    expected_rectified_right = cv2.imread('tests/data/calib-opencv/right01-rectified.png')
+    expected_undistorted_left = cv2.imread('tests/data/calib-opencv/left_cv_undistorted_4.1.1.26.png')
+    expected_undistorted_right = cv2.imread('tests/data/calib-opencv/right_cv_undistorted_4.1.1.26.png')
+    expected_rectified_left = cv2.imread('tests/data/calib-opencv/left_cv_rectified_4.1.1.26.png')
+    expected_rectified_right = cv2.imread('tests/data/calib-opencv/right_cv_rectified_4.1.1.26.png')
     fs_li = cv2.FileStorage('tests/data/calib-opencv/calib.left.intrinsic.xml', cv2.FILE_STORAGE_READ)
     fs_ld = cv2.FileStorage('tests/data/calib-opencv/calib.left.distortion.xml', cv2.FILE_STORAGE_READ)
     fs_ri = cv2.FileStorage('tests/data/calib-opencv/calib.right.intrinsic.xml', cv2.FILE_STORAGE_READ)
@@ -298,48 +298,18 @@ def test_opencv_example_stereo_distortion_correction_and_rectification(two_chann
     vs.set_intrinsic_parameters([li, ri], [ld, rd])
     left, right = vs.get_undistorted()
 
-    cv2.imwrite('tests/output/left_cv_undistorted.png', left)
-    cv2.imwrite('tests/output/right_cv_undistorted.png', right)
-
-    atol = 32
+    atol = 16
     rtol = 0.0
     #test with all close, OpenCV uses a tolerance of 16 for undistortion on a uint8
-    """
-    for row in range(left.shape[0]):
-        for col in range(left.shape[1]):
-            for chan in range(left.shape[2]):
-                absdiff = abs(np.int16(left[row,col,chan]) - np.int16(expected_undistorted_left[row,col,chan]))
-                if absdiff > atol:
-                    print (left.dtype, row, col, chan, left[row,col,chan], expected_undistorted_left[row,col,chan], absdiff)
-                    assert (False)
-    
-    for row in range(right.shape[0]):
-        for col in range(right.shape[1]):
-            for chan in range(right.shape[2]):
-                absdiff = abs(np.int16(right[row,col,chan]) - np.int16(expected_undistorted_right[row,col,chan]))
-                if absdiff > atol:
-                    print (right.dtype, row, col, chan, right[row,col,chan], expected_undistorted_right[row,col,chan], absdiff)
-                    assert (False)
-    """
-    border = 25
-    min_x = border - 1
-    max_x = left.shape[0] - border
-    min_y = border - 1
-    max_y = left.shape[1] - border
-    #test with all close, OpenCV uses a tolerance of 16 for undistortion on a uint8
-    np.testing.assert_allclose(left[min_x:max_x,min_y:max_y,:], expected_undistorted_left[min_x:max_x,min_y:max_y,:], rtol, atol)
-    np.testing.assert_allclose(right[min_x:max_x,min_y:max_y,:], expected_undistorted_right[min_x:max_x,min_y:max_y,:], rtol, atol)
+    np.testing.assert_allclose(left, expected_undistorted_left, rtol, atol)
+    np.testing.assert_allclose(right, expected_undistorted_right, rtol, atol)
 
     vs.set_extrinsic_parameters(r, t, (int(vs.video_sources.frames[0].shape[1]),
                                        int(vs.video_sources.frames[0].shape[0])))
     rectified_left, rectified_right = vs.get_rectified()
     
-    cv2.imwrite('tests/output/left_cv_rectified.png', rectified_left)
-    cv2.imwrite('tests/output/right_cv_rectified.png', rectified_right)
-
-
-    #np.testing.assert_allclose(rectified_left[min_x:max_x,min_y:max_y,:], expected_rectified_left[min_x:max_x,min_y:max_y,:], rtol, atol, verbose=True)
-    np.testing.assert_allclose(rectified_right[min_x:max_x,min_y:max_y,:], expected_rectified_right[min_x:max_x,min_y:max_y,:], rtol, atol, verbose=True)
+    np.testing.assert_allclose(rectified_left, expected_rectified_left, rtol, atol, verbose=True)
+    np.testing.assert_allclose(rectified_right, expected_rectified_right, rtol, atol, verbose=True)
 
     vs.release()  # Just ensuring code doesn't crash
 
@@ -347,10 +317,10 @@ def test_opencv_example_stereo_distortion_correction_and_rectification(two_chann
 def test_ucl_example_stereo_distortion_correction_and_rectification(two_channel_ucl_video_source):
     expected_original_left = cv2.imread('tests/data/calib-ucl-chessboard/leftImage.png')
     expected_original_right = cv2.imread('tests/data/calib-ucl-chessboard/rightImage.png')
-    expected_undistorted_left = cv2.imread('tests/data/calib-ucl-chessboard/leftImageUndistorted.png')
-    expected_undistorted_right = cv2.imread('tests/data/calib-ucl-chessboard/rightImageUndistorted.png')
-    expected_rectified_left = cv2.imread('tests/data/calib-ucl-chessboard/leftImageRect.png')
-    expected_rectified_right = cv2.imread('tests/data/calib-ucl-chessboard/rightImageRect.png')
+    expected_undistorted_left = cv2.imread('tests/data/calib-ucl-chessboard/left_ucl_undistorted_4.1.1.26.png')
+    expected_undistorted_right = cv2.imread('tests/data/calib-ucl-chessboard/right_ucl_undistorted_4.1.1.26.png')
+    expected_rectified_left = cv2.imread('tests/data/calib-ucl-chessboard/left_ucl_rectified_4.1.1.26.png')
+    expected_rectified_right = cv2.imread('tests/data/calib-ucl-chessboard/right_ucl_rectified_4.1.1.26.png')
     fs_li = cv2.FileStorage('tests/data/calib-ucl-chessboard/calib.left.intrinsic.xml', cv2.FILE_STORAGE_READ)
     fs_ld = cv2.FileStorage('tests/data/calib-ucl-chessboard/calib.left.distortion.xml', cv2.FILE_STORAGE_READ)
     fs_ri = cv2.FileStorage('tests/data/calib-ucl-chessboard/calib.right.intrinsic.xml', cv2.FILE_STORAGE_READ)
@@ -378,35 +348,11 @@ def test_ucl_example_stereo_distortion_correction_and_rectification(two_channel_
     cv2.imwrite('tests/output/left_ucl_undistorted.png', left)
     cv2.imwrite('tests/output/right_ucl_undistorted.png', right)
 
-    atol = 32
+    atol = 16
     rtol = 0.0
     #test with all close, OpenCV uses a tolerance of 16 for undistortion on a uint8
-    """
-    for row in range(left.shape[0]):
-        for col in range(left.shape[1]):
-            for chan in range(left.shape[2]):
-                absdiff = abs(np.int16(left[row,col,chan]) - np.int16(expected_undistorted_left[row,col,chan]))
-                if absdiff > atol:
-                    print (left.dtype,row, col, chan, left[row,col,chan], expected_undistorted_left[row,col,chan], absdiff)
-                    assert (False)
-    
-    for row in range(right.shape[0]):
-        for col in range(right.shape[1]):
-            for chan in range(right.shape[2]):
-                absdiff = abs(np.int16(right[row,col,chan]) - np.int16(expected_undistorted_right[row,col,chan]))
-                if absdiff > atol:
-                    print (right.dtype,row, col, chan, right[row,col,chan], expected_undistorted_right[row,col,chan], absdiff)
-                    assert (False)
-                    """
-    border = 25
-    min_x = border - 1
-    max_x = left.shape[0] - border
-    min_y = border - 1
-    max_y = left.shape[1] - border
-    #test with all close, OpenCV uses a tolerance of 16 for undistortion on a uint8
-    np.testing.assert_allclose(left[min_x:max_x,min_y:max_y,:], expected_undistorted_left[min_x:max_x,min_y:max_y,:], rtol, atol)
-    np.testing.assert_allclose(right[min_x:max_x,min_y:max_y,:], expected_undistorted_right[min_x:max_x,min_y:max_y,:], rtol, atol)
-
+    np.testing.assert_allclose(left, expected_undistorted_left, rtol, atol)
+    np.testing.assert_allclose(right, expected_undistorted_right, rtol, atol)
 
     vs.set_extrinsic_parameters(r, t,
                                 (int(vs.video_sources.frames[0].shape[1]),
@@ -415,16 +361,6 @@ def test_ucl_example_stereo_distortion_correction_and_rectification(two_channel_
                                 )  # double height
     rectified_left, rectified_right = vs.get_rectified()
 
-    cv2.imwrite('tests/output/left_ucl_rectified.png', rectified_left)
-    cv2.imwrite('tests/output/right_ucl_rectified.png', rectified_right)
+    np.testing.assert_allclose(rectified_left, expected_rectified_left, rtol, atol, verbose=True)
+    np.testing.assert_allclose(rectified_right, expected_rectified_right, rtol, atol, verbose=True)
 
-    np.testing.assert_allclose(rectified_left[min_x:max_x,min_y:max_y,:], expected_rectified_left[min_x:max_x,min_y:max_y,:], rtol, atol, verbose=True)
-    np.testing.assert_allclose(rectified_right[min_x:max_x,min_y:max_y,:], expected_rectified_right[min_x:max_x,min_y:max_y,:], rtol, atol, verbose=True)
-
-
-from sksurgeryimage.acquire import stereo_video as sv
-if __name__ == "__main__":
-    test_opencv_example_stereo_distortion_correction_and_rectification(sv.StereoVideo(sv.StereoVideoLayouts.DUAL,
-                          ["tests/data/calib-ucl-chessboard/leftImage.avi",
-                           "tests/data/calib-ucl-chessboard/rightImage.avi"
-                           ]))

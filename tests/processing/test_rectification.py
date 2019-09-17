@@ -4,14 +4,14 @@ import numpy as np
 import cv2
 
 
-def test_rectify_4_1_0_25():
+def test_rectify_4_1_1_26():
     """
-    A unit test for the performance of OpenCV's undistort
+    A unit test for the performance of OpenCV's rectification test
     function. This isn't really part of scikit-surgeryimage, but I've added
     it as a convenience. We got into some trouble when we changed versions
     of opencv-contrib-python from 4_1_0_25 to 4_1_0_26. OpenCV's underlying
-    undistort function is only tested to a tolerance of 16 for a uint8 image,
-    so we do the same here.
+    rectification function doesn't seem too stable between versions, so this unit test
+    should pick up changes due to changes in opencv-contrib-python.
     """
     original = np.zeros((64,128,3), dtype=np.uint8)
     absolute_tolerance = 16
@@ -33,7 +33,6 @@ def test_rectify_4_1_0_25():
     li[1,2] = 32.0
     ld = np.zeros((1,4),dtype = np.double)
     ld = (-0.333, 0.088, 0.022, 0.004)
-    undistorted = cv2.undistort ( original, li, ld )
 
     rectify_rotation = [None, None]
     rectify_projection = [None, None]
@@ -46,8 +45,6 @@ def test_rectify_4_1_0_25():
     sr = np.array([[9.9998654509984819e-01, -4.0289369251237809e-03, -3.2676117460306965e-03] ,
          [4.0291930116066648e-03, 9.9999188019182839e-01, 7.1791971146594814e-05] ,
          [3.2672959683266610e-03, -8.4956843604492188e-05, 9.9999465876543070e-01 ]])
-    #sr = np.eye(3,3, dtype=np.double)
-    sr=np.asmatrix(sr)
     st = np.zeros((3,1), dtype=np.double)
     st[0,0]=1.1
     rectify_rotation[0], \
@@ -68,8 +65,8 @@ def test_rectify_4_1_0_25():
                       alpha=0.0,
                       newImageSize=rectify_new_size
                       )
-  
-    
+
+
     for image_index in range(2):
         rectify_dx[image_index], rectify_dy[image_index] = cv2.initUndistortRectifyMap(
                         li,
@@ -86,26 +83,17 @@ def test_rectify_4_1_0_25():
                                 rectify_dy[0],
                                 cv2.INTER_LINEAR
                                )
-    cv2.imwrite ('tests/output/rectified_image_left.png', rectified_image)
+
+    expected_rectified = cv2.imread('tests/data/processing/rectified_image_left_4.1.1.26.png')
+    np.testing.assert_allclose(rectified_image, expected_rectified, rtol = 0.0, atol = absolute_tolerance)
+
     rectified_image = cv2.remap(original,
                                 rectify_dx[1],
                                 rectify_dy[1],
                                 cv2.INTER_LINEAR
                                )
-    cv2.imwrite ('tests/output/rectified_image_right.png', rectified_image)
-    cv2.imwrite ('tests/output/rectify_dx_0.png', rectify_dx[0])
-    cv2.imwrite ('tests/output/rectify_dy_0.png', rectify_dy[0])
-    cv2.imwrite ('tests/output/rectify_dx_1.png', rectify_dx[1])
-    cv2.imwrite ('tests/output/rectify_dy_1.png', rectify_dy[1])
-    cv2.imwrite ('tests/output/rectify_q.png', rectify_q)
-    print(rectify_valid_roi[0])
-    print(rectify_valid_roi[1])
-    print(rectify_rotation[0])
-    print(rectify_projection[0])
-    print(rectify_rotation[1])
-    print(rectify_projection[1])
 
-    assert(False)
+    expected_rectified = cv2.imread('tests/data/processing/rectified_image_right_4.1.1.26.png')
+    np.testing.assert_allclose(rectified_image, expected_rectified, rtol = 0.0, atol = absolute_tolerance)
 
-if __name__ == '__main__':
-    test_rectify_4_1_0_25()
+
