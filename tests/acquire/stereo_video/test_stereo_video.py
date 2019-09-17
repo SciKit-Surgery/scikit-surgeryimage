@@ -59,7 +59,7 @@ def test_create_stereo_video_invalid_because_first_channel_not_correct_type():
 def test_create_stereo_video_invalid_because_second_channel_not_correct_type():
     with pytest.raises(TypeError):
         sv.StereoVideo(sv.StereoVideoLayouts.DUAL,
-                       ["tests/output/test-16x8-rgb.avi", np.ones((1, 1))])
+                       ["tests/data/acquire/test-16x8-rgb.avi", np.ones((1, 1))])
 
 
 def test_create_stereo_video_invalid_because_too_few_channels_for_dual():
@@ -70,7 +70,7 @@ def test_create_stereo_video_invalid_because_too_few_channels_for_dual():
 def test_create_stereo_video_invalid_because_width_invalid_type():
     with pytest.raises(TypeError):
         sv.StereoVideo(sv.StereoVideoLayouts.INTERLACED,
-                       ["tests/output/test-16x8-rgb.avi"],
+                       ["tests/data/acquire/test-16x8-rgb.avi"],
                        ("a", "b")
                        )
 
@@ -78,7 +78,7 @@ def test_create_stereo_video_invalid_because_width_invalid_type():
 def test_create_stereo_video_invalid_because_height_invalid_type():
     with pytest.raises(TypeError):
         sv.StereoVideo(sv.StereoVideoLayouts.INTERLACED,
-                       ["tests/output/test-16x8-rgb.avi"],
+                       ["tests/data/acquire/test-16x8-rgb.avi"],
                        (1, "b")
                        )
 
@@ -86,7 +86,7 @@ def test_create_stereo_video_invalid_because_height_invalid_type():
 def test_create_stereo_video_invalid_because_width_too_low():
     with pytest.raises(ValueError):
         sv.StereoVideo(sv.StereoVideoLayouts.INTERLACED,
-                       ["tests/output/test-16x8-rgb.avi"],
+                       ["tests/data/acquire/test-16x8-rgb.avi"],
                        (-1, 1)
                        )
 
@@ -94,7 +94,7 @@ def test_create_stereo_video_invalid_because_width_too_low():
 def test_create_stereo_video_invalid_because_height_too_low():
     with pytest.raises(ValueError):
         sv.StereoVideo(sv.StereoVideoLayouts.INTERLACED,
-                       ["tests/output/test-16x8-rgb.avi"],
+                       ["tests/data/acquire/test-16x8-rgb.avi"],
                        (1, -1)
                        )
 
@@ -344,9 +344,6 @@ def test_ucl_example_stereo_distortion_correction_and_rectification(two_channel_
     vs.video_sources.frames[1] = expected_original_right  # Hack for now, as colour space is changing !?!?
 
     left, right = vs.get_undistorted()
-
-    cv2.imwrite('tests/output/left_ucl_undistorted.png', left)
-    cv2.imwrite('tests/output/right_ucl_undistorted.png', right)
 
     atol = 16
     rtol = 0.0
