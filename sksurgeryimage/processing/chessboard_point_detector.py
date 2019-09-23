@@ -49,19 +49,22 @@ class ChessboardPointDetector(PointDetector):
         :return: ids, object_points, image_points as Nx[1,3,2] ndarrays
         """
         img_points = np.zeros((0, 2))
-        criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER,
-                    30, 0.001)
 
+        detection_criteria = cv2.CALIB_CB_ADAPTIVE_THRESH\
+            + cv2.CALIB_CB_FILTER_QUADS
         ret, corners = cv2.findChessboardCorners(image,
                                                  self.number_of_corners,
-                                                 None)
+                                                 detection_criteria)
 
+        optimisation_criteria = (cv2.TERM_CRITERIA_EPS
+                                 + cv2.TERM_CRITERIA_MAX_ITER,
+                                 30, 0.001)
         if ret:
             img_points = cv2.cornerSubPix(image,
                                           corners,
                                           (11, 11),
                                           (-1, -1),
-                                          criteria
+                                          optimisation_criteria
                                           )
 
             # If successful, we return all ids, 3D points and 2D points.
