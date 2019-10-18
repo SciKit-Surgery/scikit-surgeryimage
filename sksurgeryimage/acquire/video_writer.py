@@ -12,7 +12,10 @@ import cv2
 import numpy as np
 
 LOGGER = logging.getLogger(__name__)
-#pylint:disable=useless-object-inheritance
+
+# pylint:disable=useless-object-inheritance
+
+
 class VideoWriter(object):
     """
     Class to write images to disk using cv2.VideoWriter.
@@ -24,6 +27,9 @@ class VideoWriter(object):
     """
     def __init__(self, filename, fps=25, width=640, height=480, codec='MJPG'):
 
+        self.filename = None
+
+        # This also validates.
         self.set_filename(filename)
 
         fourcc = cv2.VideoWriter_fourcc(*codec)
@@ -88,7 +94,6 @@ class VideoWriter(object):
         self.video_writer.write(frame)
 
 
-
 class TimestampedVideoWriter(VideoWriter):
     """
     Class to write images and timestamps to disk, inherits from VideoWriter.
@@ -136,6 +141,7 @@ class TimestampedVideoWriter(VideoWriter):
 
         # Convert datetime object to string
         self.timestamp_file.write(timestamp.isoformat() + '\n')
+
 
 class ThreadedTimestampedVideoWriter(TimestampedVideoWriter):
     """ TimestampedVideoWriter that can be run in a thread.
