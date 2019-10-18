@@ -108,10 +108,12 @@ class TimestampedVideoWriter(VideoWriter):
         super(TimestampedVideoWriter, self).__init__(filename, fps,
                                                      width, height, codec)
 
-        timestamp_filename = filename + '.timestamps'
+        suffix = '.timestamps.txt'
+        basename, _ = os.path.splitext(filename)
+        timestamp_filename = basename + suffix
+
         self.timestamp_file = open(timestamp_filename, 'w')
         self.default_timestamp_message = "NO_TIMESTAMP"
-
 
     def close(self):
         """ Close/release the output files for video and timestamps. """
