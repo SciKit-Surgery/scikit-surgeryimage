@@ -17,20 +17,24 @@ def test_videowriter_invalid_filename_raises_error():
     with pytest.raises(ValueError):
         vw.VideoWriter(invalid_filename, fps, width, height)
 
+
 @mock.patch('os.makedirs')
 def test_videowriter_create_dir(mocked_makedirs):
     filename = 'new_dir/file.avi'
     vw.VideoWriter(filename, fps, width, height)
     mocked_makedirs.assert_called_with('new_dir')
 
+
 def test_timestamp_videowriter_creates_timestamp_file(tmpdir):
     filename = os.path.join(tmpdir.dirname, 'test.avi')
     vw.TimestampedVideoWriter(filename, fps, width, height)
 
+    basename, _ = os.path.splitext(filename)
     assert os.path.isfile(filename)
-    assert os.path.isfile(filename + '.timestamps')
+    assert os.path.isfile(os.path.join(basename + '.timestamps.txt'))
 
     # Video writer is tested further in test_integration
+
 
 def test_default_timestamp_written(tmpdir):
     # Write a frame without passing in a timestamp.
@@ -45,7 +49,8 @@ def test_default_timestamp_written(tmpdir):
     video_writer.write_frame(frame)
     video_writer.close()
 
-    timestamp_file = filename + '.timestamps'
+    basename, _ = os.path.splitext(filename)
+    timestamp_file = os.path.join(basename + '.timestamps.txt')
 
     expected_timestamp = video_writer.default_timestamp_message + '\n'
     with open(timestamp_file) as f:
