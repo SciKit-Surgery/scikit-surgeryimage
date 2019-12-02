@@ -146,7 +146,11 @@ def test_dotty_grid_16(setup_dotty_calibration_model):
     model_points = setup_dotty_calibration_model
     file_name = 'tests/data/calib-ucl-circles/snapshots/08_56_52/right_image.png'
     number_of_points = __check_real_image(model_points, file_name)
-    assert(192 == number_of_points)
+
+    # Expected to fail, as one of the reference dots is partially missing.
+    # So, the homography mapping picks wrong points, and RMS should be
+    # too high. So, the correct response is to return zero points to indicate failure.
+    assert(0 == number_of_points)
 
 
 def test_dotty_grid_17(setup_dotty_calibration_model):
