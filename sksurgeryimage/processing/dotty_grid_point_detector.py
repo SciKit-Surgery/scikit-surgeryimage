@@ -67,15 +67,19 @@ class DottyGridPointDetector(PointDetector):
         :param image: numpy 2D grey scale image.
         :return: ids, object_points, image_points as Nx[1,3,2] ndarrays
         """
+
+        # pylint:disable=too-many-locals, invalid-name, too-many-branches
+        # pylint:disable=too-many-statements
+
         smoothed = cv2.GaussianBlur(image, (5, 5), 0)
         threshold_max = 255
-        threshold = 151
+        window_size = 151
         c_offset = 20
         thresh = cv2.adaptiveThreshold(smoothed,
                                        threshold_max,
                                        cv2.ADAPTIVE_THRESH_MEAN_C,
                                        cv2.THRESH_BINARY,
-                                       threshold,
+                                       window_size,
                                        c_offset
                                        )
 
@@ -101,7 +105,7 @@ class DottyGridPointDetector(PointDetector):
                                   threshold_max,
                                   cv2.ADAPTIVE_THRESH_MEAN_C,
                                   cv2.THRESH_BINARY,
-                                  threshold,
+                                  window_size,
                                   c_offset
                                   )
         undistorted_keypoints = detector.detect(undistorted_thresholded)
@@ -176,7 +180,7 @@ class DottyGridPointDetector(PointDetector):
 
             # Find the homography between the distortion corrected points
             # and the reference points, from an ideal face-on image.
-            homography, status = \
+            homography, _ = \
                 cv2.findHomography(sorted_fiducials[:, 0:2],
                                    self.model_fiducials[:, 1:3])
 
