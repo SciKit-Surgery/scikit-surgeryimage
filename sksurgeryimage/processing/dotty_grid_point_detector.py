@@ -7,7 +7,6 @@ Dotty Grid implementation of PointDetector.
 import copy
 import logging
 import cv2
-from collections import Counter
 import numpy as np
 from sksurgeryimage.processing.point_detector import PointDetector
 
@@ -37,6 +36,9 @@ class DottyGridPointDetector(PointDetector):
         the points correctly. The image points returned are always
         the image points detected in the original distorted image.
 
+        The list of indexes, must be of length 4, and correspond to
+        top-left, top-right, bottom-left, bottom-right big blobs.
+
         :param model_points: numpy ndarray of id, x_pix, y_pix, x_mm, y_mm, z_mm
         :param list_of_indexes: list of specific indexes to use as fiducials
         :param intrinsics: 3x3 ndarray of camera intrinsics
@@ -49,6 +51,8 @@ class DottyGridPointDetector(PointDetector):
             raise ValueError('intrinsics is None')
         if distortion_coefficients is None:
             raise ValueError('distortion coefficients are None')
+        if len(list_of_indexes) != 4:
+            raise ValueError('list_of_index not of length 4')
 
         self.model_points = model_points
         self.list_of_indexes = list_of_indexes
@@ -63,7 +67,6 @@ class DottyGridPointDetector(PointDetector):
         :param image: numpy 2D grey scale image.
         :return: ids, object_points, image_points as Nx[1,3,2] ndarrays
         """
-
         smoothed = cv2.GaussianBlur(image, (5, 5), 0)
         threshold_max = 255
         threshold = 151
@@ -89,10 +92,6 @@ class DottyGridPointDetector(PointDetector):
         keypoints = detector.detect(thresh)
 
         # Also detect them in an undistorted image.
-        # Therefore this method assume that distortion correction is
-        # not so bad, so that the order of these two arrays of keypoints
-        # remains the same.
-
         undistorted_image = cv2.undistort(smoothed,
                                           self.intrinsics,
                                           self.distortion_coefficients
@@ -107,6 +106,8 @@ class DottyGridPointDetector(PointDetector):
                                   )
         undistorted_keypoints = detector.detect(undistorted_thresholded)
 
+        # Note that keypoints and undistorted_keypoints
+        # can be of different length
         if len(keypoints) > 4 and len(undistorted_keypoints) > 4:
             number_of_keypoints = len(keypoints)
             number_of_undistorted_keypoints = len(undistorted_keypoints)
@@ -114,12 +115,16 @@ class DottyGridPointDetector(PointDetector):
             # These are the final outputs.
             img_points = np.zeros((number_of_undistorted_keypoints, 2))
             object_points = np.zeros((number_of_undistorted_keypoints, 3))
-            indexes = np.zeros((number_of_undistorted_keypoints, 1), dtype=np.int16)
+            indexes = np.zeros((number_of_undistorted_keypoints, 1),
+                               dtype=np.int16)
 
             # These are for intermediate storage.
-            key_points = np.zeros((number_of_keypoints, 3))
-            undistorted_key_points = np.zeros((number_of_undistorted_keypoints, 3))
-            matched_points = np.zeros((number_of_undistorted_keypoints, 4))
+            key_points = \
+                np.zeros((number_of_keypoints, 3))
+            undistorted_key_points = \
+                np.zeros((number_of_undistorted_keypoints, 3))
+            matched_points = \
+                np.zeros((number_of_undistorted_keypoints, 4))
 
             # Converting OpenCV keypoints to numpy key_points
             counter = 0
@@ -135,13 +140,14 @@ class DottyGridPointDetector(PointDetector):
                 undistorted_key_points[counter][2] = key.pt[1]
                 counter = counter + 1
 
-            # Sort keypoints and pick biggest 4
+            # Sort undistorted_key_points and pick biggest 4
             sorted_points = undistorted_key_points[
                 undistorted_key_points[:, 0].argsort()]
 
             biggest_four = np.zeros((4, 5))
             counter = 0
-            for row_counter in range(number_of_undistorted_keypoints - 4, number_of_undistorted_keypoints):
+            for row_counter in range(number_of_undistorted_keypoints - 4,
+                                     number_of_undistorted_keypoints):
                 biggest_four[counter][0] = sorted_points[row_counter][1]
                 biggest_four[counter][1] = sorted_points[row_counter][2]
                 counter = counter + 1
@@ -189,7 +195,6 @@ class DottyGridPointDetector(PointDetector):
             # For each transformed point, find closest point in reference grid.
             rms_error = 0
             counter = 0
-            indexes_as_list = []
             for transformed_point in transformed_points:
                 best_distance_so_far = np.finfo('d').max
                 best_id_so_far = -1
@@ -211,7 +216,6 @@ class DottyGridPointDetector(PointDetector):
                         reference_points[counter][0][1] = \
                             self.model_points[best_id_so_far][2]
 
-                indexes_as_list.append(best_id_so_far)
                 indexes[counter] = self.model_points[best_id_so_far][0]
                 object_points[counter][0] = self.model_points[best_id_so_far][3]
                 object_points[counter][1] = self.model_points[best_id_so_far][4]
@@ -258,47 +262,6 @@ class DottyGridPointDetector(PointDetector):
                              str(dist)
                              )
 
-            # Find duplicates
-            counted_indexes = Counter(indexes_as_list)
-
-            # Work out which indexes are suspicious
-            dodgy_indexes = []
-            for c_i in counted_indexes:
-                if counted_indexes[c_i] > 1:
-                    dodgy_indexes.append(c_i)
-
-            LOGGER.debug("Duplicates=%s", str(dodgy_indexes))
-
-            # Work out which rows to delete from output
-            dodgy_rows = []
-            for d_i in dodgy_indexes:
-                # Find best case for this index
-                best_distance_so_far = np.finfo('d').max
-                best_row_index_so_far = -1
-                for counter in range(number_of_undistorted_keypoints):
-                    if indexes[counter] == d_i:
-                        dist = (undistorted_key_points[counter][1]
-                                - inverted_points[counter][0][0])\
-                            * (undistorted_key_points[counter][1]
-                               - inverted_points[counter][0][0])\
-                            + (undistorted_key_points[counter][2]
-                               - inverted_points[counter][0][1])\
-                            * (undistorted_key_points[counter][2]
-                               - inverted_points[counter][0][1])
-                        if dist < best_distance_so_far:
-                            best_distance_so_far = dist
-                            best_row_index_so_far = counter
-                # Find all other instances of this index
-                for counter in range(number_of_undistorted_keypoints):
-                    if indexes[counter] == d_i and counter != best_row_index_so_far:
-                        dodgy_rows.append(counter)
-
-            LOGGER.debug("Need to delete=%s", str(dodgy_rows))
-
-            # Delete dodgy rows
-            indexes = np.delete(indexes, dodgy_rows, axis=0)
-            object_points = np.delete(object_points, dodgy_rows, axis=0)
-
             # Now have to map undistorted points back to distorted points
             rms_error = 0
             for counter in range(number_of_undistorted_keypoints):
@@ -306,21 +269,34 @@ class DottyGridPointDetector(PointDetector):
                 best_id_so_far = -1
 
                 # Distort point to match original input image.
-                relative_x = (matched_points[counter][0] - self.intrinsics[0][2]) / self.intrinsics[0][0]
-                relative_y = (matched_points[counter][1] - self.intrinsics[1][2]) / self.intrinsics[1][1]
-                r2 = relative_x * relative_x + relative_y * relative_y;
-                radial = (1 + self.distortion_coefficients[0] * r2 + self.distortion_coefficients[1] * r2 * r2)
+                relative_x = (matched_points[counter][0]
+                              - self.intrinsics[0][2]) / self.intrinsics[0][0]
+                relative_y = (matched_points[counter][1]
+                              - self.intrinsics[1][2]) / self.intrinsics[1][1]
+                r2 = relative_x * relative_x + relative_y * relative_y
+                radial = (1 + self.distortion_coefficients[0] * r2
+                          + self.distortion_coefficients[1] * r2 * r2)
                 distorted_x = relative_x * radial
                 distorted_y = relative_y * radial
 
-                distorted_x = distorted_x + (2 * self.distortion_coefficients[2] * relative_x * relative_y
-                                             + self.distortion_coefficients[3] * (r2 + 2 * relative_x * relative_x))
+                distorted_x = distorted_x + (2 * self.distortion_coefficients[2]
+                                             * relative_x * relative_y
+                                             + self.distortion_coefficients[3]
+                                             * (r2 + 2
+                                                * relative_x
+                                                * relative_x))
 
-                distorted_y = distorted_y + (self.distortion_coefficients[2] * (r2 + 2 * relative_x * relative_y)
-                                             + 2 * self.distortion_coefficients[3] * relative_x * relative_y)
+                distorted_y = distorted_y + (self.distortion_coefficients[2]
+                                             * (r2 + 2 * relative_x
+                                                * relative_y)
+                                             + 2 *
+                                             self.distortion_coefficients[3]
+                                             * relative_x * relative_y)
 
-                distorted_x = distorted_x * self.intrinsics[0][0] + self.intrinsics[0][2]
-                distorted_y = distorted_y * self.intrinsics[1][1] + self.intrinsics[1][2]
+                distorted_x = distorted_x * self.intrinsics[0][0] \
+                    + self.intrinsics[0][2]
+                distorted_y = distorted_y * self.intrinsics[1][1] \
+                    + self.intrinsics[1][2]
 
                 for distorted_counter in range(number_of_keypoints):
                     sq_dist = (distorted_x - key_points[distorted_counter][1]) \
