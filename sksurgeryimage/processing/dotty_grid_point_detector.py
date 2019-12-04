@@ -25,7 +25,6 @@ class DottyGridPointDetector(PointDetector):
                  list_of_indexes,
                  intrinsics,
                  distortion_coefficients,
-                 verbose=False,
                  scale=(1, 1)
                  ):
         """
@@ -42,7 +41,6 @@ class DottyGridPointDetector(PointDetector):
         :param list_of_indexes: list of specific indexes to use as fiducials
         :param intrinsics: 3x3 ndarray of camera intrinsics
         :param distortion_coefficients: 1x4,5 ndarray of distortion coeffs.
-        :param verbose: bool
         :param scale: if you want to resize the image, specify scale factors
         """
         super(DottyGridPointDetector, self).__init__(scale=scale)
@@ -56,7 +54,6 @@ class DottyGridPointDetector(PointDetector):
         self.list_of_indexes = list_of_indexes
         self.intrinsics = intrinsics
         self.distortion_coefficients = distortion_coefficients
-        self.verbose = verbose
         self.model_fiducials = self.model_points[self.list_of_indexes]
 
     def _internal_get_points(self, image):
@@ -152,9 +149,8 @@ class DottyGridPointDetector(PointDetector):
                 biggest_four[counter][1] = sorted_points[row_counter][2]
                 counter = counter + 1
 
-            if self.verbose:
-                LOGGER.info('Biggest 4 points in undistorted image:%s',
-                            str(biggest_four))
+            LOGGER.debug('Biggest 4 points in undistorted image:%s',
+                         str(biggest_four))
 
             # Labelling which points are below or to the right of the centroid,
             # and assigning a score.
@@ -230,8 +226,7 @@ class DottyGridPointDetector(PointDetector):
             rms_error = rms_error / number_of_undistorted_keypoints
             rms_error = np.sqrt(rms_error)
 
-            if self.verbose:
-                LOGGER.info('Matching points to reference, RMS=%s', rms_error)
+            LOGGER.debug('Matching points to reference, RMS=%s', rms_error)
 
             # Now recompute homography using all points so far.
             homography, status = \
@@ -291,8 +286,7 @@ class DottyGridPointDetector(PointDetector):
             rms_error = rms_error / number_of_undistorted_keypoints
             rms_error = np.sqrt(rms_error)
 
-            if self.verbose:
-                LOGGER.info('Matching points to reference, RMS=%s', rms_error)
+            LOGGER.debug('Matching points to reference, RMS=%s', rms_error)
 
             # invert matched points
             inverse_homography = np.linalg.inv(homography)
@@ -311,14 +305,13 @@ class DottyGridPointDetector(PointDetector):
                        * (undistorted_key_points[counter][2]
                           - inverted_points[counter][0][1])
 
-                if self.verbose:
-                    LOGGER.info("Mapped, c=%s, i=%s, u=%s, r=%s, d=%s",
-                                str(counter),
-                                str(indexes[counter]),
-                                str(undistorted_key_points[counter]),
-                                str(inverted_points[counter]),
-                                str(dist)
-                                )
+                LOGGER.debug("Mapped, c=%s, i=%s, u=%s, r=%s, d=%s",
+                             str(counter),
+                             str(indexes[counter]),
+                             str(undistorted_key_points[counter]),
+                             str(inverted_points[counter]),
+                             str(dist)
+                             )
 
             # Find duplicates
             counted_indexes = Counter(indexes_as_list)
@@ -329,8 +322,7 @@ class DottyGridPointDetector(PointDetector):
                 if counted_indexes[c_i] > 1:
                     dodgy_indexes.append(c_i)
 
-            if self.verbose:
-                LOGGER.info("Duplicates=%s", str(dodgy_indexes))
+            LOGGER.debug("Duplicates=%s", str(dodgy_indexes))
 
             # Work out which rows to delete from output
             dodgy_rows = []
@@ -356,8 +348,7 @@ class DottyGridPointDetector(PointDetector):
                     if indexes[counter] == d_i and counter != best_row_index_so_far:
                         dodgy_rows.append(counter)
 
-            if self.verbose:
-                LOGGER.info("Need to delete=%s", str(dodgy_rows))
+            LOGGER.debug("Need to delete=%s", str(dodgy_rows))
 
             # Delete dodgy rows
             indexes = np.delete(indexes, dodgy_rows, axis=0)
@@ -386,8 +377,7 @@ class DottyGridPointDetector(PointDetector):
             rms_error = rms_error / number_of_undistorted_keypoints
             rms_error = np.sqrt(rms_error)
 
-            if self.verbose:
-                LOGGER.info("RMS=%s", str(rms_error))
+            LOGGER.debug("RMS=%s", str(rms_error))
 
             if rms_error < 1000:
                 return indexes, object_points, img_points

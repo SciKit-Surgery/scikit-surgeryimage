@@ -5,6 +5,7 @@ Tests for dotty grid implementation of PointDetector.
 """
 
 import os
+import logging
 import cv2 as cv2
 import numpy as np
 import pytest
@@ -26,14 +27,14 @@ def __check_real_image(model_points,
                        intrinsics_file_name,
                        distortion_file_name
                        ):
+    logging.basicConfig(level=logging.DEBUG)
     image = cv2.imread(image_file_name)
     intrinsics = np.loadtxt(intrinsics_file_name)
     distortion = np.loadtxt(distortion_file_name)
     detector = DottyGridPointDetector(model_points,
                                       [133, 141, 308, 316],
                                       intrinsics,
-                                      distortion,
-                                      verbose=True
+                                      distortion
                                       )
     ids, object_points, image_points = detector.get_points(image)
     font = cv2.FONT_HERSHEY_SIMPLEX
