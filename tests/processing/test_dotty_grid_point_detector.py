@@ -5,6 +5,7 @@ Tests for dotty grid implementation of PointDetector.
 """
 
 import os
+import datetime
 import logging
 import cv2 as cv2
 import numpy as np
@@ -21,12 +22,22 @@ def __check_real_image(model_points,
     image = cv2.imread(image_file_name)
     intrinsics = np.loadtxt(intrinsics_file_name)
     distortion = np.loadtxt(distortion_file_name)
+
     detector = DottyGridPointDetector(model_points,
                                       [133, 141, 308, 316],
                                       intrinsics,
                                       distortion
                                       )
+
+    time_before = datetime.datetime.now()
+
     ids, object_points, image_points = detector.get_points(image)
+
+    time_after = datetime.datetime.now()
+    time_diff = time_after - time_before
+
+    print("__check_real_image:time_diff=" + str(time_diff))
+
     font = cv2.FONT_HERSHEY_SIMPLEX
     for counter in range(ids.shape[0]):
         cv2.putText(image, str(ids[counter][0]), (int(image_points[counter][0]), int(image_points[counter][1])), font, 0.5, (0, 255, 0), 2, cv2.LINE_AA)
