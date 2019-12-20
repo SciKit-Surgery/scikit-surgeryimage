@@ -4,7 +4,6 @@
 Dotty Grid implementation of PointDetector.
 """
 
-import copy
 import logging
 import cv2
 import numpy as np
@@ -24,7 +23,8 @@ class DottyGridPointDetector(PointDetector):
                  list_of_indexes,
                  intrinsics,
                  distortion_coefficients,
-                 scale=(1, 1)
+                 scale=(1, 1),
+                 rms=15
                  ):
         """
         Constructs a PointDetector that extracts a grid of dots,
@@ -42,8 +42,9 @@ class DottyGridPointDetector(PointDetector):
         :param model_points: numpy ndarray of id, x_pix, y_pix, x_mm, y_mm, z_mm
         :param list_of_indexes: list of specific indexes to use as fiducials
         :param intrinsics: 3x3 ndarray of camera intrinsics
-        :param distortion_coefficients: 1x4,5 ndarray of distortion coeffs.
+        :param distortion_coefficients: 1x5 ndarray of distortion coeffs.
         :param scale: if you want to resize the image, specify scale factors
+        :param rms: root mean square error when finding grid points
         """
         super(DottyGridPointDetector, self).__init__(scale=scale)
 
@@ -51,6 +52,8 @@ class DottyGridPointDetector(PointDetector):
             raise ValueError('intrinsics is None')
         if distortion_coefficients is None:
             raise ValueError('distortion coefficients are None')
+        if len(distortion_coefficients) != 5:
+            raise ValueError('there should be 5 distortion coefficients')
         if len(list_of_indexes) != 4:
             raise ValueError('list_of_index not of length 4')
 
@@ -59,6 +62,7 @@ class DottyGridPointDetector(PointDetector):
         self.intrinsics = intrinsics
         self.distortion_coefficients = distortion_coefficients
         self.model_fiducials = self.model_points[self.list_of_indexes]
+        self.rms_tolerance = rms
 
     def _internal_get_points(self, image):
         """
@@ -194,8 +198,6 @@ class DottyGridPointDetector(PointDetector):
                 cv2.perspectiveTransform(float_array,
                                          homography)
 
-            reference_points = copy.deepcopy(transformed_points)
-
             # For each transformed point, find closest point in reference grid.
             rms_error = 0
             counter = 0
@@ -215,10 +217,6 @@ class DottyGridPointDetector(PointDetector):
                     if sq_dist < best_distance_so_far:
                         best_id_so_far = model_point_counter
                         best_distance_so_far = sq_dist
-                        reference_points[counter][0][0] = \
-                            self.model_points[best_id_so_far][1]
-                        reference_points[counter][0][1] = \
-                            self.model_points[best_id_so_far][2]
 
                 indexes[counter] = self.model_points[best_id_so_far][0]
                 object_points[counter][0] = self.model_points[best_id_so_far][3]
@@ -241,33 +239,11 @@ class DottyGridPointDetector(PointDetector):
 
             LOGGER.debug('Matching points to reference, RMS=%s', rms_error)
 
-            # invert matched points
-            inverse_homography = np.linalg.inv(homography)
-            inverted_points = \
-                cv2.perspectiveTransform(reference_points,
-                                         inverse_homography)
-
-            # Print original and inverted.
-            for counter in range(number_of_undistorted_keypoints):
-                dist = (undistorted_key_points[counter][1]
-                        - inverted_points[counter][0][0]) \
-                       * (undistorted_key_points[counter][1]
-                          - inverted_points[counter][0][0]) \
-                       + (undistorted_key_points[counter][2]
-                          - inverted_points[counter][0][1]) \
-                       * (undistorted_key_points[counter][2]
-                          - inverted_points[counter][0][1])
-
-                LOGGER.debug("Mapped, c=%s, i=%s, u=%s, r=%s, d=%s",
-                             str(counter),
-                             str(indexes[counter]),
-                             str(undistorted_key_points[counter]),
-                             str(inverted_points[counter]),
-                             str(dist)
-                             )
+            if rms_error > self.rms_tolerance:
+                LOGGER.warning('Matching points to reference, RMS too high')
+                return np.zeros((0, 1)), np.zeros((0, 3)), np.zeros((0, 2))
 
             # Now have to map undistorted points back to distorted points
-            rms_error = 0
             for counter in range(number_of_undistorted_keypoints):
                 best_distance_so_far = np.finfo('d').max
                 best_id_so_far = -1
@@ -278,8 +254,11 @@ class DottyGridPointDetector(PointDetector):
                 relative_y = (matched_points[counter][1]
                               - self.intrinsics[1][2]) / self.intrinsics[1][1]
                 r2 = relative_x * relative_x + relative_y * relative_y
-                radial = (1 + self.distortion_coefficients[0] * r2
-                          + self.distortion_coefficients[1] * r2 * r2)
+                radial = (1
+                          + self.distortion_coefficients[0] * r2
+                          + self.distortion_coefficients[1] * r2 * r2
+                          + self.distortion_coefficients[4] * r2 * r2 * r2
+                          )
                 distorted_x = relative_x * radial
                 distorted_y = relative_y * radial
 
@@ -291,7 +270,7 @@ class DottyGridPointDetector(PointDetector):
                                                 * relative_x))
 
                 distorted_y = distorted_y + (self.distortion_coefficients[2]
-                                             * (r2 + 2 * relative_x
+                                             * (r2 + 2 * relative_y
                                                 * relative_y)
                                              + 2 *
                                              self.distortion_coefficients[3]
@@ -312,18 +291,10 @@ class DottyGridPointDetector(PointDetector):
                         best_distance_so_far = sq_dist
                         best_id_so_far = distorted_counter
 
-                rms_error = rms_error + best_distance_so_far
                 img_points[counter][0] = key_points[best_id_so_far][1]
                 img_points[counter][1] = key_points[best_id_so_far][2]
 
-            # Compute total RMS error, to see if fit was good enough.
-            rms_error = rms_error / number_of_undistorted_keypoints
-            rms_error = np.sqrt(rms_error)
-
-            LOGGER.debug("RMS=%s", str(rms_error))
-
-            if rms_error < 25:
-                return indexes, object_points, img_points
+            return indexes, object_points, img_points
 
         # If we didn't find all points, of the fit was poor,
         # return a consistent set of 'nothing'
