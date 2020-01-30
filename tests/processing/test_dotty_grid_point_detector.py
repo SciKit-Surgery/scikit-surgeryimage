@@ -249,3 +249,222 @@ def test_dotty_uncalibrated_20(setup_dotty_calibration_model):
                                           )
     assert(346 == number_of_points)
 
+
+def test_calibration_0(setup_dotty_calibration_model):
+    model_points = setup_dotty_calibration_model
+    number_of_points = __check_real_image(model_points,
+                                          'tests/data/calib-ucl-circles/10_54_44/calib.left.images.0.png',
+                                          'tests/data/calib-ucl-circles/10_54_44/viking.calib.left.intrinsics.txt',
+                                          'tests/data/calib-ucl-circles/10_54_44/viking.calib.left.distortion.txt',
+                                          )
+    assert(313 == number_of_points)
+
+
+def test_calibration_1(setup_dotty_calibration_model):
+    model_points = setup_dotty_calibration_model
+    number_of_points = __check_real_image(model_points,
+                                          'tests/data/calib-ucl-circles/10_54_44/calib.left.images.1.png',
+                                          'tests/data/calib-ucl-circles/10_54_44/viking.calib.left.intrinsics.txt',
+                                          'tests/data/calib-ucl-circles/10_54_44/viking.calib.left.distortion.txt',
+                                          )
+    assert(334 == number_of_points)
+
+
+def test_calibration_2(setup_dotty_calibration_model):
+    model_points = setup_dotty_calibration_model
+    number_of_points = __check_real_image(model_points,
+                                          'tests/data/calib-ucl-circles/10_54_44/calib.left.images.2.png',
+                                          'tests/data/calib-ucl-circles/10_54_44/viking.calib.left.intrinsics.txt',
+                                          'tests/data/calib-ucl-circles/10_54_44/viking.calib.left.distortion.txt',
+                                          )
+    assert(316 == number_of_points)
+
+
+def test_calibration_3(setup_dotty_calibration_model):
+    model_points = setup_dotty_calibration_model
+    number_of_points = __check_real_image(model_points,
+                                          'tests/data/calib-ucl-circles/10_54_44/calib.left.images.3.png',
+                                          'tests/data/calib-ucl-circles/10_54_44/viking.calib.left.intrinsics.txt',
+                                          'tests/data/calib-ucl-circles/10_54_44/viking.calib.left.distortion.txt',
+                                          )
+    assert(317 == number_of_points)
+
+
+def test_calibration_4(setup_dotty_calibration_model):
+    model_points = setup_dotty_calibration_model
+    number_of_points = __check_real_image(model_points,
+                                          'tests/data/calib-ucl-circles/10_54_44/calib.left.images.4.png',
+                                          'tests/data/calib-ucl-circles/10_54_44/viking.calib.left.intrinsics.txt',
+                                          'tests/data/calib-ucl-circles/10_54_44/viking.calib.left.distortion.txt',
+                                          )
+    assert(350 == number_of_points)
+
+
+def test_calibration_5(setup_dotty_calibration_model):
+    model_points = setup_dotty_calibration_model
+    number_of_points = __check_real_image(model_points,
+                                          'tests/data/calib-ucl-circles/10_54_44/calib.left.images.5.png',
+                                          'tests/data/calib-ucl-circles/10_54_44/viking.calib.left.intrinsics.txt',
+                                          'tests/data/calib-ucl-circles/10_54_44/viking.calib.left.distortion.txt',
+                                          )
+    assert(315 == number_of_points)
+
+
+def test_calibration_6(setup_dotty_calibration_model):
+    model_points = setup_dotty_calibration_model
+    number_of_points = __check_real_image(model_points,
+                                          'tests/data/calib-ucl-circles/10_54_44/calib.left.images.6.png',
+                                          'tests/data/calib-ucl-circles/10_54_44/viking.calib.left.intrinsics.txt',
+                                          'tests/data/calib-ucl-circles/10_54_44/viking.calib.left.distortion.txt',
+                                          )
+    assert(329 == number_of_points)
+
+
+def test_calibration_7(setup_dotty_calibration_model):
+    model_points = setup_dotty_calibration_model
+    number_of_points = __check_real_image(model_points,
+                                          'tests/data/calib-ucl-circles/10_54_44/calib.left.images.7.png',
+                                          'tests/data/calib-ucl-circles/10_54_44/viking.calib.left.intrinsics.txt',
+                                          'tests/data/calib-ucl-circles/10_54_44/viking.calib.left.distortion.txt',
+                                          )
+    assert(305 == number_of_points)
+
+
+def test_calibration_8(setup_dotty_calibration_model):
+    model_points = setup_dotty_calibration_model
+    number_of_points = __check_real_image(model_points,
+                                          'tests/data/calib-ucl-circles/10_54_44/calib.left.images.8.png',
+                                          'tests/data/calib-ucl-circles/10_54_44/viking.calib.left.intrinsics.txt',
+                                          'tests/data/calib-ucl-circles/10_54_44/viking.calib.left.distortion.txt',
+                                          )
+    assert(303 == number_of_points)
+
+
+def test_calibration_9(setup_dotty_calibration_model):
+    model_points = setup_dotty_calibration_model
+    number_of_points = __check_real_image(model_points,
+                                          'tests/data/calib-ucl-circles/10_54_44/calib.left.images.9.png',
+                                          'tests/data/calib-ucl-circles/10_54_44/viking.calib.left.intrinsics.txt',
+                                          'tests/data/calib-ucl-circles/10_54_44/viking.calib.left.distortion.txt',
+                                          )
+    assert(300 == number_of_points)
+
+
+def test_calibration_10(setup_dotty_calibration_model):
+    model_points = setup_dotty_calibration_model
+    number_of_points = __check_real_image(model_points,
+                                          'tests/data/calib-ucl-circles/10_54_44/calib.right.images.0.png',
+                                          'tests/data/calib-ucl-circles/10_54_44/viking.calib.right.intrinsics.txt',
+                                          'tests/data/calib-ucl-circles/10_54_44/viking.calib.right.distortion.txt',
+                                          )
+    assert(311 == number_of_points)
+
+
+def test_calibration_11(setup_dotty_calibration_model):
+    model_points = setup_dotty_calibration_model
+    number_of_points = __check_real_image(model_points,
+                                          'tests/data/calib-ucl-circles/10_54_44/calib.right.images.1.png',
+                                          'tests/data/calib-ucl-circles/10_54_44/viking.calib.right.intrinsics.txt',
+                                          'tests/data/calib-ucl-circles/10_54_44/viking.calib.right.distortion.txt',
+                                          )
+    assert (326 == number_of_points)
+
+
+def test_calibration_12(setup_dotty_calibration_model):
+    model_points = setup_dotty_calibration_model
+    number_of_points = __check_real_image(model_points,
+                                          'tests/data/calib-ucl-circles/10_54_44/calib.right.images.2.png',
+                                          'tests/data/calib-ucl-circles/10_54_44/viking.calib.right.intrinsics.txt',
+                                          'tests/data/calib-ucl-circles/10_54_44/viking.calib.right.distortion.txt',
+                                          )
+    assert (315 == number_of_points)
+
+
+def test_calibration_13(setup_dotty_calibration_model):
+    model_points = setup_dotty_calibration_model
+    number_of_points = __check_real_image(model_points,
+                                          'tests/data/calib-ucl-circles/10_54_44/calib.right.images.3.png',
+                                          'tests/data/calib-ucl-circles/10_54_44/viking.calib.right.intrinsics.txt',
+                                          'tests/data/calib-ucl-circles/10_54_44/viking.calib.right.distortion.txt',
+                                          )
+    assert (302 == number_of_points)
+
+
+def test_calibration_14(setup_dotty_calibration_model):
+    model_points = setup_dotty_calibration_model
+    number_of_points = __check_real_image(model_points,
+                                          'tests/data/calib-ucl-circles/10_54_44/calib.right.images.4.png',
+                                          'tests/data/calib-ucl-circles/10_54_44/viking.calib.right.intrinsics.txt',
+                                          'tests/data/calib-ucl-circles/10_54_44/viking.calib.right.distortion.txt',
+                                          )
+    assert (355 == number_of_points)
+
+
+def test_calibration_15(setup_dotty_calibration_model):
+    model_points = setup_dotty_calibration_model
+    number_of_points = __check_real_image(model_points,
+                                          'tests/data/calib-ucl-circles/10_54_44/calib.right.images.5.png',
+                                          'tests/data/calib-ucl-circles/10_54_44/viking.calib.right.intrinsics.txt',
+                                          'tests/data/calib-ucl-circles/10_54_44/viking.calib.right.distortion.txt',
+                                          )
+    assert (311 == number_of_points)
+
+
+def test_calibration_16(setup_dotty_calibration_model):
+    model_points = setup_dotty_calibration_model
+    number_of_points = __check_real_image(model_points,
+                                          'tests/data/calib-ucl-circles/10_54_44/calib.right.images.6.png',
+                                          'tests/data/calib-ucl-circles/10_54_44/viking.calib.right.intrinsics.txt',
+                                          'tests/data/calib-ucl-circles/10_54_44/viking.calib.right.distortion.txt',
+                                          )
+    assert (332 == number_of_points)
+
+
+def test_calibration_17(setup_dotty_calibration_model):
+    model_points = setup_dotty_calibration_model
+    number_of_points = __check_real_image(model_points,
+                                          'tests/data/calib-ucl-circles/10_54_44/calib.right.images.7.png',
+                                          'tests/data/calib-ucl-circles/10_54_44/viking.calib.right.intrinsics.txt',
+                                          'tests/data/calib-ucl-circles/10_54_44/viking.calib.right.distortion.txt',
+                                          )
+    assert (295 == number_of_points)
+
+
+def test_calibration_18(setup_dotty_calibration_model):
+    model_points = setup_dotty_calibration_model
+    number_of_points = __check_real_image(model_points,
+                                          'tests/data/calib-ucl-circles/10_54_44/calib.right.images.8.png',
+                                          'tests/data/calib-ucl-circles/10_54_44/viking.calib.right.intrinsics.txt',
+                                          'tests/data/calib-ucl-circles/10_54_44/viking.calib.right.distortion.txt',
+                                          )
+    assert (295 == number_of_points)
+
+
+def test_calibration_19(setup_dotty_calibration_model):
+    model_points = setup_dotty_calibration_model
+    number_of_points = __check_real_image(model_points,
+                                          'tests/data/calib-ucl-circles/10_54_44/calib.right.images.9.png',
+                                          'tests/data/calib-ucl-circles/10_54_44/viking.calib.right.intrinsics.txt',
+                                          'tests/data/calib-ucl-circles/10_54_44/viking.calib.right.distortion.txt',
+                                          )
+    assert (290 == number_of_points)
+
+
+def test_calibration_20(setup_dotty_calibration_model):
+    model_points = setup_dotty_calibration_model
+    number_of_points = __check_real_image(model_points,
+                                          'tests/data/calib-ucl-circles/13_22_20/calib.left.images.9.png',
+                                          'tests/data/calib-ucl-circles/10_54_44/viking.calib.left.intrinsics.txt',
+                                          'tests/data/calib-ucl-circles/10_54_44/viking.calib.left.distortion.txt',
+                                          )
+    assert (319 == number_of_points)
+
+
+def test_calibration_21(setup_dotty_calibration_model):
+    model_points = setup_dotty_calibration_model
+    number_of_points = __check_real_image(model_points,
+                                          'tests/data/calib-ucl-circles/13_22_20/calib.right.images.9.png',
+                                          'tests/data/calib-ucl-circles/10_54_44/viking.calib.right.intrinsics.txt',
+                                          'tests/data/calib-ucl-circles/10_54_44/viking.calib.right.distortion.txt',
+                                          )
+    assert (311 == number_of_points)
