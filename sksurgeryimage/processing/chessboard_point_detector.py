@@ -5,6 +5,7 @@ Chessboard implementation of PointDetector.
 """
 
 import logging
+import copy
 import cv2
 import numpy as np
 from sksurgeryimage.processing.point_detector import PointDetector
@@ -68,7 +69,9 @@ class ChessboardPointDetector(PointDetector):
                                           )
 
             # If successful, we return all ids, 3D points and 2D points.
-            return self.ids, self.object_points, img_points.squeeze()
+            return copy.deepcopy(self.ids), \
+                   copy.deepcopy(self.object_points), \
+                   img_points.squeeze()
 
         # If we didn't find all points, return consistent set of 'nothing'
         return np.zeros((0, 1)), np.zeros((0, 3)), img_points
