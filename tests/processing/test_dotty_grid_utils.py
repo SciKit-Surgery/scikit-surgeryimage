@@ -19,14 +19,17 @@ def __check_real_image(model_points,
     intrinsics = np.loadtxt(intrinsics_file_name)
     distortion = np.loadtxt(distortion_file_name)
 
+    size = (2600, 1900)
     fiducials = [133, 141, 308, 316]
     if is_metal:
         fiducials = [69, 74, 149, 154]
+        size = (1360, 1200)
 
     detector = DottyGridPointDetector(model_points,
                                       fiducials,
                                       intrinsics,
-                                      distortion
+                                      distortion,
+                                      reference_image_size=size
                                       )
 
     time_before = datetime.datetime.now()
