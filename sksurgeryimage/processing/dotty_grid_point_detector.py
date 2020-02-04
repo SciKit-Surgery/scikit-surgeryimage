@@ -33,19 +33,18 @@ class DottyGridPointDetector(PointDetector):
 
         Requires intrinsics and distortion_coefficients to be provided,
         then these are used as a reference transform to undistort
-        the image, purely for the sake of identifying and labelling
-        the points correctly. The image points returned are always
-        the image points detected in the original distorted image.
+        the image, which makes matching to a reference grid more reliable.
 
         The list of indexes, must be of length 4, and correspond to
-        top-left, top-right, bottom-left, bottom-right big blobs.
+        top-left, top-right, bottom-left, bottom-right bigger blobs.
 
         :param model_points: numpy ndarray of id, x_pix, y_pix, x_mm, y_mm, z_mm
         :param list_of_indexes: list of specific indexes to use as fiducials
         :param intrinsics: 3x3 ndarray of camera intrinsics
         :param distortion_coefficients: 1x5 ndarray of distortion coeffs.
         :param scale: if you want to resize the image, specify scale factors
-        :param rms: root mean square error when finding grid points
+        :param reference_image_size: used to warp undistorted image to reference
+        :param rms: max root mean square error when finding grid points
         """
         super(DottyGridPointDetector, self).__init__(scale=scale)
 
