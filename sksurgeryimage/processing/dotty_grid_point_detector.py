@@ -57,7 +57,9 @@ class DottyGridPointDetector(PointDetector):
             raise ValueError('there should be 5 distortion coefficients')
         if len(list_of_indexes) != 4:
             raise ValueError('list_of_index not of length 4')
-
+        if reference_image_size is None:
+            raise ValueError('You must provide a reference image size')
+        
         self.model_points = model_points
         self.list_of_indexes = list_of_indexes
         self.intrinsics = intrinsics
@@ -78,16 +80,6 @@ class DottyGridPointDetector(PointDetector):
         # pylint:disable=too-many-statements
 
         smoothed = cv2.GaussianBlur(image, (5, 5), 0)
-        threshold_max = 255
-        window_size = 151
-        c_offset = 20
-        thresh = cv2.adaptiveThreshold(smoothed,
-                                       threshold_max,
-                                       cv2.ADAPTIVE_THRESH_MEAN_C,
-                                       cv2.THRESH_BINARY,
-                                       window_size,
-                                       c_offset
-                                       )
 
         params = cv2.SimpleBlobDetector_Params()
         params.filterByConvexity = False
@@ -106,14 +98,6 @@ class DottyGridPointDetector(PointDetector):
                                           self.intrinsics,
                                           self.distortion_coefficients
                                           )
-        undistorted_thresholded = \
-            cv2.adaptiveThreshold(undistorted_image,
-                                  threshold_max,
-                                  cv2.ADAPTIVE_THRESH_MEAN_C,
-                                  cv2.THRESH_BINARY,
-                                  window_size,
-                                  c_offset
-                                  )
         undistorted_keypoints = detector.detect(undistorted_image)
 
         # Note that keypoints and undistorted_keypoints
@@ -183,7 +167,9 @@ class DottyGridPointDetector(PointDetector):
                                    self.model_fiducials[:, 1:3])
 
             # Warp image to cannonical face on.
-            warped = cv2.warpPerspective(undistorted_image, homography, self.reference_image_size)
+            warped = cv2.warpPerspective(undistorted_image,
+                                         homography,
+                                         self.reference_image_size)
             warped_keypoints = detector.detect(warped)
             number_of_warped_keypoints = len(warped_keypoints)
             warped_key_points = \
@@ -194,7 +180,6 @@ class DottyGridPointDetector(PointDetector):
                 warped_key_points[counter][1] = key.pt[0]
                 warped_key_points[counter][2] = key.pt[1]
                 counter = counter + 1
-            cv2.imwrite("/Users/mattclarkson/warped.png", warped)
             img_points = np.zeros((number_of_warped_keypoints, 2))
             object_points = np.zeros((number_of_warped_keypoints, 3))
             indexes = np.zeros((number_of_warped_keypoints, 1),
@@ -263,15 +248,13 @@ class DottyGridPointDetector(PointDetector):
 
             # Now copy inverted points into matched_points
             counter = 0
-            for key in warped_keypoints:
+            for key in inverted_points:
                 matched_points[counter][0] = key.pt[0]
                 matched_points[counter][1] = key.pt[1]
                 counter = counter + 1
 
             # Now have to map undistorted points back to distorted points
             for counter in range(number_of_warped_keypoints):
-                best_distance_so_far = np.finfo('d').max
-                best_id_so_far = -1
 
                 # Distort point to match original input image.
                 relative_x = (matched_points[counter][0]
