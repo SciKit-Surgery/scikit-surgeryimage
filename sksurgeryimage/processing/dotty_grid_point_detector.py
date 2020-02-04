@@ -24,6 +24,7 @@ class DottyGridPointDetector(PointDetector):
                  intrinsics,
                  distortion_coefficients,
                  scale=(1, 1),
+                 reference_image_size=None,
                  rms=15
                  ):
         """
@@ -62,6 +63,7 @@ class DottyGridPointDetector(PointDetector):
         self.intrinsics = intrinsics
         self.distortion_coefficients = distortion_coefficients
         self.model_fiducials = self.model_points[self.list_of_indexes]
+        self.reference_image_size = reference_image_size
         self.rms_tolerance = rms
 
     def _internal_get_points(self, image):
@@ -97,7 +99,7 @@ class DottyGridPointDetector(PointDetector):
 
         # Detect points in the distorted image
         detector = cv2.SimpleBlobDetector_create(params)
-        keypoints = detector.detect(thresh)
+        keypoints = detector.detect(smoothed)
 
         # Also detect them in an undistorted image.
         undistorted_image = cv2.undistort(smoothed,
@@ -112,7 +114,7 @@ class DottyGridPointDetector(PointDetector):
                                   window_size,
                                   c_offset
                                   )
-        undistorted_keypoints = detector.detect(undistorted_thresholded)
+        undistorted_keypoints = detector.detect(undistorted_image)
 
         # Note that keypoints and undistorted_keypoints
         # can be of different length
@@ -188,15 +190,32 @@ class DottyGridPointDetector(PointDetector):
                 cv2.findHomography(sorted_fiducials[:, 0:2],
                                    self.model_fiducials[:, 1:3])
 
-            float_array = undistorted_key_points[:, 1:3] \
+            # Warp image to cannonical face on.
+            warped = cv2.warpPerspective(undistorted_image, homography, self.reference_image_size)
+            warped_keypoints = detector.detect(warped)
+            number_of_warped_keypoints = len(warped_keypoints)
+            warped_key_points = \
+                np.zeros((number_of_warped_keypoints, 3))
+            counter = 0
+            for key in warped_keypoints:
+                warped_key_points[counter][0] = key.size
+                warped_key_points[counter][1] = key.pt[0]
+                warped_key_points[counter][2] = key.pt[1]
+                counter = counter + 1
+
+            # Note, warped_key_points and undistorted_key_points have different order.
+
+            float_array = warped_key_points[:, 1:3] \
                 .astype(np.float32) \
                 .reshape(-1, 1, 2)
 
-            # So, this is actually transforming distortion corrected
-            # (i.e. undistorted) points to the reference point space.
             transformed_points = \
                 cv2.perspectiveTransform(float_array,
-                                         homography)
+                                         np.eye(3))
+
+            inverted_points = \
+                cv2.perspectiveTransform(transformed_points,
+                                         np.linalg.inv(homography))
 
             # For each transformed point, find closest point in reference grid.
             rms_error = 0
@@ -223,9 +242,9 @@ class DottyGridPointDetector(PointDetector):
                 object_points[counter][1] = self.model_points[best_id_so_far][4]
                 object_points[counter][2] = self.model_points[best_id_so_far][5]
                 matched_points[counter][0] = \
-                    undistorted_key_points[counter][1]
+                    warped_key_points[counter][1]
                 matched_points[counter][1] = \
-                    undistorted_key_points[counter][2]
+                    warped_key_points[counter][2]
                 matched_points[counter][2] = \
                     self.model_points[best_id_so_far][1]
                 matched_points[counter][3] = \
@@ -243,8 +262,15 @@ class DottyGridPointDetector(PointDetector):
                 LOGGER.warning('Matching points to reference, RMS too high')
                 return np.zeros((0, 1)), np.zeros((0, 3)), np.zeros((0, 2))
 
+            # Now copy inverted points into matched_points
+            counter = 0
+            for key in warped_keypoints:
+                matched_points[counter][0] = key.pt[0]
+                matched_points[counter][1] = key.pt[1]
+                counter = counter + 1
+
             # Now have to map undistorted points back to distorted points
-            for counter in range(number_of_undistorted_keypoints):
+            for counter in range(number_of_warped_keypoints):
                 best_distance_so_far = np.finfo('d').max
                 best_id_so_far = -1
 
@@ -281,18 +307,8 @@ class DottyGridPointDetector(PointDetector):
                 distorted_y = distorted_y * self.intrinsics[1][1] \
                     + self.intrinsics[1][2]
 
-                for distorted_counter in range(number_of_keypoints):
-                    sq_dist = (distorted_x - key_points[distorted_counter][1]) \
-                            * (distorted_x - key_points[distorted_counter][1]) \
-                            + (distorted_y - key_points[distorted_counter][2]) \
-                            * (distorted_y - key_points[distorted_counter][2])
-
-                    if sq_dist < best_distance_so_far:
-                        best_distance_so_far = sq_dist
-                        best_id_so_far = distorted_counter
-
-                img_points[counter][0] = key_points[best_id_so_far][1]
-                img_points[counter][1] = key_points[best_id_so_far][2]
+                img_points[counter][0] = distorted_x
+                img_points[counter][1] = distorted_y
 
             return indexes, object_points, img_points
 
