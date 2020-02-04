@@ -248,6 +248,7 @@ class DottyGridPointDetector(PointDetector):
                 return np.zeros((0, 1)), np.zeros((0, 3)), np.zeros((0, 2))
 
             # Now copy inverted points into matched_points
+            # pylint: disable=consider-using-enumerate
             for counter in range(len(inverted_points)):
                 matched_points[counter][0] = inverted_points[counter][0][0]
                 matched_points[counter][1] = inverted_points[counter][0][1]
