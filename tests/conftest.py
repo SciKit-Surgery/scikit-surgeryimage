@@ -12,8 +12,8 @@ def setup_dotty_calibration_model():
     for y_index in range(18):
         for x_index in range(25):
             model_points[counter][0] = counter
-            model_points[counter][1] = (x_index + 1) * 50
-            model_points[counter][2] = (y_index + 1) * 50
+            model_points[counter][1] = (x_index + 1) * 100
+            model_points[counter][2] = (y_index + 1) * 100
             model_points[counter][3] = x_index * 5
             model_points[counter][4] = y_index * 5
             model_points[counter][5] = 0
