@@ -25,7 +25,7 @@ class DottyGridPointDetector(PointDetector):
                  distortion_coefficients,
                  scale=(1, 1),
                  reference_image_size=None,
-                 rms=15
+                 rms=30
                  ):
         """
         Constructs a PointDetector that extracts a grid of dots,
@@ -122,19 +122,11 @@ class DottyGridPointDetector(PointDetector):
             number_of_keypoints = len(keypoints)
             number_of_undistorted_keypoints = len(undistorted_keypoints)
 
-            # These are the final outputs.
-            img_points = np.zeros((number_of_undistorted_keypoints, 2))
-            object_points = np.zeros((number_of_undistorted_keypoints, 3))
-            indexes = np.zeros((number_of_undistorted_keypoints, 1),
-                               dtype=np.int16)
-
             # These are for intermediate storage.
             key_points = \
                 np.zeros((number_of_keypoints, 3))
             undistorted_key_points = \
                 np.zeros((number_of_undistorted_keypoints, 3))
-            matched_points = \
-                np.zeros((number_of_undistorted_keypoints, 4))
 
             # Converting OpenCV keypoints to numpy key_points
             counter = 0
@@ -202,6 +194,13 @@ class DottyGridPointDetector(PointDetector):
                 warped_key_points[counter][1] = key.pt[0]
                 warped_key_points[counter][2] = key.pt[1]
                 counter = counter + 1
+            cv2.imwrite("/Users/mattclarkson/warped.png", warped)
+            img_points = np.zeros((number_of_warped_keypoints, 2))
+            object_points = np.zeros((number_of_warped_keypoints, 3))
+            indexes = np.zeros((number_of_warped_keypoints, 1),
+                               dtype=np.int16)
+            matched_points = \
+                np.zeros((number_of_warped_keypoints, 4))
 
             # Note, warped_key_points and undistorted_key_points have different order.
 
