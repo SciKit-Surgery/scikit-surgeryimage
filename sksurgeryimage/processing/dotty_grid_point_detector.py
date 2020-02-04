@@ -59,7 +59,7 @@ class DottyGridPointDetector(PointDetector):
             raise ValueError('list_of_index not of length 4')
         if reference_image_size is None:
             raise ValueError('You must provide a reference image size')
-        
+
         self.model_points = model_points
         self.list_of_indexes = list_of_indexes
         self.intrinsics = intrinsics
@@ -187,7 +187,8 @@ class DottyGridPointDetector(PointDetector):
             matched_points = \
                 np.zeros((number_of_warped_keypoints, 4))
 
-            # Note, warped_key_points and undistorted_key_points have different order.
+            # Note, warped_key_points and undistorted_key_points
+            # have different order.
 
             float_array = warped_key_points[:, 1:3] \
                 .astype(np.float32) \
@@ -247,11 +248,9 @@ class DottyGridPointDetector(PointDetector):
                 return np.zeros((0, 1)), np.zeros((0, 3)), np.zeros((0, 2))
 
             # Now copy inverted points into matched_points
-            counter = 0
-            for key in inverted_points:
-                matched_points[counter][0] = key.pt[0]
-                matched_points[counter][1] = key.pt[1]
-                counter = counter + 1
+            for counter in range(len(inverted_points)):
+                matched_points[counter][0] = inverted_points[counter][0][0]
+                matched_points[counter][1] = inverted_points[counter][0][1]
 
             # Now have to map undistorted points back to distorted points
             for counter in range(number_of_warped_keypoints):
