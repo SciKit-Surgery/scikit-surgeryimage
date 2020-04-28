@@ -25,5 +25,18 @@ script:
  - coverage run -a --source ./sksurgerycalibration -m pytest -v -s ./tests/
  - coverage report -m
  - if [ $LINT == 1 ]; then
-    pylint --rcfile=tests/pylintrc sksurgerycalibration tests;
+    pylint --rcfile=tests/pylintrc sksurgerycalibration;
    fi
+
+after_success:
+ - coveralls
+
+deploy:
+  provider: pypi
+  user: $PYPI_USER
+  password: $PYPI_PASS
+  skip_existing: true
+  on:
+   tags: true
+   branch: master
+
