@@ -1,6 +1,9 @@
 from sksurgeryimage.ui.ImageCropper import ImageCropper
 import numpy as np
 import pytest
+import os
+
+pytest.skip("Can't run these tests without a display")
 
 @pytest.fixture
 def img():
