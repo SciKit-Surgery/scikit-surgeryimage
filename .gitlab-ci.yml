@@ -52,7 +52,7 @@ build windows installer:
 
 test Linux:
   stage: test
-   script:
+  script:
     - tox
   tags:
     - shared-linux, gui
