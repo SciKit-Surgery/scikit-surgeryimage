@@ -22,10 +22,10 @@ install:
 
 script:
  - coverage erase
- - coverage run -a --source ./sksurgerycore -m pytest -v -s ./tests/
+ - coverage run -a --source ./sksurgeryimage -m pytest -v -s ./tests/
  - coverage report -m
  - if [ $LINT == 1 ]; then
-    pylint --rcfile=tests/pylintrc sksurgerycore;
+    pylint --rcfile=tests/pylintrc sksurgeryimage;
    fi
 
 after_success:
