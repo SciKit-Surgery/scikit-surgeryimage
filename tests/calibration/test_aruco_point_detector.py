@@ -9,7 +9,7 @@ from cv2 import aruco
 import numpy as np
 import six
 import pytest
-from sksurgeryimage.processing.aruco_point_detector import ArucoPointDetector
+from sksurgeryimage.calibration.aruco_point_detector import ArucoPointDetector
 
 
 def test_aruco_detector_without_model():

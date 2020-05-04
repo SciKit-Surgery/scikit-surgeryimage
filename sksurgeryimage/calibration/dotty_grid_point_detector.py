@@ -7,7 +7,7 @@ Dotty Grid implementation of PointDetector.
 import logging
 import cv2
 import numpy as np
-from sksurgeryimage.processing.point_detector import PointDetector
+from sksurgeryimage.calibration.point_detector import PointDetector
 
 LOGGER = logging.getLogger(__name__)
 

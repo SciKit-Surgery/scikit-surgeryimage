@@ -8,7 +8,7 @@ import cv2 as cv2
 from cv2 import aruco
 import six
 import pytest
-from sksurgeryimage.processing.charuco_point_detector import CharucoPointDetector
+from sksurgeryimage.calibration.charuco_point_detector import CharucoPointDetector
 
 
 def test_charuco_detector():

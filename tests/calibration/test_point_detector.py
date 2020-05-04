@@ -6,7 +6,7 @@ Tests for PointDetector.
 
 import numpy as np
 import pytest
-from sksurgeryimage.processing.point_detector import PointDetector
+from sksurgeryimage.calibration.point_detector import PointDetector
 
 
 def test_cant_use_base_class():

@@ -7,7 +7,7 @@ ArUco implementation of PointDetector.
 import logging
 from cv2 import aruco
 import numpy as np
-from sksurgeryimage.processing.point_detector import PointDetector
+from sksurgeryimage.calibration.point_detector import PointDetector
 
 LOGGER = logging.getLogger(__name__)
 

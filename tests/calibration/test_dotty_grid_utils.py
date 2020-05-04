@@ -5,7 +5,7 @@ import datetime
 import logging
 import numpy as np
 import cv2 as cv2
-from sksurgeryimage.processing.dotty_grid_point_detector import DottyGridPointDetector
+from sksurgeryimage.calibration.dotty_grid_point_detector import DottyGridPointDetector
 
 
 def __check_real_image(model_points,
