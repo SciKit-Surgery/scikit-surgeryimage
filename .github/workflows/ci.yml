@@ -6,9 +6,6 @@ jobs:
       matrix:
         os: [ubuntu-18.04, macos-latest, windows-latest]
 
-    services:
-      - xfb
-
     runs-on: ${{ matrix.os }}
 
     steps:
@@ -21,6 +18,12 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install tox
+
+      - name: Set environmental variables for linux
+        if: startsWith(matrix.os, 'ubuntu')
+        run: |
+          echo "::set-env name=LD_LIBRARY_PATH::${{ github.workspace }}/.tox/py36/lib/python3.6/site-packages/PySide2/Qt/plugins/platforms"
+          echo "::set-env name=DISPLAY::localhost:1"
 
       - name: Run tox
         run: |
