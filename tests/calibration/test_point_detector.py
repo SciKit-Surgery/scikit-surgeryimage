@@ -28,10 +28,3 @@ def test_invalid_because_image_is_not_ndarray():
     image = "hello world"
     with pytest.raises(TypeError):
         detector.get_points(image)
-
-
-def test_invalid_because_image_is_not_rgb_3_channel():
-    detector = PointDetector()
-    image = np.ones((1, 1, 1), dtype=np.uint8)
-    with pytest.raises(ValueError):
-        detector.get_points(image)
