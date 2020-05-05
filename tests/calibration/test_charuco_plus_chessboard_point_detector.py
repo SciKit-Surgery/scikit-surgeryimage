@@ -14,7 +14,8 @@ import sksurgeryimage.calibration.charuco as ch
 def test_charuco_plus_chess_detector():
 
     calib_image = ch.make_charuco_with_chessboard()
-    cv2.imwrite('tests/data/calibration/pattern_4x4_26x19_5_4_with_inset_18x13.png', calib_image)
+    cv2.imwrite('tests/data/calibration/pattern_4x4_19x26_5_4_with_inset_13x18.png', calib_image)
+    return
     file_name = 'tests/data/calibration/pattern_4x4_26x19_5_4_with_inset_18x13.png'
     image = cv2.imread(file_name)
     detector = CharucoPlusChessboardPointDetector((19, 26), (5, 4), 25, (1, 1),
