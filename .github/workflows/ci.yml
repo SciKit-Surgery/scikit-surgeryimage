@@ -19,7 +19,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install tox
 
-      - name: Run xvfb on ubuntu
+      - name: Run tox on ubuntu using xvfb
         if: startsWith(matrix.os, 'ubuntu')
         run: |
           sudo apt-get install xvfb
@@ -28,6 +28,7 @@ jobs:
           xvfb-run tox
 
       - name: Run tox on windows/mac
+        # Matches the 'o' in 'windows' or 'macos'
         if: contains(matrix.os, 'o')
         run: |
           tox
