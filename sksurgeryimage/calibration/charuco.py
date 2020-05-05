@@ -204,7 +204,7 @@ def make_charuco_with_chessboard(
         charuco_squares=(19, 26),
         charuco_size=(5, 4),
         pixels_per_millimetre=10,
-        chessboard_squares=(13, 18),
+        chessboard_squares=(9, 14),
         chessboard_size=3,
         chessboard_border=0.7
         ):

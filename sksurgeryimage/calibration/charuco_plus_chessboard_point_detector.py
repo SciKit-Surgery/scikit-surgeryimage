@@ -20,16 +20,16 @@ class CharucoPlusChessboardPointDetector(PointDetector):
     in a 2D grey scale video image.
     """
     def __init__(self,
-                 number_of_charuco_squares,
-                 size_of_charuco_squares,
-                 minimum_number_of_points,
+                 number_of_charuco_squares=(19, 26),
+                 size_of_charuco_squares=(5, 4),
+                 minimum_number_of_points=50,
                  scale=(1, 1),
                  dictionary=cv2.aruco.getPredefinedDictionary(
                      cv2.aruco.DICT_4X4_250),
                  charuco_filtering=False,
                  use_chessboard_inset=False,
-                 number_of_chessboard_squares=None,
-                 chessboard_square_size=1,
+                 number_of_chessboard_squares=(9, 14),
+                 chessboard_square_size=3,
                  chessboard_id_offset=500
                  ):
         """
