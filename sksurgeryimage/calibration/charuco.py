@@ -236,12 +236,16 @@ def make_charuco_with_chessboard(
          charuco_squares[1] * charuco_pixels_per_square)
     )
 
-    centre_of_image = (((charuco_squares[0] * charuco_pixels_per_square) - 1) / 2.0,
-                       ((charuco_squares[1] * charuco_pixels_per_square) - 1) / 2.0)
+    centre_of_image = (
+        ((charuco_squares[0] * charuco_pixels_per_square) - 1) / 2.0,
+        ((charuco_squares[1] * charuco_pixels_per_square) - 1) / 2.0
+    )
 
     # Creates minimum size chessboard, one pixel per chessboard square.
     chessboard_image = np.zeros((chessboard_squares[1],
                                  chessboard_squares[0]), dtype=np.uint8)
+
+    # pylint: disable=invalid-name
     for x in range(0, chessboard_squares[0]):
         for y in range(0, chessboard_squares[1]):
             if x % 2 == 0 and y % 2 == 0 or x % 2 == 1 and y % 2 == 1:
@@ -257,8 +261,10 @@ def make_charuco_with_chessboard(
 
     # Draw white polygon around chessboard
     corners = np.zeros((4, 2))
-    corner_offsets = (((chessboard_squares[0] / 2) + chessboard_border) * chessboard_scale,
-                      ((chessboard_squares[1] / 2) + chessboard_border) * chessboard_scale)
+    corner_offsets = (
+        ((chessboard_squares[0] / 2) + chessboard_border) * chessboard_scale,
+        ((chessboard_squares[1] / 2) + chessboard_border) * chessboard_scale
+    )
     corners[0][0] = int(centre_of_image[0] - corner_offsets[0])
     corners[0][1] = int(centre_of_image[1] - corner_offsets[1])
     corners[1][0] = int(centre_of_image[0] + corner_offsets[0])
