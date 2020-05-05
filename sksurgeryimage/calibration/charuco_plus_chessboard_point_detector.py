@@ -62,6 +62,16 @@ class CharucoPlusChessboardPointDetector(PointDetector):
                 "You must provide the number of chessboard corners")
         if use_chessboard_inset and not self.chessboard_square_size:
             raise ValueError("You must provide the size of chessboard squares")
+        if use_chessboard_inset and not self.chessboard_id_offset:
+            raise ValueError("You must provide chessboard ID offset")
+        if use_chessboard_inset and self.chessboard_id_offset <= 0:
+            raise ValueError("Chessboard ID offset must be positive.")
+        if use_chessboard_inset \
+                and self.chessboard_id_offset < \
+                (self.number_of_charuco_squares[0] - 1) \
+                * (self.number_of_charuco_squares[1] - 1):
+            raise ValueError("Chessboard ID offset "
+                             "must > number of ChArUco tags.")
 
         self.charuco_point_detector = \
             cpd.CharucoPointDetector(dictionary,
@@ -121,8 +131,7 @@ class CharucoPlusChessboardPointDetector(PointDetector):
                 self.chessboard_point_detector.get_points(image)
 
             if chess_image_points.shape[0] == 0:
-                LOGGER.info("Chessboard not detected.")
-                return None, None, None
+                raise ValueError("Checking for chessboard, and non detected")
 
             total_number_of_points = total_number_of_points + \
                 chess_image_points.shape[0]

@@ -44,3 +44,49 @@ def test_charuco_plus_chess_detector():
 
     assert np.allclose(ids_portrait, ids_landscape)
     assert np.allclose(object_points_portrait, object_points_landscape)
+
+
+def test_charuco_plus_chess_invalid_because_no_chessboard_squares():
+    with pytest.raises(ValueError):
+        detector = CharucoPlusChessboardPointDetector(use_chessboard_inset=True,
+                                                      number_of_chessboard_squares=None)
+
+
+def test_charuco_plus_chess_invalid_because_no_chessboard_size():
+    with pytest.raises(ValueError):
+        detector = CharucoPlusChessboardPointDetector(use_chessboard_inset=True,
+                                                      chessboard_square_size=None)
+
+
+def test_charuco_plus_chess_invalid_because_no_id_offset():
+    with pytest.raises(ValueError):
+        detector = CharucoPlusChessboardPointDetector(use_chessboard_inset=True,
+                                                      chessboard_id_offset=None)
+
+
+def test_charuco_plus_chess_invalid_because_id_offset_negative():
+    with pytest.raises(ValueError):
+        detector = CharucoPlusChessboardPointDetector(use_chessboard_inset=True,
+                                                      chessboard_id_offset=-1)
+
+
+def test_charuco_plus_chess_invalid_because_id_offset_too_small():
+    # The default 26*19 grid will result in a maximum of 25*18 corners
+    # from the ChArUco bit, so we must have an id_offset of at least 450.
+    with pytest.raises(ValueError):
+        detector = CharucoPlusChessboardPointDetector(use_chessboard_inset=True,
+                                                      chessboard_id_offset=449)
+    detector = CharucoPlusChessboardPointDetector(use_chessboard_inset=True,
+                                                  chessboard_id_offset=450)
+
+
+def test_charuco_plus_chess_invalid_because_no_chessboard_detected():
+
+    input_file_name = 'tests/data/calibration/pattern_4x4_19x26_5_4_with_inset_9x14.png'
+    reference_image = cv2.imread(input_file_name)
+    roi = reference_image[0:400, 0:400, :]
+
+    with pytest.raises(ValueError):
+        # If user specifies in constructor that we are using a chessboard, then a chessboard must be detected.
+        detector = CharucoPlusChessboardPointDetector()
+        ids_portrait, object_points_portrait, image_points_portrait = detector.get_points(roi)
