@@ -7,9 +7,9 @@ scikit-surgeryimage
    :target: https://github.com/UCL/scikit-surgeryimage
    :alt: Logo
 
-.. image:: https://travis-ci.com/UCL/scikit-surgeryimage.svg?branch=master
-   :target: https://travis-ci.com/github/UCL/scikit-surgeryimage
-   :alt: Travisx CI test status
+.. image:: https://github.com/UCL/scikit-surgeryimage/.github/workflows/ci.yml/badge.svg
+   :target: https://github.com/UCL/scikit-surgeryimage/actions
+   :alt: GitHub Actions CI status
 
 .. image:: https://coveralls.io/repos/github/UCL/scikit-surgeryimage/badge.svg?branch=master&service=github
     :target: https://coveralls.io/github/UCL/scikit-surgeryimage?branch=master
