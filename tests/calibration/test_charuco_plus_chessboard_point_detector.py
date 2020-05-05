@@ -16,7 +16,7 @@ def test_charuco_plus_chess_detector():
     file_name = 'tests/data/calibration/pattern_4x4_19x26_5_4_with_inset_13x18.png'
 
     # Note: image generated with
-    calib_image = ch.make_charuco_with_chessboard()
+    calib_image = ch.make_charuco_with_chessboard(chessboard_squares=(13, 18))
     cv2.imwrite(file_name, calib_image)
 
     image = cv2.imread(file_name)
