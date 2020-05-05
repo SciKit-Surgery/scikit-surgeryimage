@@ -13,7 +13,7 @@ from sksurgeryimage.calibration.aruco_point_detector import ArucoPointDetector
 
 
 def test_aruco_detector_without_model():
-    image = cv2.imread('tests/data/processing/test-aruco.png')
+    image = cv2.imread('tests/data/calibration/test-aruco.png')
     dictionary = cv2.aruco.Dictionary_get(aruco.DICT_ARUCO_ORIGINAL)
     parameters = cv2.aruco.DetectorParameters_create()
     detector = ArucoPointDetector(dictionary, parameters, None, (1, 1))
@@ -27,7 +27,7 @@ def test_aruco_detector_without_model():
 
 
 def test_aruco_detector_with_model():
-    image = cv2.imread('tests/data/processing/test-aruco.png')
+    image = cv2.imread('tests/data/calibration/test-aruco.png')
     dictionary = cv2.aruco.Dictionary_get(aruco.DICT_ARUCO_ORIGINAL)
     parameters = cv2.aruco.DetectorParameters_create()
 
@@ -54,7 +54,7 @@ def test_aruco_detector_with_model():
 
 
 def test_aruco_detector_with_point_not_in_model():
-    image = cv2.imread('tests/data/processing/test-aruco.png')
+    image = cv2.imread('tests/data/calibration/test-aruco.png')
     dictionary = cv2.aruco.Dictionary_get(aruco.DICT_ARUCO_ORIGINAL)
     parameters = cv2.aruco.DetectorParameters_create()
 

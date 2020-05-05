@@ -29,7 +29,7 @@ class PointDetector(object):
         """
         Client's call this method to extract points from an image.
 
-        :param image: numpy 2D RGB image.
+        :param image: numpy 2D RGB/grayscale image.
         :return: ids, object_points, image_points as Nx[1,3,2] ndarrays
         """
 
@@ -37,10 +37,13 @@ class PointDetector(object):
             raise TypeError('image is None')
         if not isinstance(image, np.ndarray):
             raise TypeError('image is not an ndarray')
-        if image.shape[2] != 3:
-            raise ValueError("image doesn't have 3 channels")
 
-        grey = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
+        grey = image
+        if len(image.shape) > 2:
+            if image.shape[2] == 3:
+                grey = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
+            elif image.shape[2] == 4:
+                grey = cv2.cvtColor(image, cv2.COLOR_RGBA2GRAY)
 
         is_resized = False
         if self.scale_x != 1 or self.scale_y != 1:

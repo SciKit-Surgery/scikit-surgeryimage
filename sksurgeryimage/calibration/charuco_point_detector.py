@@ -16,7 +16,7 @@ LOGGER = logging.getLogger(__name__)
 
 class CharucoPointDetector(PointDetector):
     """
-    Class to detect ChArUco points in a 2D grey scale video image.
+    Class to detect ChArUco points in a 2D video image.
     """
     def __init__(self, dictionary,
                  number_of_squares,

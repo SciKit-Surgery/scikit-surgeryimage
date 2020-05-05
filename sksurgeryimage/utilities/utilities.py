@@ -23,6 +23,7 @@ def prepare_cv2_text_overlay(overlay_text, frame, text_scale=1):
 
     return text_overlay_properties
 
+
 def noisy_image(image, mean=0, stddev=(50, 5, 5)):
     """
     Creates a noise image, based on the dimensions of the

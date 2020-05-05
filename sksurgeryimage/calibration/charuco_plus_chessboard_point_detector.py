@@ -30,20 +30,20 @@ class CharucoPlusChessboardPointDetector(PointDetector):
                  use_chessboard_inset=False,
                  number_of_chessboard_squares=None,
                  chessboard_square_size=1,
-                 chessboard_offset=500
+                 chessboard_id_offset=500
                  ):
         """
         Constructs a CharucoPlusChessboardPointDetector.
 
         :param dictionary: aruco dictionary
         :param number_of_charuco_squares: tuple of (number in x, number in y)
-        :param size_of_charuco_squares: tuple of (size in x, size in y) in mm
+        :param size_of_charuco_squares: tuple of size (external, internal) in mm
         :param minimum_number_of_points: combined minimum number of points
         :param scale: if you want to resize the image, specify scale factors
         :param use_chessboard_inset: True if we want to use a chessboard inset
         :param number_of_chessboard_squares: tuple of (num in x, num in y)
         :param chessboard_square_size: size in millimetres of chessboard squares
-        :param chessboard_offset: offset to add to chessboard IDs.
+        :param chessboard_id_offset: offset to add to chessboard IDs.
         """
         super(CharucoPlusChessboardPointDetector, self).__init__(scale=scale)
 
@@ -53,12 +53,12 @@ class CharucoPlusChessboardPointDetector(PointDetector):
         self.charuco_filtering = charuco_filtering
         self.number_of_chessboard_squares = number_of_chessboard_squares
         self.chessboard_square_size = chessboard_square_size
-        self.chessboard_offset = chessboard_offset
+        self.chessboard_id_offset = chessboard_id_offset
 
-        if use_chessboard_inset and not self.chessboard_squares:
+        if use_chessboard_inset and not self.number_of_chessboard_squares:
             raise ValueError(
                 "You must provide the number of chessboard corners")
-        if use_chessboard_inset and not self.chessboard_size:
+        if use_chessboard_inset and not self.chessboard_square_size:
             raise ValueError("You must provide the size of chessboard squares")
 
         self.charuco_point_detector = \
@@ -69,6 +69,7 @@ class CharucoPlusChessboardPointDetector(PointDetector):
                                      )
 
         self.chessboard_point_detector = None
+        self.chessboard_offset = [0] * 3
 
         if use_chessboard_inset:
 
@@ -77,10 +78,10 @@ class CharucoPlusChessboardPointDetector(PointDetector):
             charucoboard_size_y = self.number_of_charuco_squares[1] * \
                 self.size_of_charuco_squares[0]
 
-            chessboard_size_x = self.chessboard_size[0] \
-                * self.chessboard_size
-            chessboard_size_y = self.chessboard_size[1] \
-                * self.chessboard_size
+            chessboard_size_x = self.number_of_chessboard_squares[0] \
+                * self.chessboard_square_size
+            chessboard_size_y = self.number_of_chessboard_squares[1] \
+                * self.chessboard_square_size
 
             self.chessboard_offset[0] = \
                 (charucoboard_size_x - chessboard_size_x) / 2 + \
@@ -110,11 +111,8 @@ class CharucoPlusChessboardPointDetector(PointDetector):
 
         total_number_of_points = charuco_image_points.shape[0]
 
-        chess_ids = None
-        chess_object_points = None
-        chess_image_points = None
-
         if self.chessboard_point_detector:
+
             chess_ids, chess_object_points, chess_image_points = \
                 self.chessboard_point_detector.get_points(image)
 
@@ -125,21 +123,22 @@ class CharucoPlusChessboardPointDetector(PointDetector):
             total_number_of_points = total_number_of_points + \
                 chess_image_points.shape[0]
 
+            # Prepare to merge charuco and chessboard points
+            chess_ids = chess_ids + self.chessboard_id_offset
+            chess_object_points = chess_object_points * [-1, 1, 1]\
+                + self.chessboard_offset
+
+            # Merge!
+            charuco_ids = np.append(charuco_ids, chess_ids, axis=0)
+            charuco_object_points = np.append(charuco_object_points,
+                                              chess_object_points,
+                                              axis=0)
+            charuco_image_points = np.append(charuco_image_points,
+                                             chess_image_points,
+                                             axis=0)
+
         if total_number_of_points < self.minimum_number_of_points:
             LOGGER.info("Not enough points detected. Discard.")
             return None, None, None
 
-        # Prepare to merge charuco and chessboard points
-        chess_ids = chess_ids + self.chessboard_id_offset
-        chess_object_points = chess_object_points * [-1, 1, 1]\
-            + self.chessboard_offset
-
-        # Merge!
-        charuco_ids = np.append(charuco_ids, chess_ids)
-        charuco_object_points = np.append(charuco_object_points,
-                                          chess_object_points,
-                                          axis=0)
-        charuco_image_points = np.append(charuco_image_points,
-                                         chess_image_points,
-                                         axis=0)
         return charuco_ids, charuco_object_points, charuco_image_points

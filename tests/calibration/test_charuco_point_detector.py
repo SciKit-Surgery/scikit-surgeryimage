@@ -12,7 +12,7 @@ from sksurgeryimage.calibration.charuco_point_detector import CharucoPointDetect
 
 
 def test_charuco_detector():
-    image = cv2.imread('tests/data/processing/test-charuco.png')
+    image = cv2.imread('tests/data/calibration/test-charuco.png')
     dictionary = cv2.aruco.Dictionary_get(aruco.DICT_4X4_250)
     detector = CharucoPointDetector(dictionary, (13, 10), (3, 2))
     ids, object_points, image_points = detector.get_points(image)
@@ -25,7 +25,7 @@ def test_charuco_detector():
 
 
 def test_charuco_detector_with_masked_image():
-    image = cv2.imread('tests/data/processing/test-charuco-blanked.png')
+    image = cv2.imread('tests/data/calibration/test-charuco-blanked.png')
     dictionary = cv2.aruco.Dictionary_get(aruco.DICT_4X4_250)
     detector = CharucoPointDetector(dictionary, (13, 10), (3, 2))
     ids, object_points, image_points = detector.get_points(image)
@@ -38,7 +38,7 @@ def test_charuco_detector_with_masked_image():
 
 
 def test_charuco_detector_with_filtering():
-    image = cv2.imread('tests/data/processing/pattern_4x4_19x26_5_4_with_inset_13x18_corrupted2.png')
+    image = cv2.imread('tests/data/calibration/pattern_4x4_19x26_5_4_with_inset_13x18_corrupted2.png')
     dictionary = cv2.aruco.Dictionary_get(aruco.DICT_4X4_250)
     detector = CharucoPointDetector(dictionary, (19, 26), (5, 4), filtering=True)
     ids, object_points, image_points = detector.get_points(image)
@@ -51,7 +51,7 @@ def test_charuco_detector_with_filtering():
 
 
 def test_charuco_detector_without_filtering():
-    image = cv2.imread('tests/data/processing/pattern_4x4_19x26_5_4_with_inset_13x18_corrupted2.png')
+    image = cv2.imread('tests/data/calibration/pattern_4x4_19x26_5_4_with_inset_13x18_corrupted2.png')
     dictionary = cv2.aruco.Dictionary_get(aruco.DICT_4X4_250)
     detector = CharucoPointDetector(dictionary, (19, 26), (5, 4))
     ids, object_points, image_points = detector.get_points(image)
