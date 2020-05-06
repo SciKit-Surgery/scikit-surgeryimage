@@ -6,7 +6,7 @@ ChArUco implementation of PointDetector.
 
 import logging
 import numpy as np
-from sksurgeryimage.processing.point_detector import PointDetector
+from sksurgeryimage.calibration.point_detector import PointDetector
 import sksurgeryimage.calibration.charuco as charuco
 
 LOGGER = logging.getLogger(__name__)
@@ -16,7 +16,7 @@ LOGGER = logging.getLogger(__name__)
 
 class CharucoPointDetector(PointDetector):
     """
-    Class to detect ChArUco points in a 2D grey scale video image.
+    Class to detect ChArUco points in a 2D video image.
     """
     def __init__(self, dictionary,
                  number_of_squares,

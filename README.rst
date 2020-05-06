@@ -32,11 +32,12 @@ Features
 requirements.txt specifies a dependency on opencv-contrib-python, so you can use any OpenCV python therein.
 In addition, this project provides:
 
-* Video read and write.
+* Convenience classes for video read and write.
 * Utilities to detect the number of cameras and prepare text for overlay on video.
 * Functions to make charuco boards, and detect charuco markers.
 * Interlacing and deinterlacing.
 * Convenience wrappers for erosion and dilation.
+* A PointDetector interface for video camera calibration and implementations such as OpenCV chessboard, ArUco, ChArUco and combinations.
 
 
 Installing

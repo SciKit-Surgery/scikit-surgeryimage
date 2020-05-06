@@ -7,7 +7,7 @@ Tests for chessboard implementation of PointDetector.
 import cv2 as cv2
 import numpy as np
 import pytest
-from sksurgeryimage.processing.chessboard_point_detector import ChessboardPointDetector
+from sksurgeryimage.calibration.chessboard_point_detector import ChessboardPointDetector
 
 
 def test_chessboard_detector():

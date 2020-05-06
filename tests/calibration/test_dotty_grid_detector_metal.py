@@ -6,7 +6,7 @@ Tests for dotty grid implementation of PointDetector on metal images.
 
 import numpy as np
 import pytest
-import tests.processing.test_dotty_grid_utils as tdgu
+import tests.calibration.test_dotty_grid_utils as tdgu
 
 
 def test_metal_1(setup_dotty_metal_model):
