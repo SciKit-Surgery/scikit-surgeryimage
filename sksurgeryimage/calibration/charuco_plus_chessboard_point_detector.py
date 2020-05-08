@@ -4,6 +4,8 @@
 ChArUco + Chessboard implementation of PointDetector.
 """
 
+# pylint: disable=too-many-instance-attributes
+
 import logging
 import numpy as np
 import cv2
@@ -32,7 +34,9 @@ class CharucoPlusChessboardPointDetector(PointDetector):
                  use_chessboard_inset=True,
                  number_of_chessboard_squares=(9, 14),
                  chessboard_square_size=3,
-                 chessboard_id_offset=500
+                 chessboard_id_offset=500,
+                 error_if_no_chessboard=True,
+                 error_if_no_charuco=False
                  ):
         """
         Constructs a CharucoPlusChessboardPointDetector.
@@ -46,6 +50,8 @@ class CharucoPlusChessboardPointDetector(PointDetector):
         :param number_of_chessboard_squares: tuple of (num in x, num in y)
         :param chessboard_square_size: size in millimetres of chessboard squares
         :param chessboard_id_offset: offset to add to chessboard IDs.
+        :param error_if_no_chessboard: if True, throws Exception
+        :param error_if_no_charuco: if True, throws Exception
         """
         super(CharucoPlusChessboardPointDetector, self).__init__(scale=scale)
 
@@ -56,6 +62,8 @@ class CharucoPlusChessboardPointDetector(PointDetector):
         self.number_of_chessboard_squares = number_of_chessboard_squares
         self.chessboard_square_size = chessboard_square_size
         self.chessboard_id_offset = chessboard_id_offset
+        self.error_if_no_chessboard = error_if_no_chessboard
+        self.error_if_no_charuco = error_if_no_charuco
 
         if use_chessboard_inset and not self.number_of_chessboard_squares:
             raise ValueError(
@@ -123,34 +131,45 @@ class CharucoPlusChessboardPointDetector(PointDetector):
         charuco_ids, charuco_object_points, charuco_image_points = \
             self.charuco_point_detector.get_points(image)
 
-        total_number_of_points = charuco_image_points.shape[0]
+        if self.error_if_no_charuco and charuco_ids.shape[0] == 0:
+            raise ValueError("No ChArUco detected.")
+
+        total_number_of_points = charuco_ids.shape[0]
 
         if self.chessboard_point_detector:
 
             chess_ids, chess_object_points, chess_image_points = \
                 self.chessboard_point_detector.get_points(image)
 
-            if chess_image_points.shape[0] == 0:
-                raise ValueError("Checking for chessboard, and non detected")
+            if self.error_if_no_chessboard and chess_ids.shape[0] == 0:
+                raise ValueError("No chessboard detected.")
 
             total_number_of_points = total_number_of_points + \
-                chess_image_points.shape[0]
+                chess_ids.shape[0]
 
             # Prepare to merge charuco and chessboard points
             chess_ids = chess_ids + self.chessboard_id_offset
             chess_object_points = chess_object_points * [-1, 1, 1]\
                 + self.chessboard_offset
 
-            # Merge!
-            charuco_ids = np.append(charuco_ids,
-                                    chess_ids,
-                                    axis=0)
-            charuco_object_points = np.append(charuco_object_points,
-                                              chess_object_points,
-                                              axis=0)
-            charuco_image_points = np.append(charuco_image_points,
-                                             chess_image_points,
-                                             axis=0)
+            if charuco_ids.shape[0] == 0:
+
+                # No merging required
+                charuco_ids = chess_ids
+                charuco_object_points = chess_object_points
+                charuco_image_points = chess_image_points
+
+            elif charuco_ids.shape[0] != 0 and chess_ids.shape[0] != 0:
+
+                charuco_ids = np.append(charuco_ids,
+                                        chess_ids,
+                                        axis=0)
+                charuco_object_points = np.append(charuco_object_points,
+                                                  chess_object_points,
+                                                  axis=0)
+                charuco_image_points = np.append(charuco_image_points,
+                                                 chess_image_points,
+                                                 axis=0)
 
         if total_number_of_points < self.minimum_number_of_points:
             LOGGER.info("Not enough points detected. Discard.")
