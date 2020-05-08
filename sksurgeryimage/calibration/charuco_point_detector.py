@@ -69,6 +69,10 @@ class CharucoPointDetector(PointDetector):
         :param image: numpy 2D grey scale image.
         :return: ids, object_points, image_points as Nx[1,3,2] ndarrays
         """
+        img_points = np.zeros((0, 2))
+        obj_points = np.zeros((0, 3))
+        ids = np.zeros((0, 1))
+
         _, \
         _, \
         chessboard_corners, \
@@ -79,6 +83,16 @@ class CharucoPointDetector(PointDetector):
                                           self.camera_matrix,
                                           self.distortion_coefficients,
                                           self.filtering)
-        points_3d = \
-            np.take(self.object_points, chessboard_ids, axis=0).reshape((-1, 3))
-        return chessboard_ids, points_3d, chessboard_corners.reshape((-1, 2))
+
+        if chessboard_ids is not None \
+                and chessboard_ids is not None \
+                and len(chessboard_corners) > 0 \
+                and len(chessboard_ids) > 0:
+
+            ids = chessboard_ids
+            obj_points = \
+                np.take(self.object_points, chessboard_ids, axis=0)\
+                    .reshape((-1, 3))
+            img_points = chessboard_corners.reshape((-1, 2))
+
+        return ids, obj_points, img_points
