@@ -173,6 +173,6 @@ class CharucoPlusChessboardPointDetector(PointDetector):
 
         if total_number_of_points < self.minimum_number_of_points:
             LOGGER.info("Not enough points detected. Discard.")
-            return None, None, None
+            return np.zeros((0, 1)), np.zeros((0, 3)), np.zeros((0, 2))
 
         return charuco_ids, charuco_object_points, charuco_image_points
