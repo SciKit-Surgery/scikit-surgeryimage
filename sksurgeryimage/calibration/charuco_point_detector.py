@@ -80,5 +80,5 @@ class CharucoPointDetector(PointDetector):
                                           self.distortion_coefficients,
                                           self.filtering)
         points_3d = \
-            np.take(self.object_points, chessboard_ids, axis=0).squeeze()
-        return chessboard_ids, points_3d, chessboard_corners.squeeze()
+            np.take(self.object_points, chessboard_ids, axis=0).reshape((-1, 3))
+        return chessboard_ids, points_3d, chessboard_corners.reshape((-1, 2))
