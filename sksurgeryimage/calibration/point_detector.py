@@ -41,9 +41,9 @@ class PointDetector(object):
         grey = image
         if len(image.shape) > 2:
             if image.shape[2] == 3:
-                grey = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
+                grey = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
             elif image.shape[2] == 4:
-                grey = cv2.cvtColor(image, cv2.COLOR_RGBA2GRAY)
+                grey = cv2.cvtColor(image, cv2.COLOR_BGRA2GRAY)
 
         is_resized = False
         if self.scale_x != 1 or self.scale_y != 1:
