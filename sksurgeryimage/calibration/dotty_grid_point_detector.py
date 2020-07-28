@@ -4,6 +4,7 @@
 Dotty Grid implementation of PointDetector.
 """
 
+import copy
 import logging
 import cv2
 import numpy as np
@@ -301,4 +302,4 @@ class DottyGridPointDetector(PointDetector):
         """
         Returns a [Nx3] numpy ndarray representing the model points in 3D.
         """
-        return np.ones((1, 3))
+        return copy.deepcopy(self.model_points[:, 3:6])

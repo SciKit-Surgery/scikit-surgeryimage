@@ -73,6 +73,10 @@ class PointDetector:
         Derived classes should override this, to detector returns the
         complete model of 3D points. e.g. for a chessboard this would be
         all the corners in chessboard coordinates (e.g. z=0).
+
+        By design, this can return an ndarray with zero rows, if the
+        detector does not support 3D coordinates.
+
         :return: [Nx3] numpy ndarray representing model points.
         """
         raise NotImplementedError()

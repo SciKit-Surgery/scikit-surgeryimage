@@ -80,4 +80,4 @@ class ChessboardPointDetector(PointDetector):
         """
         Returns a [Nx3] numpy ndarray representing the model points in 3D.
         """
-        return np.ones((1, 3))
+        return copy.deepcopy(self.object_points)

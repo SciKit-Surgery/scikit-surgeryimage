@@ -1,12 +1,8 @@
 # -*- coding: utf-8 -*-
 
-import os
 import pytest
 import numpy as np
 import cv2
-
-
-
 
 
 @pytest.fixture(scope="function")
@@ -41,3 +37,9 @@ def setup_dotty_metal_model():
             model_points[counter][5] = 0
             counter = counter + 1
     return model_points
+
+
+@pytest.fixture(scope="function")
+def load_reference_charuco_chessboard_image():
+    image = cv2.imread('tests/data/calibration/pattern_4x4_19x26_5_4_with_inset_9x14.png')
+    return image

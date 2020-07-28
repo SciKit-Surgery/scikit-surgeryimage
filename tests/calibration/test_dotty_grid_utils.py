@@ -55,5 +55,8 @@ def __check_real_image(model_points,
 
     __write_annotated_image(image, ids, image_points, image_file_name)
 
+    model = detector.get_model_points()
+    assert model.shape[0] == model_points.shape[0]
+
     return ids.shape[0]
 

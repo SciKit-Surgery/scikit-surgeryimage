@@ -108,4 +108,16 @@ class ArucoPointDetector(PointDetector):
         """
         Returns a [Nx3] numpy ndarray representing the model points in 3D.
         """
-        return np.ones((1, 3))
+        if self.model is None:
+            return np.zeros((0, 3))
+
+        number_of_points = len(self.model)
+        result = np.zeros((number_of_points, 3))
+        counter = 0
+        for key in self.model:
+            point = self.model[key]
+            result[counter][0] = point[0][0]
+            result[counter][1] = point[0][1]
+            result[counter][2] = point[0][2]
+            counter = counter + 1
+        return result
