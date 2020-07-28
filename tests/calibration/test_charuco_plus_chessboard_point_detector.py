@@ -29,13 +29,13 @@ def test_charuco_plus_chess_detector(load_reference_charuco_chessboard_image):
     detector = CharucoPlusChessboardPointDetector(ref_img)
     ids_portrait, object_points_portrait, image_points_portrait = detector.get_points(reference_image)
     if ids_portrait.shape[0] > 0:
-        pdu.write_annotated_image(reference_image, ids_portrait, image_points_portrait, input_file_name)
+        pdu.write_annotated_image(reference_image, ids_portrait, image_points_portrait, 'tests/output/pattern_4x4_19x26_5_4_with_inset_9x14_portrait.png')
 
     input_file_name = 'tests/data/calibration/pattern_4x4_19x26_5_4_with_inset_9x14_landscape.png'
     image = cv2.imread(input_file_name)
     ids_landscape, object_points_landscape, image_points_landscape = detector.get_points(image)
     if ids_landscape.shape[0] > 0:
-        pdu.write_annotated_image(image, ids_landscape, image_points_landscape, input_file_name)
+        pdu.write_annotated_image(image, ids_landscape, image_points_landscape, 'tests/output/pattern_4x4_19x26_5_4_with_inset_9x14_landscape.png')
 
     assert ids_portrait.shape[0] == 468
     assert object_points_portrait.shape[0] == 468

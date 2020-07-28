@@ -66,6 +66,9 @@ class ArucoPointDetector(PointDetector):
         """
         Extracts points using OpenCV's ArUco implementation.
 
+        If the 'model' is not provided in the constructor,
+        the object points will all be zero.
+
         :param image: numpy 2D grey scale image.
         :return: ids, object_points, image_points
         """
