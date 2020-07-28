@@ -12,10 +12,8 @@ import cv2
 
 LOGGER = logging.getLogger(__name__)
 
-#pylint:disable=useless-object-inheritance
 
-
-class PointDetector(object):
+class PointDetector:
     """
     Class to detect points in a 2D video image.
     :param scale: tuple (x scale, y scale) to scale up/down the image
@@ -67,5 +65,18 @@ class PointDetector(object):
 
         :param image: numpy 2D grey scale image.
         :return: ids, object_points, image_points as Nx[1,3,2] ndarrays
+        """
+        raise NotImplementedError()
+
+    def get_model_points(self):
+        """
+        Derived classes should override this, to detector returns the
+        complete model of 3D points. e.g. for a chessboard this would be
+        all the corners in chessboard coordinates (e.g. z=0).
+
+        By design, this can return an ndarray with zero rows, if the
+        detector does not support 3D coordinates.
+
+        :return: [Nx3] numpy ndarray representing model points.
         """
         raise NotImplementedError()

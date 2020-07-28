@@ -27,6 +27,9 @@ def test_chessboard_detector():
     np.testing.assert_array_equal(object_points, object_points2)
     np.testing.assert_allclose(image_points, image_points2, 0.01, 2)
 
+    model = detector2.get_model_points()
+    assert model.shape[0] == 130
+
 
 def test_non_chessboard_image():
     image = cv2.imread('tests/data/processing/j_eroded.png')

@@ -4,6 +4,7 @@
 ChArUco implementation of PointDetector.
 """
 
+import copy
 import logging
 import numpy as np
 from sksurgeryimage.calibration.point_detector import PointDetector
@@ -96,3 +97,9 @@ class CharucoPointDetector(PointDetector):
             img_points = chessboard_corners.reshape((-1, 2))
 
         return ids, obj_points, img_points
+
+    def get_model_points(self):
+        """
+        Returns a [Nx3] numpy ndarray representing the model points in 3D.
+        """
+        return copy.deepcopy(self.object_points)

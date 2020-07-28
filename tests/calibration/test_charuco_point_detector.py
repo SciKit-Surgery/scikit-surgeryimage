@@ -23,6 +23,9 @@ def test_charuco_detector():
     assert image_points.shape[0] == 108
     assert image_points.shape[1] == 2
 
+    model = detector.get_model_points()
+    assert model.shape[0] == 108
+
 
 def test_charuco_detector_with_masked_image():
     image = cv2.imread('tests/data/calibration/test-charuco-blanked.png')

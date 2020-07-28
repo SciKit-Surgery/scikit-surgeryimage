@@ -75,3 +75,9 @@ class ChessboardPointDetector(PointDetector):
 
         # If we didn't find all points, return consistent set of 'nothing'
         return np.zeros((0, 1)), np.zeros((0, 3)), img_points
+
+    def get_model_points(self):
+        """
+        Returns a [Nx3] numpy ndarray representing the model points in 3D.
+        """
+        return copy.deepcopy(self.object_points)

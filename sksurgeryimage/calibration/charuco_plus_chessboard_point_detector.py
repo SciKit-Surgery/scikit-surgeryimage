@@ -6,6 +6,7 @@ ChArUco + Chessboard implementation of PointDetector.
 
 # pylint: disable=too-many-instance-attributes
 
+import copy
 import logging
 import numpy as np
 import cv2
@@ -22,6 +23,7 @@ class CharucoPlusChessboardPointDetector(PointDetector):
     in a 2D grey scale video image.
     """
     def __init__(self,
+                 reference_image,
                  minimum_number_of_points=50,
                  scale=(1, 1),
                  number_of_charuco_squares=(19, 26),
@@ -36,11 +38,12 @@ class CharucoPlusChessboardPointDetector(PointDetector):
                  chessboard_square_size=3,
                  chessboard_id_offset=500,
                  error_if_no_chessboard=True,
-                 error_if_no_charuco=False
+                 error_if_no_charuco=False,
                  ):
         """
         Constructs a CharucoPlusChessboardPointDetector.
 
+        :param reference_image: mandatory example of image with all tags on
         :param dictionary: aruco dictionary
         :param number_of_charuco_squares: tuple of (number in x, number in y)
         :param size_of_charuco_squares: tuple of size (external, internal) in mm
@@ -50,10 +53,17 @@ class CharucoPlusChessboardPointDetector(PointDetector):
         :param number_of_chessboard_squares: tuple of (num in x, num in y)
         :param chessboard_square_size: size in millimetres of chessboard squares
         :param chessboard_id_offset: offset to add to chessboard IDs.
-        :param error_if_no_chessboard: if True, throws Exception
-        :param error_if_no_charuco: if True, throws Exception
+        :param error_if_no_chessboard: if True, throws Exception when
+        no chessboard is seen
+        :param error_if_no_charuco: if True, throws Exception when
+        no ChArUco tags are seen
         """
         super(CharucoPlusChessboardPointDetector, self).__init__(scale=scale)
+
+        if reference_image is None:
+            raise ValueError("You must provide a reference image of all points")
+        if not isinstance(reference_image, np.ndarray):
+            raise ValueError("The reference image must be a numpy ndarray")
 
         self.number_of_charuco_squares = number_of_charuco_squares
         self.size_of_charuco_squares = size_of_charuco_squares
@@ -119,6 +129,11 @@ class CharucoPlusChessboardPointDetector(PointDetector):
                      self.number_of_chessboard_squares[1] - 1),
                     self.chessboard_square_size
                     )
+        # Run this detector on the reference image, to get a model
+        # of ALL the available points.
+        _, self.model_points, _ = self.get_points(reference_image)
+        if self.model_points.shape[0] == 0:
+            raise ValueError("No reference model points were found")
 
     def _internal_get_points(self, image):
         """
@@ -176,3 +191,9 @@ class CharucoPlusChessboardPointDetector(PointDetector):
             return np.zeros((0, 1)), np.zeros((0, 3)), np.zeros((0, 2))
 
         return charuco_ids, charuco_object_points, charuco_image_points
+
+    def get_model_points(self):
+        """
+        Returns a [Nx3] numpy ndarray representing the model points in 3D.
+        """
+        return copy.deepcopy(self.model_points)

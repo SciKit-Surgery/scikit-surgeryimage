@@ -4,6 +4,7 @@
 Dotty Grid implementation of PointDetector.
 """
 
+import copy
 import logging
 import cv2
 import numpy as np
@@ -296,3 +297,9 @@ class DottyGridPointDetector(PointDetector):
         # If we didn't find all points, of the fit was poor,
         # return a consistent set of 'nothing'
         return np.zeros((0, 1)), np.zeros((0, 3)), np.zeros((0, 2))
+
+    def get_model_points(self):
+        """
+        Returns a [Nx3] numpy ndarray representing the model points in 3D.
+        """
+        return copy.deepcopy(self.model_points[:, 3:6])

@@ -25,6 +25,10 @@ def test_aruco_detector_without_model():
     assert image_points.shape[0] == 12
     assert image_points.shape[1] == 2
 
+    # This should return a numpy ndarray with zero rows.
+    model = detector.get_model_points()
+    assert model.shape[0] == 0
+
 
 def test_aruco_detector_with_model():
     image = cv2.imread('tests/data/calibration/test-aruco.png')
@@ -51,6 +55,9 @@ def test_aruco_detector_with_model():
     six.print_('ArUco ids=' + str(ids))
     six.print_('ArUco object_points=' + str(object_points))
     six.print_('ArUco image_points=' + str(image_points))
+
+    model = detector.get_model_points()
+    assert model.shape[0] == 2000
 
 
 def test_aruco_detector_with_point_not_in_model():
