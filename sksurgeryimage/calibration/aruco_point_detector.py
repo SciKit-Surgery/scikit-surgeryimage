@@ -103,3 +103,9 @@ class ArucoPointDetector(PointDetector):
             return ids, object_points, image_points
 
         return np.zeros((0, 1)), object_points, image_points
+
+    def get_model_points(self):
+        """
+        Returns a [Nx3] numpy ndarray representing the model points in 3D.
+        """
+        return np.ones((1, 3))

@@ -176,3 +176,9 @@ class CharucoPlusChessboardPointDetector(PointDetector):
             return np.zeros((0, 1)), np.zeros((0, 3)), np.zeros((0, 2))
 
         return charuco_ids, charuco_object_points, charuco_image_points
+
+    def get_model_points(self):
+        """
+        Returns a [Nx3] numpy ndarray representing the model points in 3D.
+        """
+        return np.ones((1, 3))
