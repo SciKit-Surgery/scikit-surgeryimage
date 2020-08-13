@@ -1,7 +1,7 @@
 scikit-surgeryimage
-===============================
+====================
 
-.. image:: https://github.com/UCL/scikit-surgeryimage/raw/master/project-icon.png
+.. image:: https://github.com/UCL/scikit-surgeryimage/raw/master/weiss-logo.png
    :height: 128px
    :width: 128px
    :target: https://github.com/UCL/scikit-surgeryimage
@@ -26,19 +26,22 @@ that are useful for image-guided surgery.
 
 scikit-surgeryimage was developed at the `Wellcome EPSRC Centre for Interventional and Surgical Sciences`_ in `University College London (UCL)`_.
 
+.. features-start
+
 Features
 --------
 
 requirements.txt specifies a dependency on opencv-contrib-python, so you can use any OpenCV python therein.
 In addition, this project provides:
 
-* Convenience classes for video read and write.
-* Utilities to detect the number of cameras and prepare text for overlay on video.
-* Functions to make charuco boards, and detect charuco markers.
-* Interlacing and deinterlacing.
-* Convenience wrappers for erosion and dilation.
-* A PointDetector interface for video camera calibration and implementations such as OpenCV chessboard, ArUco, ChArUco and combinations.
-
+* `Convenience classes <https://scikit-surgeryimage.readthedocs.io/en/latest/module_ref.html#data-acquisition>`_ for video read and write.
+* `Utilities <https://scikit-surgeryimage.readthedocs.io/en/latest/module_ref.html#calibration-tools>`_ to detect the number of cameras and prepare text for overlay on video.
+* A `PointDetector <https://scikit-surgeryimage.readthedocs.io/en/latest/module_ref.html#utilities>`_ interface for video camera calibration and implementations such as OpenCV chessboard, ArUco, ChArUco and combinations.
+* Generate `ChArUco <https://scikit-surgeryimage.readthedocs.io/en/latest/module_ref.html#sksurgeryimage.calibration.charuco.make_charuco_board>`_ patterns
+* `Interlacing and deinterlacing <https://scikit-surgeryimage.readthedocs.io/en/latest/module_ref.html#video-interlacing-functions>`_.
+* Convenience wrappers for `erosion and dilation <https://scikit-surgeryimage.readthedocs.io/en/latest/module_ref.html#module-sksurgeryimage.processing.morphological_operators>`_.
+* 
+.. features-end
 
 Installing
 ~~~~~~~~~~
