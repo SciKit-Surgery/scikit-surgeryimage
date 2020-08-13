@@ -7,6 +7,8 @@ scikit-surgeryimage
    :target: https://github.com/UCL/scikit-surgeryimage
    :alt: Logo
 
+|
+
 .. image:: https://github.com/UCL/scikit-surgeryimage/workflows/.github/workflows/ci.yml/badge.svg
    :target: https://github.com/UCL/scikit-surgeryimage/actions
    :alt: GitHub Actions CI status
