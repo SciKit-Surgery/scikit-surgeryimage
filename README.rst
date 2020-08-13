@@ -1,7 +1,7 @@
 scikit-surgeryimage
 ====================
 
-.. image:: https://github.com/UCL/scikit-surgeryimage/raw/master/weiss-logo.png
+.. image:: https://github.com/UCL/scikit-surgeryimage/raw/master/weiss_logo.png
    :height: 128px
    :width: 128px
    :target: https://github.com/UCL/scikit-surgeryimage
