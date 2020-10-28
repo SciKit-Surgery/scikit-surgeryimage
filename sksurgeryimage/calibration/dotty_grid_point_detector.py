@@ -4,6 +4,8 @@
 Dotty Grid implementation of PointDetector.
 """
 
+# pylint:disable=too-many-instance-attributes
+
 import copy
 import logging
 import cv2
