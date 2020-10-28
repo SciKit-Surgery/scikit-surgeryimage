@@ -20,6 +20,7 @@ def test_metal_1(setup_dotty_metal_model):
                                                )
     assert (224 == number_of_points)
 
+
 def test_metal_1a(setup_dotty_metal_model_OR):
     # This image is the one the detector does the worst on in this set of images
     img_path = 'tests/data/calib-ucl-circles/snapshots-metal-1/mock_or/calib.right.images.1.png'
@@ -32,6 +33,7 @@ def test_metal_1a(setup_dotty_metal_model_OR):
                                                )
 
     print(number_of_points)
+
 
 def test_metal_2(setup_dotty_metal_model):
     model_points = setup_dotty_metal_model
