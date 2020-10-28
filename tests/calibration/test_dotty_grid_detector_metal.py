@@ -6,6 +6,7 @@ Tests for dotty grid implementation of PointDetector on metal images.
 
 import numpy as np
 import pytest
+import cv2
 import tests.calibration.test_dotty_grid_utils as tdgu
 
 
@@ -19,6 +20,18 @@ def test_metal_1(setup_dotty_metal_model):
                                                )
     assert (224 == number_of_points)
 
+def test_metal_1a(setup_dotty_metal_model_OR):
+    # This image is the one the detector does the worst on in this set of images
+    img_path = 'tests/data/calib-ucl-circles/snapshots-metal-1/mock_or/calib.right.images.1.png'
+    model_points = setup_dotty_metal_model_OR
+    number_of_points, img_points = tdgu.__check_real_OR_image(model_points,
+                                               img_path,
+                                               'tests/data/calib-ucl-circles/10_54_44/viking.calib.left.intrinsics.txt',
+                                               'tests/data/calib-ucl-circles/10_54_44/viking.calib.left.distortion.txt',
+                                               True
+                                               )
+
+    print(number_of_points)
 
 def test_metal_2(setup_dotty_metal_model):
     model_points = setup_dotty_metal_model

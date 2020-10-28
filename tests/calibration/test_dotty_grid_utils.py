@@ -58,5 +58,45 @@ def __check_real_image(model_points,
     model = detector.get_model_points()
     assert model.shape[0] == model_points.shape[0]
 
-    return ids.shape[0]
+    return ids.shape[0], image_points
+
+def __check_real_OR_image(model_points,
+                         image_file_name,
+                         intrinsics_file_name,
+                         distortion_file_name,
+                         is_metal=False
+                         ):
+    logging.basicConfig(level=logging.DEBUG)
+    image = cv2.imread(image_file_name)
+    intrinsics = np.loadtxt(intrinsics_file_name)
+    distortion = np.loadtxt(distortion_file_name)
+
+    size = (2600, 1900)
+    fiducials = [133, 141, 308, 316]
+    if is_metal:
+        fiducials = [133, 141, 308, 316]
+        size =  (2600, 1900)
+
+    detector = DottyGridPointDetector(model_points,
+                                      fiducials,
+                                      intrinsics,
+                                      distortion,
+                                      reference_image_size=size
+                                      )
+
+    time_before = datetime.datetime.now()
+
+    ids, object_points, image_points = detector.get_points(image)
+
+    time_after = datetime.datetime.now()
+    time_diff = time_after - time_before
+
+    print("__check_real_image:time_diff=" + str(time_diff))
+
+    __write_annotated_image(image, ids, image_points, image_file_name)
+
+    model = detector.get_model_points()
+    assert model.shape[0] == model_points.shape[0]
+
+    return ids.shape[0], image_points
 
