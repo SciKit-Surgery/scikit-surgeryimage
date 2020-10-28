@@ -58,7 +58,7 @@ def __check_real_image(model_points,
     model = detector.get_model_points()
     assert model.shape[0] == model_points.shape[0]
 
-    return ids.shape[0], image_points
+    return ids.shape[0]  # , image_points
 
 def __check_real_OR_image(model_points,
                          image_file_name,
@@ -75,7 +75,7 @@ def __check_real_OR_image(model_points,
     fiducials = [133, 141, 308, 316]
     if is_metal:
         fiducials = [133, 141, 308, 316]
-        size =  (2600, 1900)
+        size = (2600, 1900)
 
     detector = DottyGridPointDetector(model_points,
                                       fiducials,
@@ -98,5 +98,5 @@ def __check_real_OR_image(model_points,
     model = detector.get_model_points()
     assert model.shape[0] == model_points.shape[0]
 
-    return ids.shape[0], image_points
+    return ids.shape[0]  # , image_points
 
