@@ -22,7 +22,6 @@ def test_metal_1(setup_dotty_metal_model):
 
 
 def test_metal_1a(setup_dotty_metal_model_OR):
-    # This image is the one the detector does the worst on in this set of images
     img_path = 'tests/data/calib-ucl-circles/snapshots-metal-1/mock_or/calib.right.images.1.png'
     model_points = setup_dotty_metal_model_OR
     number_of_points = tdgu.__check_real_OR_image(model_points,
