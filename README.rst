@@ -42,7 +42,7 @@ In addition, this project provides:
 * Generate `ChArUco <https://scikit-surgeryimage.readthedocs.io/en/latest/module_ref.html#sksurgeryimage.calibration.charuco.make_charuco_board>`_ patterns
 * `Interlacing and deinterlacing <https://scikit-surgeryimage.readthedocs.io/en/latest/module_ref.html#video-interlacing-functions>`_.
 * Convenience wrappers for `erosion and dilation <https://scikit-surgeryimage.readthedocs.io/en/latest/module_ref.html#module-sksurgeryimage.processing.morphological_operators>`_.
-* 
+
 .. features-end
 
 Installing
