@@ -22,7 +22,7 @@ def test_metal_1(setup_dotty_metal_model):
 
 
 def test_metal_1a(setup_dotty_metal_model_OR):
-    img_path = 'tests/data/calib-ucl-circles/snapshots-metal-1/mock_or/calib.right.images.1.png'
+    img_path = 'tests/data/calib-ucl-circles/snapshots-metal-1/mock_or/calib.left.images.1.png'
     model_points = setup_dotty_metal_model_OR
     number_of_points = tdgu.__check_real_OR_image(model_points,
                                                   img_path,
@@ -31,7 +31,7 @@ def test_metal_1a(setup_dotty_metal_model_OR):
                                                   True
                                                   )
 
-    assert (322 == number_of_points)
+    assert (326 == number_of_points)
 
 
 def test_metal_2(setup_dotty_metal_model):
