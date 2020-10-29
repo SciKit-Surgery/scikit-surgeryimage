@@ -4,6 +4,8 @@
 Dotty Grid implementation of PointDetector.
 """
 
+# pylint:disable=too-many-instance-attributes
+
 import copy
 import logging
 import cv2
@@ -26,7 +28,12 @@ class DottyGridPointDetector(PointDetector):
                  distortion_coefficients,
                  scale=(1, 1),
                  reference_image_size=None,
-                 rms=30
+                 rms=30,
+                 gaussian_sigma=5,
+                 threshold_window_size=151,
+                 threshold_offset=20,
+                 min_area=50,
+                 max_area=50000
                  ):
         """
         Constructs a PointDetector that extracts a grid of dots,
@@ -46,6 +53,11 @@ class DottyGridPointDetector(PointDetector):
         :param scale: if you want to resize the image, specify scale factors
         :param reference_image_size: used to warp undistorted image to reference
         :param rms: max root mean square error when finding grid points
+        :param gaussian_sigma: sigma for Gaussian blurring
+        :param threshold_window_size: window size for adaptive thresholding
+        :param threshold_offset: offset for adaptive thresholding
+        :param min_area: minimum area when filtering by area
+        :param max_area: maximum area when filtering by area
         """
         super(DottyGridPointDetector, self).__init__(scale=scale)
 
@@ -67,6 +79,11 @@ class DottyGridPointDetector(PointDetector):
         self.model_fiducials = self.model_points[self.list_of_indexes]
         self.reference_image_size = reference_image_size
         self.rms_tolerance = rms
+        self.gaussian_sigma = gaussian_sigma
+        self.threshold_window_size = threshold_window_size
+        self.threshold_offset = threshold_offset
+        self.min_area = min_area
+        self.max_area = max_area
 
     def _internal_get_points(self, image):
         """
@@ -79,26 +96,44 @@ class DottyGridPointDetector(PointDetector):
         # pylint:disable=too-many-locals, invalid-name, too-many-branches
         # pylint:disable=too-many-statements
 
-        smoothed = cv2.GaussianBlur(image, (5, 5), 0)
+        smoothed = cv2.GaussianBlur(image,
+                                    (self.gaussian_sigma, self.gaussian_sigma),
+                                    0)
+
+        thresholded = cv2.adaptiveThreshold(smoothed,
+                                            255,
+                                            cv2.ADAPTIVE_THRESH_MEAN_C,
+                                            cv2.THRESH_BINARY,
+                                            self.threshold_window_size,
+                                            self.threshold_offset)
 
         params = cv2.SimpleBlobDetector_Params()
         params.filterByConvexity = False
         params.filterByInertia = True
         params.filterByCircularity = True
         params.filterByArea = True
-        params.minArea = 50
-        params.maxArea = 50000
+        params.minArea = self.min_area
+        params.maxArea = self.max_area
 
         # Detect points in the distorted image
         detector = cv2.SimpleBlobDetector_create(params)
-        keypoints = detector.detect(smoothed)
+        keypoints = detector.detect(thresholded)
 
         # Also detect them in an undistorted image.
         undistorted_image = cv2.undistort(smoothed,
                                           self.intrinsics,
                                           self.distortion_coefficients
                                           )
-        undistorted_keypoints = detector.detect(undistorted_image)
+
+        undistorted_thresholded = \
+            cv2.adaptiveThreshold(undistorted_image,
+                                  255,
+                                  cv2.ADAPTIVE_THRESH_MEAN_C,
+                                  cv2.THRESH_BINARY,
+                                  self.threshold_window_size,
+                                  self.threshold_offset)
+
+        undistorted_keypoints = detector.detect(undistorted_thresholded)
 
         # Note that keypoints and undistorted_keypoints
         # can be of different length
