@@ -25,7 +25,7 @@ def get_model_points(dots_rows_columns: (int, int),
     :type pixels_per_mm: int
     :param dot_separation: Distance between dots in mm
     :type dot_separation: float
-    :return: Location of pattern dots, in pixel space
+    :return: array pf point info - [id, x_pix, y_pix, x_mm, y_mm, z_mm]
     :rtype: np.ndarray
     """
 
