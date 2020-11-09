@@ -44,7 +44,7 @@ def test_tutorial_stuff():
                                     reference_image_size[0])
             )
 
-    dot_pattern = cv2.imread("tests\data\calib-ucl-circles\circles-25x18-r50-s2.png")
+    dot_pattern = cv2.imread("tests/data/calib-ucl-circles/circles-25x18-r50-s2.png")
     
     # Pass in the test image, in practice we would use a captured imaged instead.
     ids, object_points, image_points = point_detector.get_points(dot_pattern)
