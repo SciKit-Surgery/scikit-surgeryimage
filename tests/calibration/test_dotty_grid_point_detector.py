@@ -5,21 +5,70 @@ Tests for dotty grid implementation of PointDetector.
 """
 
 import numpy as np
+import cv2
 import pytest
 import tests.calibration.test_dotty_grid_utils as tdgu
 import sksurgeryimage.calibration.dotty_grid_point_detector as dotty_pd
 
-def test_get_model_points():
+def test_tutorial_stuff():
+    """ Code that is used in the dotty detector tutorial. """
+    #Tutorial-section1-start
     number_of_dots = [18, 25]
-    pixels_per_mm = 20
+    pixels_per_mm = 80
     dot_separation = 5
 
     model_points = dotty_pd.get_model_points(number_of_dots,
                                              pixels_per_mm,
                                              dot_separation)
-    
+    #Tutorial-section1-end
+
     assert model_points.shape == (450, 6)
-    assert np.sum(model_points) == 349650.0
+
+    #Tutorial-section2-start
+    # Location of the large dots in the pattern
+    fiducial_indexes = [132, 142, 307, 317]
+
+    # Image size
+    reference_image_size = [1900, 2600]
+
+    left_intrinsic_matrix = np.loadtxt("tests/data/calib-ucl-circles/calib.left.intrinsics.txt")
+    left_distortion_matrix = np.loadtxt("tests/data/calib-ucl-circles/calib.left.distortion.txt")
+
+    point_detector = \
+        dotty_pd.DottyGridPointDetector(
+            model_points,
+            fiducial_indexes,
+            left_intrinsic_matrix,
+            left_distortion_matrix,
+            reference_image_size=(reference_image_size[1],
+                                    reference_image_size[0])
+            )
+
+    dot_pattern = cv2.imread("tests\data\calib-ucl-circles\circles-25x18-r50-s2.png")
+    
+    # Pass in the test image, in practice we would use a captured imaged instead.
+    ids, object_points, image_points = point_detector.get_points(dot_pattern)
+    #Tutorial-section2-end
+
+    assert ids.shape == (430, 1)
+
+    #Tutorial-section3-start
+    for idx in range(ids.shape[0]):
+        text = str(ids[idx][0])
+        x = int(image_points[idx][0])
+        y = int(image_points[idx][1])
+        
+        cv2.putText(dot_pattern,
+                    text,
+                    (x, y),
+                    cv2.FONT_HERSHEY_SIMPLEX,
+                    0.5,
+                    (0, 255, 0),
+                    2,
+                    cv2.LINE_AA)
+
+    #Tutorial-section3-end
+
 
 def test_dotty_uncalibrated_1(setup_dotty_calibration_model):
     model_points = setup_dotty_calibration_model

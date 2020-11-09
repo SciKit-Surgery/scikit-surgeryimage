@@ -11,6 +11,52 @@ from sksurgeryimage.calibration.charuco_plus_chessboard_point_detector import Ch
 import sksurgeryimage.calibration.point_detector_utils as pdu
 import sksurgeryimage.calibration.charuco as ch
 
+def test_charuco_tutorial_stuff():
+    """ Code that is used in tutorials. """
+
+    #Tutorial-section1-start
+    ref_image = "tests/data/calibration/pattern_4x4_19x26_5_4_with_inset_9x14.png"
+    charuco_pattern = cv2.imread(ref_image)
+
+    min_points_to_detect = 50
+    num_squares = [19, 26]
+    square_size_mm = [5, 4]
+    chessboard_squares = [9, 14]
+    chessboard_square_size_mm = 3
+    filter_markers = True
+
+    point_detector = \
+        CharucoPlusChessboardPointDetector(
+            charuco_pattern,
+            minimum_number_of_points=min_points_to_detect,
+            number_of_charuco_squares=num_squares,
+            size_of_charuco_squares=square_size_mm,
+            charuco_filtering=filter_markers,
+            number_of_chessboard_squares=chessboard_squares,
+            chessboard_square_size=chessboard_square_size_mm,
+        )
+    #Tutorial-section1-end
+
+    #Tutorial-section2-start
+    ids, object_points, image_points = point_detector.get_points(charuco_pattern)
+    #Tutorial-section2-end
+
+    #Tutorial-section3-start
+    for idx in range(ids.shape[0]):
+        text = str(ids[idx][0])
+        x = int(image_points[idx][0])
+        y = int(image_points[idx][1])
+        
+        cv2.putText(charuco_pattern,
+                    text,
+                    (x, y),
+                    cv2.FONT_HERSHEY_SIMPLEX,
+                    0.5,
+                    (0, 255, 0),
+                    2,
+                    cv2.LINE_AA)
+
+    #Tutorial-section3-end
 
 def test_charuco_plus_chess_detector(load_reference_charuco_chessboard_image):
 
