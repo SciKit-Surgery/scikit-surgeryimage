@@ -14,6 +14,35 @@ from sksurgeryimage.calibration.point_detector import PointDetector
 
 LOGGER = logging.getLogger(__name__)
 
+def get_model_points(dots_rows_columns: (int, int),
+                     pixels_per_mm: int,
+                     dot_separation: float) -> np.ndarray:
+    """Generate the expected locations of dots in the pattern, in pixel space.
+
+    :param dots_rows_columns: Number of rows, number of columns
+    :type number_of_dots: [int, int]
+    :param pixels_per_mm: Pixels per mm
+    :type pixels_per_mm: int
+    :param dot_separation: Distance between dots in mm
+    :type dot_separation: float
+    :return: Location of pattern dots, in pixel space
+    :rtype: np.ndarray
+    """
+
+    number_of_points = dots_rows_columns[0] * dots_rows_columns[1]
+    model_points = np.zeros((number_of_points, 6))
+    counter = 0
+    for y_index in range(dots_rows_columns[0]):
+        for x_index in range(dots_rows_columns[1]):
+            model_points[counter][0] = counter
+            model_points[counter][1] = (x_index + 1) * pixels_per_mm
+            model_points[counter][2] = (y_index + 1) * pixels_per_mm
+            model_points[counter][3] = x_index * dot_separation
+            model_points[counter][4] = y_index * dot_separation
+            model_points[counter][5] = 0
+            counter = counter + 1
+
+    return model_points
 
 class DottyGridPointDetector(PointDetector):
     """

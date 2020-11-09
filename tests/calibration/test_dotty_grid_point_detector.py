@@ -7,7 +7,19 @@ Tests for dotty grid implementation of PointDetector.
 import numpy as np
 import pytest
 import tests.calibration.test_dotty_grid_utils as tdgu
+import sksurgeryimage.calibration.dotty_grid_point_detector as dotty_pd
 
+def test_get_model_points():
+    number_of_dots = [18, 25]
+    pixels_per_mm = 20
+    dot_separation = 5
+
+    model_points = dotty_pd.get_model_points(number_of_dots,
+                                             pixels_per_mm,
+                                             dot_separation)
+    
+    assert model_points.shape == (450, 6)
+    assert np.sum(model_points) == 349650.0
 
 def test_dotty_uncalibrated_1(setup_dotty_calibration_model):
     model_points = setup_dotty_calibration_model
