@@ -1,8 +1,46 @@
-Point Detectors
+Chessboard/Point Detectors
 ^^^^^^^^^^^^^^^
 
 All of the point detectors share a common `get_points(img)` method, which is called
 to locate relevant points in the image, but each detector has a particualar set of initialisation parameters.
+
+Chessboard Detector
+-------------------
+
+The chessboard detector requires the dimensions of the chessboard and the square size in mm as arguments to the constructor.
+
+.. code-block:: python
+
+    from sksurgeryimage.calibration.chessboard_point_detector import ChessboardPointDetector
+
+    number_of_corners = (13, 10)
+    square_size_mm = 3
+    detector = ChessboardPointDetector(number_of_corners, square_size_mm)
+
+    image = cv2.imread('tests/data/calib-ucl-chessboard/leftImage.png')
+    ids, object_points, image_points = detector.get_points(image)
+
+We can annoate the detected locations onto the original image:
+
+.. code-block:: python
+
+    for idx in range(ids.shape[0]):
+        text = str(ids[idx][0])
+        x = int(image_points[idx][0])
+        y = int(image_points[idx][1])
+        
+        cv2.putText(image,
+                    text,
+                    (x, y),
+                    cv2.FONT_HERSHEY_SIMPLEX,
+                    0.5,
+                    (0, 255, 0),
+                    2,
+                    cv2.LINE_AA)
+    
+    cv2.imwrite('annotated_image.png', image)
+
+.. image:: pd_images/chessboard_annotated.png
 
 Dotty Grid Detector
 -------------------
