@@ -52,8 +52,9 @@ class TimestampedVideoSource:
             if height < 1:
                 raise ValueError("Height must be >= 1")
 
-            self.source.set(cv2.CAP_PROP_FRAME_WIDTH, width)
-            self.source.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
+            self.set_resolution(width, height)
+
+
 
         else:
             width = int(self.source.get(cv2.CAP_PROP_FRAME_WIDTH))
@@ -63,6 +64,25 @@ class TimestampedVideoSource:
 
         self.frame = np.empty((height, width, 3), dtype=np.uint8)
         self.ret = None
+
+    def set_resolution(self, width: int, height: int):
+        """Set the resolution of the input source.
+
+        :param width: Width
+        :type width: int
+        :param height: Height
+        :type height: int
+        :raises ValueError: If resolution is not supported.
+        """
+        self.source.set(cv2.CAP_PROP_FRAME_WIDTH, width)
+        self.source.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
+
+        set_w = self.source.get(cv2.CAP_PROP_FRAME_WIDTH)
+        set_h = self.source.get(cv2.CAP_PROP_FRAME_HEIGHT)
+
+        if set_w != width or set_h != height:
+            raise ValueError(f"Tried to set width/height to {width} x {height} \
+                 but failed. Width and height set to {set_w} x {set_h}")
 
     def grab(self):
         """

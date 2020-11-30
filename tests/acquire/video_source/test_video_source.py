@@ -92,8 +92,21 @@ def test_add_source_from_camera_custom_dimensions(video_source_wrapper):
     except IndexError:
         return
 
+def test_add_source_from_camera_invalid_dimensions(video_source_wrapper):
+    """
+    Add a camera and pass in custom dimensions to cv2.VideoCapture.
+    """
+    try:
+        camera_input = 0
+        custom_dims = [100, 24]  # default is 640 x 480
 
-def test_add_source_from_camera_invalid_dims(video_source_wrapper):
+        with pytest.raises(ValueError):
+            video_source_wrapper.add_camera(camera_input, custom_dims)
+
+    except IndexError:
+        return
+
+def test_add_source_from_file_invalid_dims(video_source_wrapper):
     camera_input = 'tests/data/acquire/100x50_100_frames.avi'
 
     custom_dims = ["happy", "birthday"]
