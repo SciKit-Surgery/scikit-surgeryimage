@@ -117,7 +117,7 @@ def test_dotty_uncalibrated_5(setup_dotty_calibration_model):
                                           'tests/data/calib-ucl-circles/calib.left.intrinsics.txt',
                                           'tests/data/calib-ucl-circles/calib.left.distortion.txt',
                                           )
-    assert(357 == number_of_points)
+    assert(355 == number_of_points)
 
 
 def test_dotty_uncalibrated_6(setup_dotty_calibration_model):
