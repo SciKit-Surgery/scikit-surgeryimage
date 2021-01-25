@@ -127,7 +127,7 @@ def test_dotty_uncalibrated_6(setup_dotty_calibration_model):
                                           'tests/data/calib-ucl-circles/calib.right.intrinsics.txt',
                                           'tests/data/calib-ucl-circles/calib.right.distortion.txt',
                                           )
-    assert(356 == number_of_points)
+    assert(354 == number_of_points)
 
 
 def test_dotty_uncalibrated_7(setup_dotty_calibration_model):
@@ -555,3 +555,14 @@ def test_metal_6(setup_dotty_metal_model):
                                           )
     assert (224 == number_of_points)
 
+def test_all_unique_points_detected(setup_dotty_metal_model_OR):
+    # Test an image on which the dot detector was previously detecting multiple instances of the same dot.
+    model_points = setup_dotty_metal_model_OR
+
+    number_of_points = tdgu.__check_real_OR_image(model_points,
+                                          'tests/data/calib-ucl-circles/detecting_same_point_twice_dots.png',
+                                          'tests/data/calib-ucl-circles/10_54_44/viking.calib.left.intrinsics.txt',
+                                          'tests/data/calib-ucl-circles/10_54_44/viking.calib.right.distortion.txt'
+                                          )
+
+    assert(number_of_points) == 366

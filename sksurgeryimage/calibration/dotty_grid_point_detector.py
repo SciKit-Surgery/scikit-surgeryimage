@@ -356,6 +356,15 @@ class DottyGridPointDetector(PointDetector):
                 img_points[counter][0] = distorted_x
                 img_points[counter][1] = distorted_y
 
+            unique_ids, unique_idxs, counts = np.unique(indexes, return_index=True, return_counts=True)
+
+            unique_ids = unique_ids[counts==1]
+            unique_idxs = unique_idxs[counts==1]
+
+            indexes = indexes[unique_idxs]
+            object_points = object_points[unique_idxs]
+            img_points = img_points[unique_idxs]
+
             return indexes, object_points, img_points
 
         # If we didn't find all points, of the fit was poor,
