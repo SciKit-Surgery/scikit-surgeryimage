@@ -64,7 +64,6 @@ def __check_real_OR_image(model_points,
                          image_file_name,
                          intrinsics_file_name,
                          distortion_file_name,
-                         is_metal=False
                          ):
     logging.basicConfig(level=logging.DEBUG)
     image = cv2.imread(image_file_name)
@@ -73,9 +72,7 @@ def __check_real_OR_image(model_points,
 
     size = (2600, 1900)
     fiducials = [133, 141, 308, 316]
-    if is_metal:
-        fiducials = [133, 141, 308, 316]
-        size = (2600, 1900)
+
 
     detector = DottyGridPointDetector(model_points,
                                       fiducials,

@@ -27,8 +27,7 @@ def test_metal_1a(setup_dotty_metal_model_OR):
     number_of_points = tdgu.__check_real_OR_image(model_points,
                                                   img_path,
                                                   'tests/data/calib-ucl-circles/10_54_44/viking.calib.left.intrinsics.txt',
-                                                  'tests/data/calib-ucl-circles/10_54_44/viking.calib.left.distortion.txt',
-                                                  True
+                                                  'tests/data/calib-ucl-circles/10_54_44/viking.calib.left.distortion.txt'
                                                   )
 
     assert (326 == number_of_points)
