@@ -135,7 +135,7 @@ class CharucoPlusChessboardPointDetector(PointDetector):
         if self.model_points.shape[0] == 0:
             raise ValueError("No reference model points were found")
 
-    def _internal_get_points(self, image):
+    def _internal_get_points(self, image, is_distorted=True):
         """
         Extracts points using scikit-surgeryimage ChArUcoPointDetector
         and ChessboardPointDetector classes.

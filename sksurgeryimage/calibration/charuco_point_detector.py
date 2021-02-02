@@ -63,7 +63,7 @@ class CharucoPointDetector(PointDetector):
                                        * self.size[0]
             self.object_points[i][2] = 0
 
-    def _internal_get_points(self, image):
+    def _internal_get_points(self, image, is_distorted=True):
         """
         Extracts points using OpenCV's ChArUco implementation.
 

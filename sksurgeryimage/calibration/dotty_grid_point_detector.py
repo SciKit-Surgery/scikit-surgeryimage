@@ -114,11 +114,13 @@ class DottyGridPointDetector(PointDetector):
         self.min_area = min_area
         self.max_area = max_area
 
-    def _internal_get_points(self, image):
+    def _internal_get_points(self, image, is_distorted=True):
         """
         Extracts points.
 
         :param image: numpy 2D grey scale image.
+        :param is_distorted: False if the input image has already been \
+             undistorted.
         :return: ids, object_points, image_points as Nx[1,3,2] ndarrays
         """
 
@@ -148,21 +150,29 @@ class DottyGridPointDetector(PointDetector):
         detector = cv2.SimpleBlobDetector_create(params)
         keypoints = detector.detect(thresholded)
 
-        # Also detect them in an undistorted image.
-        undistorted_image = cv2.undistort(smoothed,
-                                          self.intrinsics,
-                                          self.distortion_coefficients
-                                          )
+        # If input image is distorted, undistort and also detect points
+        # in undistorted image.
+        if is_distorted:
+            undistorted_image = cv2.undistort(smoothed,
+                                            self.intrinsics,
+                                            self.distortion_coefficients
+                                            )
 
-        undistorted_thresholded = \
-            cv2.adaptiveThreshold(undistorted_image,
-                                  255,
-                                  cv2.ADAPTIVE_THRESH_MEAN_C,
-                                  cv2.THRESH_BINARY,
-                                  self.threshold_window_size,
-                                  self.threshold_offset)
 
-        undistorted_keypoints = detector.detect(undistorted_thresholded)
+            undistorted_thresholded = \
+                cv2.adaptiveThreshold(undistorted_image,
+                                    255,
+                                    cv2.ADAPTIVE_THRESH_MEAN_C,
+                                    cv2.THRESH_BINARY,
+                                    self.threshold_window_size,
+                                    self.threshold_offset)
+
+            undistorted_keypoints = detector.detect(undistorted_thresholded)
+
+        else:
+            undistorted_image = image
+            undistorted_thresholded = thresholded
+            undistorted_keypoints = keypoints
 
         # Note that keypoints and undistorted_keypoints
         # can be of different length

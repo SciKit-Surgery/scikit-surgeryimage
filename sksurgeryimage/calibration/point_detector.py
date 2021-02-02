@@ -23,11 +23,13 @@ class PointDetector:
         self.scale = scale
         self.scale_x, self.scale_y = scale
 
-    def get_points(self, image):
+    def get_points(self, image, is_distorted=True):
         """
         Client's call this method to extract points from an image.
 
         :param image: numpy 2D RGB/grayscale image.
+        :param is_distorted: False if the input image has already been \
+             undistorted.
         :return: ids, object_points, image_points as Nx[1,3,2] ndarrays
         """
 
@@ -51,7 +53,8 @@ class PointDetector:
         else:
             resized = grey
 
-        ids, object_points, image_points = self._internal_get_points(resized)
+        ids, object_points, image_points = \
+            self._internal_get_points(resized, is_distorted=is_distorted)
 
         if is_resized:
             image_points[:, 0] /= self.scale_x
@@ -59,11 +62,13 @@ class PointDetector:
 
         return ids, object_points, image_points
 
-    def _internal_get_points(self, image):
+    def _internal_get_points(self, image, is_distorted=True):
         """
         Derived classes override this one.
 
         :param image: numpy 2D grey scale image.
+        :param is_distorted: False if the input image has already been \
+             undistorted.
         :return: ids, object_points, image_points as Nx[1,3,2] ndarrays
         """
         raise NotImplementedError()
