@@ -62,7 +62,7 @@ class ArucoPointDetector(PointDetector):
         self.parameters = parameters
         self.model = model
 
-    def _internal_get_points(self, image):
+    def _internal_get_points(self, image, is_distorted=True):
         """
         Extracts points using OpenCV's ArUco implementation.
 

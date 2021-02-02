@@ -42,7 +42,7 @@ class ChessboardPointDetector(PointDetector):
             self.object_points[i][2] = 0
             self.ids[i][0] = i
 
-    def _internal_get_points(self, image):
+    def _internal_get_points(self, image, is_distorted=True):
         """
         Extracts points using OpenCV's chessboard implementation.
 
