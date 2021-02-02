@@ -154,18 +154,18 @@ class DottyGridPointDetector(PointDetector):
         # in undistorted image.
         if is_distorted:
             undistorted_image = cv2.undistort(smoothed,
-                                            self.intrinsics,
-                                            self.distortion_coefficients
-                                            )
+                                              self.intrinsics,
+                                              self.distortion_coefficients
+                                              )
 
 
             undistorted_thresholded = \
                 cv2.adaptiveThreshold(undistorted_image,
-                                    255,
-                                    cv2.ADAPTIVE_THRESH_MEAN_C,
-                                    cv2.THRESH_BINARY,
-                                    self.threshold_window_size,
-                                    self.threshold_offset)
+                                      255,
+                                      cv2.ADAPTIVE_THRESH_MEAN_C,
+                                      cv2.THRESH_BINARY,
+                                      self.threshold_window_size,
+                                      self.threshold_offset)
 
             undistorted_keypoints = detector.detect(undistorted_thresholded)
 
