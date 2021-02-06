@@ -10,9 +10,10 @@ import pytest
 import tests.calibration.test_dotty_grid_utils as tdgu
 import sksurgeryimage.calibration.dotty_grid_point_detector as dotty_pd
 
+
 def test_tutorial_stuff():
     """ Code that is used in the dotty detector tutorial. """
-    #Tutorial-section1-start
+    # Tutorial-section1-start
     number_of_dots = [18, 25]
     pixels_per_mm = 80
     dot_separation = 5
@@ -20,11 +21,11 @@ def test_tutorial_stuff():
     model_points = dotty_pd.get_model_points(number_of_dots,
                                              pixels_per_mm,
                                              dot_separation)
-    #Tutorial-section1-end
+    # Tutorial-section1-end
 
     assert model_points.shape == (450, 6)
 
-    #Tutorial-section2-start
+    # Tutorial-section2-start
     # Location of the large dots in the pattern
     fiducial_indexes = [132, 142, 307, 317]
 
@@ -48,11 +49,11 @@ def test_tutorial_stuff():
     
     # Pass in the test image, in practice we would use a captured imaged instead.
     ids, object_points, image_points = point_detector.get_points(dot_pattern)
-    #Tutorial-section2-end
+    # Tutorial-section2-end
 
     assert ids.shape == (430, 1)
 
-    #Tutorial-section3-start
+    # Tutorial-section3-start
     for idx in range(ids.shape[0]):
         text = str(ids[idx][0])
         x = int(image_points[idx][0])
@@ -67,7 +68,7 @@ def test_tutorial_stuff():
                     2,
                     cv2.LINE_AA)
 
-    #Tutorial-section3-end
+    # Tutorial-section3-end
 
 
 def test_dotty_uncalibrated_1(setup_dotty_calibration_model):
@@ -554,6 +555,7 @@ def test_metal_6(setup_dotty_metal_model):
                                           True
                                           )
     assert (224 == number_of_points)
+
 
 def test_all_unique_points_detected(setup_dotty_metal_model_OR):
     # Test an image on which the dot detector was previously detecting multiple instances of the same dot.

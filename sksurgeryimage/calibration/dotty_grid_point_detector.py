@@ -14,6 +14,7 @@ from sksurgeryimage.calibration.point_detector import PointDetector
 
 LOGGER = logging.getLogger(__name__)
 
+
 def get_model_points(dots_rows_columns: (int, int),
                      pixels_per_mm: int,
                      dot_separation: float) -> np.ndarray:
@@ -43,6 +44,7 @@ def get_model_points(dots_rows_columns: (int, int),
             counter = counter + 1
 
     return model_points
+
 
 class DottyGridPointDetector(PointDetector):
     """
