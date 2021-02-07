@@ -31,7 +31,8 @@ def _validate_camera_parameters(camera_intrinsics,
         raise ValueError('camera_intrinsics does not have 3 rows')
     if camera_intrinsics.shape[1] != 3:
         raise ValueError('camera_intrinsics does not have 3 columns')
-    if distortion_coefficients.shape[0] != 1:
+    if len(distortion_coefficients.shape) != 1 and \
+            distortion_coefficients.shape[0] != 1:
         raise ValueError('distortion_coefficients does not have 1 row')
 
 
