@@ -17,7 +17,7 @@ LOGGER = logging.getLogger(__name__)
 def _validate_camera_parameters(camera_intrinsics,
                                 distortion_coefficients):
     """
-    Validates that the camera intrinsics are the correct shape.
+    Validates that the camera intrinsics are not None and the correct shape.
     Throws ValueError if incorrect.
 
     :param camera_intrinsics: [3x3] matrix
@@ -58,6 +58,12 @@ class PointDetector:
         self.scale_x, self.scale_y = scale
         self.camera_intrinsics = None
         self.distortion_coefficients = None
+        if camera_intrinsics is not None and distortion_coefficients is None:
+            raise ValueError("camera_intrinsics is not None, "
+                             "but distortion_coefficients are None??")
+        if distortion_coefficients is not None and camera_intrinsics is None:
+            raise ValueError("distortion_coefficients are not None, "
+                             "but camera intrinsics are None??")
         if camera_intrinsics is not None and \
                 distortion_coefficients is not None:
             self.set_camera_parameters(camera_intrinsics,
@@ -68,6 +74,7 @@ class PointDetector:
                               distortion_coefficients):
         """
         Enables camera parameters to be set dynamically at run-time.
+        Calls _validate_camera_parameters().
 
         :param camera_intrinsics: [3x3] camera matrix
         :param distortion_coefficients: [1xn] distortion coefficients
