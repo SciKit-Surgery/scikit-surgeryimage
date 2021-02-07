@@ -326,8 +326,9 @@ class DottyGridPointDetector(PointDetector):
                 img_points[counter][0] = inverted_points[counter][0][0]
                 img_points[counter][1] = inverted_points[counter][0][1]
 
-            # Now have to map undistorted points back to distorted points
             if is_distorted:
+                # Input image was a distorted image, so now we have to map
+                # undistorted points back to distorted points.
                 for counter in range(number_of_warped_keypoints):
                     # Distort point to match original input image.
                     relative_x = (matched_points[counter][0]
