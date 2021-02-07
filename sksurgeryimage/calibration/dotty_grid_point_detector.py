@@ -21,7 +21,7 @@ def get_model_points(dots_rows_columns: (int, int),
     """Generate the expected locations of dots in the pattern, in pixel space.
 
     :param dots_rows_columns: Number of rows, number of columns
-    :type number_of_dots: [int, int]
+    :type dots_rows_columns: [int, int]
     :param pixels_per_mm: Pixels per mm
     :type pixels_per_mm: int
     :param dot_separation: Distance between dots in mm
@@ -55,7 +55,7 @@ class DottyGridPointDetector(PointDetector):
     def __init__(self,
                  model_points,
                  list_of_indexes,
-                 intrinsics,
+                 camera_intrinsics,
                  distortion_coefficients,
                  scale=(1, 1),
                  reference_image_size=None,
@@ -70,16 +70,17 @@ class DottyGridPointDetector(PointDetector):
         Constructs a PointDetector that extracts a grid of dots,
         with 4 extra large dots, at known locations.
 
-        Requires intrinsics and distortion_coefficients to be provided,
+        Requires camera_intrinsics and distortion_coefficients to be provided,
         then these are used as a reference transform to undistort
-        the image, which makes matching to a reference grid more reliable.
+        the image, which makes matching to a reference grid and identifying
+        point indexes more reliable.
 
         The list of indexes, must be of length 4, and correspond to
         top-left, top-right, bottom-left, bottom-right bigger blobs.
 
         :param model_points: numpy ndarray of id, x_pix, y_pix, x_mm, y_mm, z_mm
         :param list_of_indexes: list of specific indexes to use as fiducials
-        :param intrinsics: 3x3 ndarray of camera intrinsics
+        :param camera_intrinsics: 3x3 ndarray of camera intrinsics
         :param distortion_coefficients: 1x5 ndarray of distortion coeffs.
         :param scale: if you want to resize the image, specify scale factors
         :param reference_image_size: used to warp undistorted image to reference
@@ -90,14 +91,12 @@ class DottyGridPointDetector(PointDetector):
         :param min_area: minimum area when filtering by area
         :param max_area: maximum area when filtering by area
         """
-        super(DottyGridPointDetector, self).__init__(scale=scale)
+        super(DottyGridPointDetector, self).\
+            __init__(scale=scale,
+                     camera_intrinsics=camera_intrinsics,
+                     distortion_coefficients=distortion_coefficients
+                     )
 
-        if intrinsics is None:
-            raise ValueError('intrinsics is None')
-        if distortion_coefficients is None:
-            raise ValueError('distortion coefficients are None')
-        if len(distortion_coefficients) != 5:
-            raise ValueError('there should be 5 distortion coefficients')
         if len(list_of_indexes) != 4:
             raise ValueError('list_of_index not of length 4')
         if reference_image_size is None:
@@ -105,8 +104,6 @@ class DottyGridPointDetector(PointDetector):
 
         self.model_points = model_points
         self.list_of_indexes = list_of_indexes
-        self.intrinsics = intrinsics
-        self.distortion_coefficients = distortion_coefficients
         self.model_fiducials = self.model_points[self.list_of_indexes]
         self.reference_image_size = reference_image_size
         self.rms_tolerance = rms
@@ -156,7 +153,7 @@ class DottyGridPointDetector(PointDetector):
         # in undistorted image.
         if is_distorted:
             undistorted_image = cv2.undistort(smoothed,
-                                              self.intrinsics,
+                                              self.camera_intrinsics,
                                               self.distortion_coefficients
                                               )
 
@@ -334,11 +331,11 @@ class DottyGridPointDetector(PointDetector):
                 for counter in range(number_of_warped_keypoints):
                     # Distort point to match original input image.
                     relative_x = (matched_points[counter][0]
-                                  - self.intrinsics[0][2]) \
-                                 / self.intrinsics[0][0]
+                                  - self.camera_intrinsics[0][2]) \
+                                 / self.camera_intrinsics[0][0]
                     relative_y = (matched_points[counter][1]
-                                  - self.intrinsics[1][2]) \
-                                 / self.intrinsics[1][1]
+                                  - self.camera_intrinsics[1][2]) \
+                                 / self.camera_intrinsics[1][1]
                     r2 = relative_x * relative_x + relative_y * relative_y
                     radial = (1
                               + self.distortion_coefficients[0] * r2
@@ -364,10 +361,10 @@ class DottyGridPointDetector(PointDetector):
                             self.distortion_coefficients[3]
                             * relative_x * relative_y)
 
-                    distorted_x = distorted_x * self.intrinsics[0][0] \
-                                  + self.intrinsics[0][2]
-                    distorted_y = distorted_y * self.intrinsics[1][1] \
-                                  + self.intrinsics[1][2]
+                    distorted_x = distorted_x * self.camera_intrinsics[0][0] \
+                                  + self.camera_intrinsics[0][2]
+                    distorted_y = distorted_y * self.camera_intrinsics[1][1] \
+                                  + self.camera_intrinsics[1][2]
 
                     img_points[counter][0] = distorted_x
                     img_points[counter][1] = distorted_y
