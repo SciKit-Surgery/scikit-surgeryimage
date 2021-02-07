@@ -173,7 +173,6 @@ class DottyGridPointDetector(PointDetector):
 
         else:
             undistorted_image = image
-            undistorted_thresholded = thresholded
             undistorted_keypoints = keypoints
 
         # Note that keypoints and undistorted_keypoints
@@ -328,51 +327,56 @@ class DottyGridPointDetector(PointDetector):
             for counter in range(len(inverted_points)):
                 matched_points[counter][0] = inverted_points[counter][0][0]
                 matched_points[counter][1] = inverted_points[counter][0][1]
+                img_points[counter][0] = inverted_points[counter][0][0]
+                img_points[counter][1] = inverted_points[counter][0][1]
 
             # Now have to map undistorted points back to distorted points
-            for counter in range(number_of_warped_keypoints):
+            if is_distorted:
+                for counter in range(number_of_warped_keypoints):
+                    # Distort point to match original input image.
+                    relative_x = (matched_points[counter][0]
+                                  - self.intrinsics[0][2]) \
+                                 / self.intrinsics[0][0]
+                    relative_y = (matched_points[counter][1]
+                                  - self.intrinsics[1][2]) \
+                                 / self.intrinsics[1][1]
+                    r2 = relative_x * relative_x + relative_y * relative_y
+                    radial = (1
+                              + self.distortion_coefficients[0] * r2
+                              + self.distortion_coefficients[1] * r2 * r2
+                              + self.distortion_coefficients[4] * r2 * r2 * r2
+                              )
+                    distorted_x = relative_x * radial
+                    distorted_y = relative_y * radial
 
-                # Distort point to match original input image.
-                relative_x = (matched_points[counter][0]
-                              - self.intrinsics[0][2]) / self.intrinsics[0][0]
-                relative_y = (matched_points[counter][1]
-                              - self.intrinsics[1][2]) / self.intrinsics[1][1]
-                r2 = relative_x * relative_x + relative_y * relative_y
-                radial = (1
-                          + self.distortion_coefficients[0] * r2
-                          + self.distortion_coefficients[1] * r2 * r2
-                          + self.distortion_coefficients[4] * r2 * r2 * r2
-                          )
-                distorted_x = relative_x * radial
-                distorted_y = relative_y * radial
+                    distorted_x = distorted_x + (
+                            2 * self.distortion_coefficients[2]
+                            * relative_x * relative_y
+                            + self.distortion_coefficients[3]
+                            * (r2 + 2
+                               * relative_x
+                               * relative_x))
 
-                distorted_x = distorted_x + (2 * self.distortion_coefficients[2]
-                                             * relative_x * relative_y
-                                             + self.distortion_coefficients[3]
-                                             * (r2 + 2
-                                                * relative_x
-                                                * relative_x))
+                    distorted_y = distorted_y + (
+                            self.distortion_coefficients[2]
+                            * (r2 + 2 * relative_y
+                               * relative_y)
+                            + 2 *
+                            self.distortion_coefficients[3]
+                            * relative_x * relative_y)
 
-                distorted_y = distorted_y + (self.distortion_coefficients[2]
-                                             * (r2 + 2 * relative_y
-                                                * relative_y)
-                                             + 2 *
-                                             self.distortion_coefficients[3]
-                                             * relative_x * relative_y)
+                    distorted_x = distorted_x * self.intrinsics[0][0] \
+                                  + self.intrinsics[0][2]
+                    distorted_y = distorted_y * self.intrinsics[1][1] \
+                                  + self.intrinsics[1][2]
 
-                distorted_x = distorted_x * self.intrinsics[0][0] \
-                    + self.intrinsics[0][2]
-                distorted_y = distorted_y * self.intrinsics[1][1] \
-                    + self.intrinsics[1][2]
-
-                img_points[counter][0] = distorted_x
-                img_points[counter][1] = distorted_y
+                    img_points[counter][0] = distorted_x
+                    img_points[counter][1] = distorted_y
 
             unique_ids, unique_idxs, counts = \
                 np.unique(indexes, return_index=True, return_counts=True)
 
-            unique_ids = unique_ids[counts==1]
-            unique_idxs = unique_idxs[counts==1]
+            unique_idxs = unique_idxs[counts == 1]
 
             indexes = indexes[unique_idxs]
             object_points = object_points[unique_idxs]

@@ -568,3 +568,51 @@ def test_all_unique_points_detected(setup_dotty_metal_model_OR):
                                           )
 
     assert number_of_points == 366
+
+
+def test_distorted_and_undistorted(setup_dotty_metal_model_OR):
+
+    model_points = setup_dotty_metal_model_OR
+
+    # Test image, when image is distorted
+    num_1, image_points_1 = tdgu.__check_real_image(
+        model_points,
+        'tests/data/calib-ucl-circles/detecting_same_point_twice_dots.png',
+        'tests/data/calib-ucl-circles/10_54_44/viking.calib.left.intrinsics.txt',
+        'tests/data/calib-ucl-circles/10_54_44/viking.calib.right.distortion.txt',
+        is_distorted=True
+    )
+
+    assert num_1 == 366
+
+    # Now load image, undistort image, pass back to same function.
+    image = cv2.imread('tests/data/calib-ucl-circles/detecting_same_point_twice_dots.png')
+    intrinsics = np.loadtxt('tests/data/calib-ucl-circles/10_54_44/viking.calib.left.intrinsics.txt')
+    distortion = np.loadtxt('tests/data/calib-ucl-circles/10_54_44/viking.calib.right.distortion.txt')
+    undistorted = cv2.undistort(image, intrinsics, distortion)
+    cv2.imwrite('tests/output/detecting_same_point_twice_dots_undistorted_1.png', undistorted)
+    cv2.imwrite('tests/output/detecting_same_point_twice_dots_undistorted_2.png', undistorted)
+
+    # Test image, when image is undistorted
+    num_2, image_points_2 = tdgu.__check_real_image(
+        model_points,
+        'tests/output/detecting_same_point_twice_dots_undistorted_1.png',
+        'tests/data/calib-ucl-circles/10_54_44/viking.calib.left.intrinsics.txt',
+        'tests/data/calib-ucl-circles/10_54_44/viking.calib.right.distortion.txt',
+        is_distorted=False
+    )
+
+    assert num_2 == 352
+
+    distortion = np.zeros((1, 5))
+    np.savetxt('tests/output/detecting_same_point_twice_dots_undistorted_distortion_coefficients.txt', distortion)
+    # Test image, pretending its distorted, but having zero distortion coefficients
+    num_3, image_points_3 = tdgu.__check_real_image(
+        model_points,
+        'tests/output/detecting_same_point_twice_dots_undistorted_2.png',
+        'tests/data/calib-ucl-circles/10_54_44/viking.calib.left.intrinsics.txt',
+        'tests/output/detecting_same_point_twice_dots_undistorted_distortion_coefficients.txt',
+        is_distorted=True
+    )
+
+    assert num_3 == 364
