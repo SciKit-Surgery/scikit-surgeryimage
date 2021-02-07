@@ -160,7 +160,6 @@ class DottyGridPointDetector(PointDetector):
                                               self.distortion_coefficients
                                               )
 
-
             undistorted_thresholded = \
                 cv2.adaptiveThreshold(undistorted_image,
                                       255,
@@ -373,7 +372,7 @@ class DottyGridPointDetector(PointDetector):
                     img_points[counter][0] = distorted_x
                     img_points[counter][1] = distorted_y
 
-            unique_ids, unique_idxs, counts = \
+            _, unique_idxs, counts = \
                 np.unique(indexes, return_index=True, return_counts=True)
 
             unique_idxs = unique_idxs[counts == 1]
