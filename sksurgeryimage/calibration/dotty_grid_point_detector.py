@@ -64,7 +64,8 @@ class DottyGridPointDetector(PointDetector):
                  threshold_window_size=151,
                  threshold_offset=20,
                  min_area=50,
-                 max_area=50000
+                 max_area=50000,
+                 dot_detector_params=None
                  ):
         """
         Constructs a PointDetector that extracts a grid of dots,
@@ -90,6 +91,7 @@ class DottyGridPointDetector(PointDetector):
         :param threshold_offset: offset for adaptive thresholding
         :param min_area: minimum area when filtering by area
         :param max_area: maximum area when filtering by area
+        :param dot_detector_params: instance of cv2.SimpleBlobDetector_Params()
         """
         super(DottyGridPointDetector, self).\
             __init__(scale=scale,
@@ -112,6 +114,17 @@ class DottyGridPointDetector(PointDetector):
         self.threshold_offset = threshold_offset
         self.min_area = min_area
         self.max_area = max_area
+
+        self.dot_detector_params = cv2.SimpleBlobDetector_Params()
+        self.dot_detector_params.filterByConvexity = False
+        self.dot_detector_params.filterByInertia = True
+        self.dot_detector_params.filterByCircularity = True
+        self.dot_detector_params.filterByArea = True
+        self.dot_detector_params.minArea = self.min_area
+        self.dot_detector_params.maxArea = self.max_area
+
+        if dot_detector_params is not None:
+            self.dot_detector_params = dot_detector_params
 
     def _internal_get_points(self, image, is_distorted=True):
         """
@@ -137,16 +150,8 @@ class DottyGridPointDetector(PointDetector):
                                             self.threshold_window_size,
                                             self.threshold_offset)
 
-        params = cv2.SimpleBlobDetector_Params()
-        params.filterByConvexity = False
-        params.filterByInertia = True
-        params.filterByCircularity = True
-        params.filterByArea = True
-        params.minArea = self.min_area
-        params.maxArea = self.max_area
-
         # Detect points in the distorted image
-        detector = cv2.SimpleBlobDetector_create(params)
+        detector = cv2.SimpleBlobDetector_create(self.dot_detector_params)
         keypoints = detector.detect(thresholded)
 
         # If input image is distorted, undistort and also detect points
