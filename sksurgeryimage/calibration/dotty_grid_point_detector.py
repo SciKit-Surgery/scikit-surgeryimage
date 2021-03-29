@@ -119,6 +119,7 @@ class DottyGridPointDetector(PointDetector):
         self.dot_detector_params.filterByConvexity = False
         self.dot_detector_params.filterByInertia = True
         self.dot_detector_params.filterByCircularity = True
+        self.dot_detector_params.minCircularity = 0.7
         self.dot_detector_params.filterByArea = True
         self.dot_detector_params.minArea = self.min_area
         self.dot_detector_params.maxArea = self.max_area
@@ -138,6 +139,10 @@ class DottyGridPointDetector(PointDetector):
 
         # pylint:disable=too-many-locals, invalid-name, too-many-branches
         # pylint:disable=too-many-statements
+
+        # If we didn't find all points, of the fit was poor,
+        # return a consistent set of 'nothing'
+        default_return = np.zeros((0, 1)), np.zeros((0, 3)), np.zeros((0, 2))
 
         smoothed = cv2.GaussianBlur(image,
                                     (self.gaussian_sigma, self.gaussian_sigma),
@@ -274,6 +279,10 @@ class DottyGridPointDetector(PointDetector):
                 cv2.perspectiveTransform(float_array,
                                          np.eye(3))
 
+            if transformed_points is None:
+                LOGGER.info("transformed_points is None, skipping")
+                return default_return
+
             inverted_points = \
                 cv2.perspectiveTransform(transformed_points,
                                          np.linalg.inv(homography))
@@ -352,20 +361,20 @@ class DottyGridPointDetector(PointDetector):
                     distorted_y = relative_y * radial
 
                     distorted_x = distorted_x + (
-                            2 * self.distortion_coefficients[2]
-                            * relative_x * relative_y
-                            + self.distortion_coefficients[3]
-                            * (r2 + 2
-                               * relative_x
-                               * relative_x))
+                        2 * self.distortion_coefficients[2]
+                        * relative_x * relative_y
+                        + self.distortion_coefficients[3]
+                        * (r2 + 2
+                           * relative_x
+                           * relative_x))
 
                     distorted_y = distorted_y + (
-                            self.distortion_coefficients[2]
-                            * (r2 + 2 * relative_y
-                               * relative_y)
-                            + 2 *
-                            self.distortion_coefficients[3]
-                            * relative_x * relative_y)
+                        self.distortion_coefficients[2]
+                        * (r2 + 2 * relative_y
+                           * relative_y)
+                        + 2 *
+                        self.distortion_coefficients[3]
+                        * relative_x * relative_y)
 
                     distorted_x = distorted_x * self.camera_intrinsics[0][0] \
                                   + self.camera_intrinsics[0][2]
@@ -386,9 +395,7 @@ class DottyGridPointDetector(PointDetector):
 
             return indexes, object_points, img_points
 
-        # If we didn't find all points, of the fit was poor,
-        # return a consistent set of 'nothing'
-        return np.zeros((0, 1)), np.zeros((0, 3)), np.zeros((0, 2))
+        return default_return
 
     def get_model_points(self):
         """
