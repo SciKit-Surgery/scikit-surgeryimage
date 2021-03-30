@@ -31,7 +31,7 @@ def test_metal_1a(setup_dotty_metal_model_OR):
                                                   'tests/data/calib-ucl-circles/10_54_44/viking.calib.left.distortion.txt'
                                                   )
 
-    assert (326 == number_of_points)
+    assert (343 == number_of_points)
 
 
 def test_metal_2(setup_dotty_metal_model):
@@ -53,7 +53,7 @@ def test_metal_3(setup_dotty_metal_model):
                                           'tests/data/calib-ucl-circles/10_54_44/viking.calib.left.distortion.txt',
                                           True
                                           )
-    assert (223 == number_of_points)
+    assert (224 == number_of_points)
 
 
 def test_metal_4(setup_dotty_metal_model):
@@ -207,7 +207,7 @@ def test_metal_17(setup_dotty_metal_model):
                                           'tests/data/calib-ucl-circles/10_54_44/viking.calib.left.distortion.txt',
                                           True
                                           )
-    assert (223 == number_of_points)
+    assert (224 == number_of_points)
 
 
 def test_metal_18(setup_dotty_metal_model):
@@ -273,7 +273,7 @@ def test_metal_23(setup_dotty_metal_model):
                                           'tests/data/calib-ucl-circles/10_54_44/viking.calib.left.distortion.txt',
                                           True
                                           )
-    assert (221 == number_of_points)
+    assert (222 == number_of_points)
 
 
 def test_metal_24(setup_dotty_metal_model):
