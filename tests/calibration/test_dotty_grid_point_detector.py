@@ -567,7 +567,7 @@ def test_all_unique_points_detected(setup_dotty_metal_model_OR):
                                           'tests/data/calib-ucl-circles/10_54_44/viking.calib.right.distortion.txt'
                                           )
 
-    assert number_of_points == 366
+    assert number_of_points == 370
 
 
 def test_distorted_and_undistorted(setup_dotty_metal_model_OR):
@@ -602,7 +602,7 @@ def test_distorted_and_undistorted(setup_dotty_metal_model_OR):
         is_distorted=False
     )
 
-    assert num_2 == 352
+    assert num_2 == 371
 
     distortion = np.zeros((1, 5))
     np.savetxt('tests/output/detecting_same_point_twice_dots_undistorted_distortion_coefficients.txt', distortion)
