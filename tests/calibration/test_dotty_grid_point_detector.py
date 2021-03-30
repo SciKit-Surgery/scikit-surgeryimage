@@ -98,7 +98,7 @@ def test_dotty_uncalibrated_3(setup_dotty_calibration_model):
                                           'tests/data/calib-ucl-circles/calib.left.intrinsics.txt',
                                           'tests/data/calib-ucl-circles/calib.left.distortion.txt',
                                           )
-    assert(376 == number_of_points)
+    assert(377 == number_of_points)
 
 
 def test_dotty_uncalibrated_4(setup_dotty_calibration_model):
@@ -118,7 +118,7 @@ def test_dotty_uncalibrated_5(setup_dotty_calibration_model):
                                           'tests/data/calib-ucl-circles/calib.left.intrinsics.txt',
                                           'tests/data/calib-ucl-circles/calib.left.distortion.txt',
                                           )
-    assert(355 == number_of_points)
+    assert(357 == number_of_points)
 
 
 def test_dotty_uncalibrated_6(setup_dotty_calibration_model):
@@ -138,7 +138,7 @@ def test_dotty_uncalibrated_7(setup_dotty_calibration_model):
                                           'tests/data/calib-ucl-circles/calib.left.intrinsics.txt',
                                           'tests/data/calib-ucl-circles/calib.left.distortion.txt',
                                           )
-    assert(371 == number_of_points)
+    assert(373 == number_of_points)
 
 
 def test_dotty_uncalibrated_8(setup_dotty_calibration_model):
@@ -178,7 +178,7 @@ def test_dotty_uncalibrated_11(setup_dotty_calibration_model):
                                           'tests/data/calib-ucl-circles/calib.left.intrinsics.txt',
                                           'tests/data/calib-ucl-circles/calib.left.distortion.txt',
                                           )
-    assert(352 == number_of_points)
+    assert(353 == number_of_points)
 
 
 def test_dotty_uncalibrated_12(setup_dotty_calibration_model):
@@ -228,7 +228,7 @@ def test_dotty_uncalibrated_16(setup_dotty_calibration_model):
                                           'tests/data/calib-ucl-circles/calib.right.intrinsics.txt',
                                           'tests/data/calib-ucl-circles/calib.right.distortion.txt',
                                           )
-    assert(366 == number_of_points)
+    assert(367 == number_of_points)
 
 
 def test_dotty_uncalibrated_17(setup_dotty_calibration_model):
@@ -238,7 +238,7 @@ def test_dotty_uncalibrated_17(setup_dotty_calibration_model):
                                           'tests/data/calib-ucl-circles/calib.left.intrinsics.txt',
                                           'tests/data/calib-ucl-circles/calib.left.distortion.txt',
                                           )
-    assert(383 == number_of_points)
+    assert(384 == number_of_points)
 
 
 def test_dotty_uncalibrated_18(setup_dotty_calibration_model):
@@ -288,7 +288,7 @@ def test_calibration_1(setup_dotty_calibration_model):
                                           'tests/data/calib-ucl-circles/10_54_44/viking.calib.left.intrinsics.txt',
                                           'tests/data/calib-ucl-circles/10_54_44/viking.calib.left.distortion.txt',
                                           )
-    assert(335 == number_of_points)
+    assert(338 == number_of_points)
 
 
 def test_calibration_2(setup_dotty_calibration_model):
@@ -298,7 +298,7 @@ def test_calibration_2(setup_dotty_calibration_model):
                                           'tests/data/calib-ucl-circles/10_54_44/viking.calib.left.intrinsics.txt',
                                           'tests/data/calib-ucl-circles/10_54_44/viking.calib.left.distortion.txt',
                                           )
-    assert(318 == number_of_points)
+    assert(319 == number_of_points)
 
 
 def test_calibration_3(setup_dotty_calibration_model):
@@ -308,7 +308,7 @@ def test_calibration_3(setup_dotty_calibration_model):
                                           'tests/data/calib-ucl-circles/10_54_44/viking.calib.left.intrinsics.txt',
                                           'tests/data/calib-ucl-circles/10_54_44/viking.calib.left.distortion.txt',
                                           )
-    assert(309 == number_of_points)
+    assert(313 == number_of_points)
 
 
 def test_calibration_4(setup_dotty_calibration_model):
@@ -338,7 +338,7 @@ def test_calibration_6(setup_dotty_calibration_model):
                                           'tests/data/calib-ucl-circles/10_54_44/viking.calib.left.intrinsics.txt',
                                           'tests/data/calib-ucl-circles/10_54_44/viking.calib.left.distortion.txt',
                                           )
-    assert(330 == number_of_points)
+    assert(332 == number_of_points)
 
 
 def test_calibration_7(setup_dotty_calibration_model):
@@ -348,7 +348,7 @@ def test_calibration_7(setup_dotty_calibration_model):
                                           'tests/data/calib-ucl-circles/10_54_44/viking.calib.left.intrinsics.txt',
                                           'tests/data/calib-ucl-circles/10_54_44/viking.calib.left.distortion.txt',
                                           )
-    assert(277 == number_of_points)
+    assert(281 == number_of_points)
 
 
 def test_calibration_8(setup_dotty_calibration_model):
@@ -358,7 +358,7 @@ def test_calibration_8(setup_dotty_calibration_model):
                                           'tests/data/calib-ucl-circles/10_54_44/viking.calib.left.intrinsics.txt',
                                           'tests/data/calib-ucl-circles/10_54_44/viking.calib.left.distortion.txt',
                                           )
-    assert(293 == number_of_points)
+    assert(295 == number_of_points)
 
 
 def test_calibration_9(setup_dotty_calibration_model):
@@ -388,7 +388,7 @@ def test_calibration_11(setup_dotty_calibration_model):
                                           'tests/data/calib-ucl-circles/10_54_44/viking.calib.right.intrinsics.txt',
                                           'tests/data/calib-ucl-circles/10_54_44/viking.calib.right.distortion.txt',
                                           )
-    assert (334 == number_of_points)
+    assert (335 == number_of_points)
 
 
 def test_calibration_12(setup_dotty_calibration_model):
@@ -408,7 +408,7 @@ def test_calibration_13(setup_dotty_calibration_model):
                                           'tests/data/calib-ucl-circles/10_54_44/viking.calib.right.intrinsics.txt',
                                           'tests/data/calib-ucl-circles/10_54_44/viking.calib.right.distortion.txt',
                                           )
-    assert (299 == number_of_points)
+    assert (300 == number_of_points)
 
 
 def test_calibration_14(setup_dotty_calibration_model):
@@ -418,7 +418,7 @@ def test_calibration_14(setup_dotty_calibration_model):
                                           'tests/data/calib-ucl-circles/10_54_44/viking.calib.right.intrinsics.txt',
                                           'tests/data/calib-ucl-circles/10_54_44/viking.calib.right.distortion.txt',
                                           )
-    assert (355 == number_of_points)
+    assert (356 == number_of_points)
 
 
 def test_calibration_15(setup_dotty_calibration_model):
@@ -448,7 +448,7 @@ def test_calibration_17(setup_dotty_calibration_model):
                                           'tests/data/calib-ucl-circles/10_54_44/viking.calib.right.intrinsics.txt',
                                           'tests/data/calib-ucl-circles/10_54_44/viking.calib.right.distortion.txt',
                                           )
-    assert (286 == number_of_points)
+    assert (292 == number_of_points)
 
 
 def test_calibration_18(setup_dotty_calibration_model):
@@ -478,7 +478,7 @@ def test_calibration_20(setup_dotty_calibration_model):
                                           'tests/data/calib-ucl-circles/10_54_44/viking.calib.left.intrinsics.txt',
                                           'tests/data/calib-ucl-circles/10_54_44/viking.calib.left.distortion.txt',
                                           )
-    assert (290 == number_of_points)
+    assert (303 == number_of_points)
 
 
 def test_calibration_21(setup_dotty_calibration_model):
@@ -488,7 +488,7 @@ def test_calibration_21(setup_dotty_calibration_model):
                                           'tests/data/calib-ucl-circles/10_54_44/viking.calib.right.intrinsics.txt',
                                           'tests/data/calib-ucl-circles/10_54_44/viking.calib.right.distortion.txt',
                                           )
-    assert (304 == number_of_points)
+    assert (305 == number_of_points)
 
 
 def test_metal_1(setup_dotty_metal_model):
@@ -521,7 +521,7 @@ def test_metal_3(setup_dotty_metal_model):
                                           'tests/data/calib-ucl-circles/10_54_44/viking.calib.left.distortion.txt',
                                           True
                                           )
-    assert (223 == number_of_points)
+    assert (224 == number_of_points)
 
 
 def test_metal_4(setup_dotty_metal_model):
@@ -583,7 +583,7 @@ def test_distorted_and_undistorted(setup_dotty_metal_model_OR):
         is_distorted=True
     )
 
-    assert num_1 == 366
+    assert num_1 == 370
 
     # Now load image, undistort image, pass back to same function.
     image = cv2.imread('tests/data/calib-ucl-circles/detecting_same_point_twice_dots.png')
