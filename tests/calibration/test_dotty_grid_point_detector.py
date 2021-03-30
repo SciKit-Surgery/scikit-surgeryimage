@@ -615,4 +615,4 @@ def test_distorted_and_undistorted(setup_dotty_metal_model_OR):
         is_distorted=True
     )
 
-    assert num_3 == 364
+    assert num_3 == 372
