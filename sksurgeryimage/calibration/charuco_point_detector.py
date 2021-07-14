@@ -8,7 +8,7 @@ import copy
 import logging
 import numpy as np
 from sksurgeryimage.calibration.point_detector import PointDetector
-import sksurgeryimage.calibration.charuco as charuco
+from sksurgeryimage.calibration import charuco
 
 LOGGER = logging.getLogger(__name__)
 
