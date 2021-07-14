@@ -17,9 +17,9 @@ setup(
     description='scikit-surgeryimage implements image processing tools and alogrithms for Image Guided Surgery.',
     long_description=long_description,
     long_description_content_type='text/x-rst',
-    url='https://weisslab.cs.ucl.ac.uk/WEISS/SoftwareRepositories/SNAPPY/scikit-surgeryimage',
-    author='Matt Clarkson',
-    author_email='YOUR-EMAIL@ucl.ac.uk',
+    url='https://github.com/UCL/scikit-surgeryimage',
+    author='Stephen Thompson',
+    author_email='s.thompson@ucl.ac.uk',
     license='BSD-3 license',
     classifiers=[
         'Development Status :: 3 - Alpha',
