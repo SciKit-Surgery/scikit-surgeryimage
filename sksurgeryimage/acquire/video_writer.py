@@ -112,7 +112,7 @@ class TimestampedVideoWriter(VideoWriter):
         basename, _ = os.path.splitext(filename)
         timestamp_filename = basename + suffix
 
-        self.timestamp_file = open(timestamp_filename, 'w')
+        self.timestamp_file = open(timestamp_filename, 'w') # pylint: disable=consider-using-with
         self.default_timestamp_message = "NO_TIMESTAMP"
 
     def close(self):
