@@ -49,4 +49,4 @@ def validate_camera_input(camera_input):
         return True
 
     raise IndexError(
-        'No camera source exists with number: {}'.format(camera_input))
+        f'No camera source exists with number: {camera_input}')
