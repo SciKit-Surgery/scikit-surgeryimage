@@ -31,7 +31,7 @@ def test_metal_1a(setup_dotty_metal_model_OR):
                                                   'tests/data/calib-ucl-circles/10_54_44/viking.calib.left.distortion.txt'
                                                   )
 
-    assert (343 == number_of_points)
+    assert (number_of_points > 342 and number_of_points < 345)
 
 
 def test_metal_2(setup_dotty_metal_model):
