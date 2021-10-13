@@ -35,18 +35,19 @@ def noisy_image(image, mean=0, stddev=(50, 5, 5)):
     return image
 
 
-def are_similar(image0, image1, threshold = 0.995, metric = cv2.TM_CCOEFF_NORMED, 
+def are_similar(image0, image1, threshold = 0.995,
+        metric = cv2.TM_CCOEFF_NORMED,
         mean_threshold = 0.005):
     """
-    Compares two images to see if they are similar. 
+    Compares two images to see if they are similar.
 
     :param image0, image0: The images
     :param threshold: The numerical threshold to use, default 0.995
-    :param method: The comparison metric, default normalised cross correlation, 
+    :param method: The comparison metric, default normalised cross correlation,
         cv2.TM_CCOEFF_NORMED
-    :param mean_threshold: Also compare the mean values of each array, 
-        return false if absolute difference of image means divided by the 
-        average of both images is greater than the mean_threshold, if set to 
+    :param mean_threshold: Also compare the mean values of each array,
+        return false if absolute difference of image means divided by the
+        average of both images is greater than the mean_threshold, if set to
         greater than or equal to one this test will effectively be skipped
 
     :return: True if the metric is greater than the threshols, false otherwise
