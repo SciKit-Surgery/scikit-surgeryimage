@@ -2,7 +2,7 @@
 
 import numpy as np
 import cv2
-
+from sksurgeryimage.utilities.utilities import are_similar
 
 def test_rectify_4_1_1_26():
     """
@@ -12,9 +12,10 @@ def test_rectify_4_1_1_26():
     of opencv-contrib-python from 4_1_0_25 to 4_1_0_26. OpenCV's underlying
     rectification function doesn't seem too stable between versions, so this unit test
     should pick up changes due to changes in opencv-contrib-python.
+    As of Issue #97 we're using sksurgeryimage.utilities.are_similar for testing
+    which gives us a bit more leeway on image similarity.
     """
     original = np.zeros((64,128,3), dtype=np.uint8)
-    absolute_tolerance = 16
 
     for row in range(8):
         for col in range(128):
@@ -85,7 +86,10 @@ def test_rectify_4_1_1_26():
                                )
 
     expected_rectified = cv2.imread('tests/data/processing/rectified_image_left_4.1.1.26.png')
-    np.testing.assert_allclose(rectified_image, expected_rectified, rtol = 0.0, atol = absolute_tolerance)
+
+    assert are_similar(rectified_image, expected_rectified,
+            threshold = 0.800, metric = cv2.TM_CCOEFF_NORMED,
+            mean_threshold = 0.005)
 
     rectified_image = cv2.remap(original,
                                 rectify_dx[1],
@@ -94,6 +98,9 @@ def test_rectify_4_1_1_26():
                                )
 
     expected_rectified = cv2.imread('tests/data/processing/rectified_image_right_4.1.1.26.png')
-    np.testing.assert_allclose(rectified_image, expected_rectified, rtol = 0.0, atol = absolute_tolerance)
+
+    assert are_similar(rectified_image, expected_rectified,
+            threshold = 0.800, metric = cv2.TM_CCOEFF_NORMED,
+            mean_threshold = 0.005)
 
 

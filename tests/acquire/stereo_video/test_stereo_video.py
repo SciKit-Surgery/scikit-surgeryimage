@@ -4,6 +4,7 @@ import numpy as np
 import cv2
 import pytest
 import sksurgeryimage.acquire.stereo_video as sv
+from sksurgeryimage.utilities.utilities import are_similar
 
 
 def test_create_video_from_png():
@@ -298,18 +299,23 @@ def test_opencv_example_stereo_distortion_correction_and_rectification(two_chann
     vs.set_intrinsic_parameters([li, ri], [ld, rd])
     left, right = vs.get_undistorted()
 
-    atol = 16
-    rtol = 0.0
-    #test with all close, OpenCV uses a tolerance of 16 for undistortion on a uint8
-    np.testing.assert_allclose(left, expected_undistorted_left, rtol, atol)
-    np.testing.assert_allclose(right, expected_undistorted_right, rtol, atol)
+    assert are_similar(left, expected_undistorted_left,
+            threshold = 0.995, metric = cv2.TM_CCOEFF_NORMED,
+            mean_threshold = 0.005)
+    assert are_similar(right, expected_undistorted_right,
+            threshold = 0.995, metric = cv2.TM_CCOEFF_NORMED,
+            mean_threshold = 0.005)
 
     vs.set_extrinsic_parameters(r, t, (int(vs.video_sources.frames[0].shape[1]),
                                        int(vs.video_sources.frames[0].shape[0])))
     rectified_left, rectified_right = vs.get_rectified()
-    
-    np.testing.assert_allclose(rectified_left, expected_rectified_left, rtol, atol, verbose=True)
-    np.testing.assert_allclose(rectified_right, expected_rectified_right, rtol, atol, verbose=True)
+
+    assert are_similar(rectified_left, expected_rectified_left,
+            threshold = 0.995, metric = cv2.TM_CCOEFF_NORMED,
+            mean_threshold = 0.005)
+    assert are_similar(rectified_right, expected_rectified_right,
+            threshold = 0.995, metric = cv2.TM_CCOEFF_NORMED,
+            mean_threshold = 0.005)
 
     vs.release()  # Just ensuring code doesn't crash
 
@@ -345,11 +351,12 @@ def test_ucl_example_stereo_distortion_correction_and_rectification(two_channel_
 
     left, right = vs.get_undistorted()
 
-    atol = 16
-    rtol = 0.0
-    #test with all close, OpenCV uses a tolerance of 16 for undistortion on a uint8
-    np.testing.assert_allclose(left, expected_undistorted_left, rtol, atol)
-    np.testing.assert_allclose(right, expected_undistorted_right, rtol, atol)
+    assert are_similar(left, expected_undistorted_left,
+            threshold = 0.995, metric = cv2.TM_CCOEFF_NORMED,
+            mean_threshold = 0.005)
+    assert are_similar(right, expected_undistorted_right,
+            threshold = 0.995, metric = cv2.TM_CCOEFF_NORMED,
+            mean_threshold = 0.005)
 
     vs.set_extrinsic_parameters(r, t,
                                 (int(vs.video_sources.frames[0].shape[1]),
@@ -358,6 +365,10 @@ def test_ucl_example_stereo_distortion_correction_and_rectification(two_channel_
                                 )  # double height
     rectified_left, rectified_right = vs.get_rectified()
 
-    np.testing.assert_allclose(rectified_left, expected_rectified_left, rtol, atol, verbose=True)
-    np.testing.assert_allclose(rectified_right, expected_rectified_right, rtol, atol, verbose=True)
+    assert are_similar(rectified_left, expected_rectified_left,
+            threshold = 0.995, metric = cv2.TM_CCOEFF_NORMED,
+            mean_threshold = 0.005)
+    assert are_similar(rectified_right, expected_rectified_right,
+            threshold = 0.995, metric = cv2.TM_CCOEFF_NORMED,
+            mean_threshold = 0.005)
 
