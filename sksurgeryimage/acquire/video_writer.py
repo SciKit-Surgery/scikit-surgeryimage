@@ -65,7 +65,7 @@ class VideoWriter(object):
         if isinstance(filename, str):
             return True
 
-        raise ValueError('Invalid filename passed {}'.format(filename))
+        raise ValueError(f'Invalid filename passed {filename}')
 
     def create_output_dir_if_needed(self):
         """
