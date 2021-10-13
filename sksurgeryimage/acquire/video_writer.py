@@ -65,7 +65,7 @@ class VideoWriter(object):
         if isinstance(filename, str):
             return True
 
-        raise ValueError('Invalid filename passed {}'.format(filename))
+        raise ValueError(f'Invalid filename passed {filename}')
 
     def create_output_dir_if_needed(self):
         """
@@ -112,7 +112,8 @@ class TimestampedVideoWriter(VideoWriter):
         basename, _ = os.path.splitext(filename)
         timestamp_filename = basename + suffix
 
-        self.timestamp_file = open(timestamp_filename, 'w') # pylint: disable=consider-using-with
+        self.timestamp_file = open(timestamp_filename, 'w', # pylint: disable=consider-using-with
+                encoding = 'us-ascii')
         self.default_timestamp_message = "NO_TIMESTAMP"
 
     def close(self):

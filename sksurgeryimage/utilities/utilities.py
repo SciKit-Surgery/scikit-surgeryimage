@@ -33,3 +33,39 @@ def noisy_image(image, mean=0, stddev=(50, 5, 5)):
     """
     cv2.randn(image, (mean), (stddev))
     return image
+
+
+def are_similar(image0, image1, threshold = 0.995,
+        metric = cv2.TM_CCOEFF_NORMED,
+        mean_threshold = 0.005):
+    """
+    Compares two images to see if they are similar.
+
+    :param image0, image0: The images
+    :param threshold: The numerical threshold to use, default 0.995
+    :param method: The comparison metric, default normalised cross correlation,
+        cv2.TM_CCOEFF_NORMED
+    :param mean_threshold: Also compare the mean values of each array,
+        return false if absolute difference of image means divided by the
+        average of both images is greater than the mean_threshold, if set to
+        greater than or equal to one this test will effectively be skipped
+
+    :return: True if the metric is greater than the threshols, false otherwise
+        or if the images are not the same dimensions or type
+    """
+
+    if image0.shape != image1.shape:
+        return False
+
+    if image0.dtype != image1.dtype:
+        return False
+
+    if cv2.matchTemplate(image0, image1, metric)[0] < threshold:
+        return False
+
+    abs_mean_diff = abs(image0.mean() - image1.mean())
+    overall_mean = (image0.mean() + image1.mean()/2.).mean()
+    if abs_mean_diff / overall_mean > mean_threshold:
+        return False
+
+    return True
