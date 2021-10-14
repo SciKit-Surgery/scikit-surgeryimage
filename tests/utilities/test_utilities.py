@@ -63,16 +63,39 @@ def test_are_simiar():
     #and means not compared
     image0 = np.zeros((4, 5, 3), dtype = 'uint8')
     image1 = np.ones((4, 5, 3), dtype = 'uint8')
-    assert not utilities.are_similar(image0, image1, mean_threshold = 1.0)
+    assert utilities.are_similar(image0, image1, mean_threshold = 1.0)
 
     #returns false if images are not the same and not correlated
-    image0 = np.zeros((4, 5, 3), dtype = 'uint8')
-    image1 = np.ones((4, 5, 3), dtype = 'uint8')
-    image0[0][0][0] = 1.0
+    image0 = np.ones((4, 5, 3), dtype = 'uint8')
+    np.random.seed(0)
+    image1 = np.random.randint(0, 10, size=(4, 5, 3), dtype = 'uint8')
     assert not utilities.are_similar(image0, image1, mean_threshold = 1.0)
+    
+    #returns true if both images are zeros
+    image0 = np.zeros((4, 5, 3), dtype = 'uint8')
+    image1 = np.zeros((4, 5, 3), dtype = 'uint8')
+    assert utilities.are_similar(image0, image1, mean_threshold = 1.0)
 
     #returns true if images are the same
     image0 = np.ones((4, 5, 3), dtype = 'uint8')
     image1 = np.ones((4, 5, 3), dtype = 'uint8')
     assert utilities.are_similar(image0, image1)
 
+
+def test_image_means_are_similar():
+    """Tests for image_means_are_similar function"""
+    #returns true if threshold less than zero
+    image0 = np.zeros((4, 5, 3), dtype = 'uint8')
+    image1 = np.ones((4, 5, 3), dtype = 'uint8')
+    assert utilities.image_means_are_similar(image0, image1, threshold = -1.0)
+    
+    #returns true if images equal
+    image0 = np.zeros((4, 5, 3), dtype = 'uint8')
+    image1 = np.zeros((4, 5, 3), dtype = 'uint8')
+    assert utilities.image_means_are_similar(image0, image1)
+
+    #returns false if images unequal
+    image0 = np.zeros((4, 5, 3), dtype = 'uint8')
+    image1 = np.ones((4, 5, 3), dtype = 'uint8')
+    assert not utilities.image_means_are_similar(image0, image1)
+    assert not utilities.image_means_are_similar(image1, image0)

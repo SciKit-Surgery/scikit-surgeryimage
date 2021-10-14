@@ -47,8 +47,8 @@ def are_similar(image0, image1, threshold = 0.995,
         cv2.TM_CCOEFF_NORMED
     :param mean_threshold: Also compare the mean values of each array,
         return false if absolute difference of image means divided by the
-        average of both images is greater than the mean_threshold, if set to
-        greater than or equal to one this test will effectively be skipped
+        average of both images is greater than the mean_threshold, if less
+        than zero this test will be skipped
 
     :return: True if the metric is greater than the threshols, false otherwise
         or if the images are not the same dimensions or type
@@ -63,9 +63,36 @@ def are_similar(image0, image1, threshold = 0.995,
     if cv2.matchTemplate(image0, image1, metric)[0] < threshold:
         return False
 
+    return image_means_are_similar(image0, image1, mean_threshold)
+
+
+def image_means_are_similar(image0, image1, threshold = 0.005):
+    """
+    Compares two images to see if they have similar mean pixel values
+
+    :param image0, image0: The images
+    :param threshold: The mean value threshold to use.
+        return false if absolute difference of image means divided by the
+        average of both images is greater than the mean_threshold.
+
+    :return: false if absolute difference of image means divided by the
+        average of both images is greater than the mean_threshold, true
+        otherwise or if threshold is less than zero.
+
+    """
+
+    if threshold < 0.0:
+        return True
+
+    if image0.mean() == image1.mean():
+        return True
+
     abs_mean_diff = abs(image0.mean() - image1.mean())
-    overall_mean = (image0.mean() + image1.mean()/2.).mean()
-    if abs_mean_diff / overall_mean > mean_threshold:
+    normalising_mean = abs(image0.mean())
+    if normalising_mean == 0.0:
+        normalising_mean = abs(image1.mean())
+
+    if abs_mean_diff / normalising_mean > threshold:
         return False
 
     return True
