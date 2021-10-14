@@ -89,7 +89,7 @@ def test_rectify_4_1_1_26():
 
     assert are_similar(rectified_image, expected_rectified,
             threshold = 0.800, metric = cv2.TM_CCOEFF_NORMED,
-            mean_threshold = 0.005)
+            mean_threshold = 0.006)
 
     rectified_image = cv2.remap(original,
                                 rectify_dx[1],
