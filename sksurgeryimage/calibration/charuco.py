@@ -82,7 +82,11 @@ def filter_out_wrong_markers(marker_corners,
         number_of_nearest_markers = len(board.nearestMarkerIdx[i])
         assert number_of_nearest_markers == 2
         for j in range(0, number_of_nearest_markers):
-            marker_id = board.ids[board.nearestMarkerIdx[i][j][0]][0]
+            try:
+                marker_id = board.ids[board.nearestMarkerIdx[i][j][0]][0]
+            except IndexError:
+                marker_id = board.ids[board.nearestMarkerIdx[i][j]]
+
             marker_index = -1
             for k in range(0, number_of_markers):
                 if marker_ids[k][0] == marker_id:
