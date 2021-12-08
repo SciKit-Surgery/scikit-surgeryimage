@@ -11,11 +11,6 @@ jobs:
           - os: macos-latest
             python-ver: 3.6
 
-        include:
-          - os: macos-latest
-            python-ver: 3.6
-            experimental: true
-
     runs-on: ${{ matrix.os }}
 
     steps:
