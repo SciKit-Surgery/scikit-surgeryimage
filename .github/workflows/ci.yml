@@ -10,6 +10,7 @@ jobs:
         exclude:
           - os: macos-latest
             python-ver: 3.6
+
         include:
           - os: macos-latest
             python-ver: 3.6
