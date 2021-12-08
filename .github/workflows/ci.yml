@@ -26,21 +26,30 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install tox
+          pip install -r requirements-dev.txt
 
-      - name: Run tox on ubuntu using xvfb
+      - name: Run tests on ubuntu using xvfb
         if: startsWith(matrix.os, 'ubuntu')
         run: |
           sudo apt-get install xvfb
           sudo Xvfb :1 -screen 0 1024x768x24 </dev/null &
           export DISPLAY=":1"
-          xvfb-run tox
+          coverage erase
+          coverage run -a --source ./sksurgeryimage -m pytest
+          coverage report -m
 
-      - name: Run tox on windows/mac
+
+      - name: Run tests on windows/mac
         # Matches the 'o' in 'windows' or 'macos'
         if: contains(matrix.os, 'o')
         run: |
-          tox
+          coverage erase
+          coverage run -a --source ./sksurgeryimage -m pytest
+          coverage report -m
+
+      - name: Linting
+        run: |
+          pylint --rcfile=tests/pylintrc sksurgeryimage
 
       - name: Run coveralls
         run: |
