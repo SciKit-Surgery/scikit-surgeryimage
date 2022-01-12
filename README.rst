@@ -46,7 +46,7 @@ scikit-surgeryimage was developed at the `Wellcome EPSRC Centre for Intervention
 Features
 --------
 
-requirements.txt specifies a dependency on opencv-contrib-python, so you can use any OpenCV python therein.
+requirements.txt specifies a dependency on opencv-contrib-python-headless, so you can use any OpenCV python therein.
 In addition, this project provides:
 
 * `Convenience classes <https://scikit-surgeryimage.readthedocs.io/en/latest/module_ref.html#data-acquisition>`_ for video read and write.
