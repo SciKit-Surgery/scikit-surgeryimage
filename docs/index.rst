@@ -5,7 +5,7 @@ scikit-surgeryimage documentation
    :start-after: .. features-start
    :end-before: .. features-end
 
-`Source code <https://github.com/UCL/scikit-surgeryimage/>`_ is avaialble on GitHub.
+`Source code <https://github.com/SciKit-Surgery/scikit-surgeryimage/>`_ is avaialble on GitHub.
 
 .. toctree::
    :maxdepth: 2

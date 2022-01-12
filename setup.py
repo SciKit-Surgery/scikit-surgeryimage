@@ -17,7 +17,7 @@ setup(
     description='scikit-surgeryimage implements image processing tools and alogrithms for Image Guided Surgery.',
     long_description=long_description,
     long_description_content_type='text/x-rst',
-    url='https://github.com/UCL/scikit-surgeryimage',
+    url='https://github.com/SciKit-Surgery/scikit-surgeryimage',
     author='Stephen Thompson',
     author_email='s.thompson@ucl.ac.uk',
     license='BSD-3 license',

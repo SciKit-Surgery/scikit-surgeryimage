@@ -1,20 +1,20 @@
 scikit-surgeryimage
 ====================
 
-.. image:: https://github.com/UCL/scikit-surgeryimage/raw/master/weiss_logo.png
+.. image:: https://github.com/SciKit-Surgery/scikit-surgeryimage/raw/master/weiss_logo.png
    :height: 128px
    :width: 128px
-   :target: https://github.com/UCL/scikit-surgeryimage
+   :target: https://github.com/SciKit-Surgery/scikit-surgeryimage
    :alt: Logo
 
 |
 
-.. image:: https://github.com/UCL/scikit-surgeryimage/workflows/.github/workflows/ci.yml/badge.svg
-   :target: https://github.com/UCL/scikit-surgeryimage/actions
+.. image:: https://github.com/SciKit-Surgery/scikit-surgeryimage/workflows/.github/workflows/ci.yml/badge.svg
+   :target: https://github.com/SciKit-Surgery/scikit-surgeryimage/actions
    :alt: GitHub Actions CI status
 
-.. image:: https://coveralls.io/repos/github/UCL/scikit-surgeryimage/badge.svg?branch=master&service=github
-    :target: https://coveralls.io/github/UCL/scikit-surgeryimage?branch=master
+.. image:: https://coveralls.io/repos/github/SciKit-Surgery/scikit-surgeryimage/badge.svg?branch=master&service=github
+    :target: https://coveralls.io/github/SciKit-Surgery/scikit-surgeryimage?branch=master
     :alt: Test coverage
 
 .. image:: https://readthedocs.org/projects/scikit-surgeryimage/badge/?version=latest
@@ -61,7 +61,7 @@ You can clone the repository using the following command:
 
 ::
 
-    git clone https://github.com/UCL/scikit-surgeryimage
+    git clone https://github.com/SciKit-Surgery/scikit-surgeryimage
 
 
 Running the tests
@@ -105,11 +105,11 @@ Supported by `Wellcome`_ and `EPSRC`_.
 
 
 .. _`Wellcome EPSRC Centre for Interventional and Surgical Sciences`: http://www.ucl.ac.uk/weiss
-.. _`source code repository`: https://github.com/UCL/scikit-surgeryimage
+.. _`source code repository`: https://github.com/SciKit-Surgery/scikit-surgeryimage
 .. _`Documentation`: https://scikit-surgeryimage.readthedocs.io
 .. _`University College London (UCL)`: http://www.ucl.ac.uk/
 .. _`Wellcome`: https://wellcome.ac.uk/
 .. _`EPSRC`: https://www.epsrc.ac.uk/
-.. _`contributing guidelines`: https://github.com/UCL/scikit-surgeryimage/blob/master/CONTRIBUTING.rst
-.. _`license file`: https://github.com/UCL/scikit-surgeryimage/blob/master/LICENSE
-.. _`common issues`: https://github.com/UCL/scikit-surgery/wikis/Common-Issues
+.. _`contributing guidelines`: https://github.com/SciKit-Surgery/scikit-surgeryimage/blob/master/CONTRIBUTING.rst
+.. _`license file`: https://github.com/SciKit-Surgery/scikit-surgeryimage/blob/master/LICENSE
+.. _`common issues`: https://github.com/SciKit-Surgery/scikit-surgery/wikis/Common-Issues
