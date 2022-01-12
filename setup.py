@@ -51,7 +51,6 @@ setup(
     ),
 
     install_requires=[
-        'six>=1.10',
         'numpy>=1.11',
         'opencv-contrib-python>=4.1.1.26',
         'scikit-surgerycore>=0.1.0',

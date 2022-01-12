@@ -6,7 +6,6 @@ Tests for ChArUco implementation of PointDetector.
 
 import cv2 as cv2
 from cv2 import aruco
-import six
 import pytest
 from sksurgeryimage.calibration.charuco_point_detector import CharucoPointDetector
 
