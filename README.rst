@@ -1,25 +1,38 @@
 scikit-surgeryimage
 ====================
 
-.. image:: https://github.com/UCL/scikit-surgeryimage/raw/master/weiss_logo.png
+.. image:: https://github.com/SciKit-Surgery/scikit-surgeryimage/raw/master/weiss_logo.png
    :height: 128px
    :width: 128px
-   :target: https://github.com/UCL/scikit-surgeryimage
+   :target: https://github.com/SciKit-Surgery/scikit-surgeryimage
    :alt: Logo
 
 |
 
-.. image:: https://github.com/UCL/scikit-surgeryimage/workflows/.github/workflows/ci.yml/badge.svg
-   :target: https://github.com/UCL/scikit-surgeryimage/actions
+.. image:: https://github.com/SciKit-Surgery/scikit-surgeryimage/workflows/.github/workflows/ci.yml/badge.svg
+   :target: https://github.com/SciKit-Surgery/scikit-surgeryimage/actions
    :alt: GitHub Actions CI status
 
-.. image:: https://coveralls.io/repos/github/UCL/scikit-surgeryimage/badge.svg?branch=master&service=github
-    :target: https://coveralls.io/github/UCL/scikit-surgeryimage?branch=master
+.. image:: https://coveralls.io/repos/github/SciKit-Surgery/scikit-surgeryimage/badge.svg?branch=master&service=github
+    :target: https://coveralls.io/github/SciKit-Surgery/scikit-surgeryimage?branch=master
     :alt: Test coverage
 
 .. image:: https://readthedocs.org/projects/scikit-surgeryimage/badge/?version=latest
     :target: http://scikit-surgeryimage.readthedocs.io/en/latest/?badge=latest
     :alt: Documentation Status
+
+.. image:: https://img.shields.io/badge/Cite-SciKit--Surgery-informational
+   :target: https://doi.org/10.1007/s11548-020-02180-5
+   :alt: The SciKit-Surgery paper
+
+.. image:: https://img.shields.io/twitter/url?style=social&url=http%3A%2F%2Fscikit-surgery.org
+   :target: https://twitter.com/intent/tweet?screen_name=scikit_surgery&ref_src=twsrc%5Etfw
+   :alt: Get in touch via twitter
+
+.. image:: https://img.shields.io/twitter/follow/scikit_surgery?style=social
+   :target: https://twitter.com/scikit_surgery?ref_src=twsrc%5Etfw
+   :alt: Follow scikit_surgery on twitter
+
 
 
 
@@ -61,7 +74,7 @@ You can clone the repository using the following command:
 
 ::
 
-    git clone https://github.com/UCL/scikit-surgeryimage
+    git clone https://github.com/SciKit-Surgery/scikit-surgeryimage
 
 
 Running the tests
@@ -105,11 +118,11 @@ Supported by `Wellcome`_ and `EPSRC`_.
 
 
 .. _`Wellcome EPSRC Centre for Interventional and Surgical Sciences`: http://www.ucl.ac.uk/weiss
-.. _`source code repository`: https://github.com/UCL/scikit-surgeryimage
+.. _`source code repository`: https://github.com/SciKit-Surgery/scikit-surgeryimage
 .. _`Documentation`: https://scikit-surgeryimage.readthedocs.io
 .. _`University College London (UCL)`: http://www.ucl.ac.uk/
 .. _`Wellcome`: https://wellcome.ac.uk/
 .. _`EPSRC`: https://www.epsrc.ac.uk/
-.. _`contributing guidelines`: https://github.com/UCL/scikit-surgeryimage/blob/master/CONTRIBUTING.rst
-.. _`license file`: https://github.com/UCL/scikit-surgeryimage/blob/master/LICENSE
-.. _`common issues`: https://github.com/UCL/scikit-surgery/wikis/Common-Issues
+.. _`contributing guidelines`: https://github.com/SciKit-Surgery/scikit-surgeryimage/blob/master/CONTRIBUTING.rst
+.. _`license file`: https://github.com/SciKit-Surgery/scikit-surgeryimage/blob/master/LICENSE
+.. _`common issues`: https://github.com/SciKit-Surgery/scikit-surgery/wikis/Common-Issues
