@@ -40,7 +40,7 @@ jobs:
         if: contains(matrix.os, 'o')
         run: |
           coverage erase
-          coverage run -a --source ./sksurgeryimage -m pytest
+          coverage run -a --source ./sksurgeryimage -m pytest -v -s ./tests/
           coverage report -m
 
       - name: Linting
