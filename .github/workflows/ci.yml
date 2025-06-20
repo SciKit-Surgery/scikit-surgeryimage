@@ -3,18 +3,31 @@ on: push
 jobs:
   test:
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        python-ver: [3.7, 3.8, 3.9]
-
+        python-ver: [3.9, '3.10', 3.11, 3.12]
+        experimental: [false]
+        include:
+          - python-ver: 3.13
+            os: ubuntu-latest
+            experimental: false
+          - python-ver: 3.13
+            os: macos-latest
+            experimental: false
+          - python-ver: 3.13
+            os: windows-latest
+            experimental: true
     runs-on: ${{ matrix.os }}
+    continue-on-error: ${{ matrix.experimental }}
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Set up Python
-        uses: actions/setup-python@v1
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-ver }}
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
@@ -36,7 +49,7 @@ jobs:
         if: contains(matrix.os, 'o')
         run: |
           coverage erase
-          coverage run -a --source ./sksurgeryimage -m pytest
+          coverage run -a --source ./sksurgeryimage -m pytest -v -s ./tests/
           coverage report -m
 
       - name: Linting
@@ -49,15 +62,15 @@ jobs:
           coveralls
 
   deploy:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     needs: test
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: actions/checkout@master
       - name: Set up Python
-        uses: actions/setup-python@v1
+        uses: actions/setup-python@v4
         with:
-          python-version: 3.6
+          python-version: 3.12
 
       - name: Install dependencies
         run: python -m pip install wheel twine setuptools
