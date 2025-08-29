@@ -5,7 +5,7 @@ ArUco implementation of PointDetector.
 """
 
 import logging
-from cv2 import aruco
+import cv2
 import numpy as np
 from sksurgeryimage.calibration.point_detector import PointDetector
 
@@ -57,7 +57,7 @@ class ArucoPointDetector(PointDetector):
         :param model: dictionary of {id : 3D point as numpy 1x3 array}
         :param scale: if you want to cv::resize the image, specify scale factors
         """
-        super(ArucoPointDetector, self).__init__(scale=scale)
+        super().__init__(scale=scale)
         self.dictionary = dictionary
         self.parameters = parameters
         self.model = model
@@ -72,10 +72,11 @@ class ArucoPointDetector(PointDetector):
         :param image: numpy 2D grey scale image.
         :return: ids, object_points, image_points
         """
+        # pylint: disable=unpacking-non-sequence
         corners, ids, _ = \
-            aruco.detectMarkers(image,
-                                self.dictionary,
-                                parameters=self.parameters)
+            cv2.aruco.detectMarkers(image,
+                                    self.dictionary,
+                                    parameters=self.parameters)
 
         number_of_points = len(corners)
         image_points = np.zeros((number_of_points, 2))

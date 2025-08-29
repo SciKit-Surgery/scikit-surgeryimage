@@ -54,16 +54,19 @@ def detect_charuco_points(dictionary, board, image,
     detection_parameters.maxErroneousBitsInBorderRate = 0.1
     detection_parameters.perspectiveRemovePixelPerCell = 30
     detection_parameters.perspectiveRemoveIgnoredMarginPerCell = 0.3
+
+    # pylint: disable=unpacking-non-sequence
     marker_corners, marker_ids, _ =\
         cv2.aruco.detectMarkers(image, dictionary,
-                            parameters=detection_parameters)
+                                parameters=detection_parameters)
 
     chessboard_corners = None
     chessboard_ids = None
 
     if marker_corners:
 
-        retval, chessboard_corners, chessboard_ids \
+        # pylint: disable=unpacking-non-sequence
+        _, chessboard_corners, chessboard_ids \
             = cv2.aruco.interpolateCornersCharuco(
                 markerCorners=marker_corners,
                 markerIds=marker_ids,
@@ -122,6 +125,7 @@ def erase_charuco_markers(image, marker_corners):
     return cloned
 
 
+# pylint: disable=too-many-arguments, too-many-locals
 def make_charuco_with_chessboard(
         dictionary=cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_4X4_250),
         charuco_squares=(19, 26),
@@ -205,6 +209,7 @@ def make_charuco_with_chessboard(
     s_x = int(centre_of_image[0] - ((chessboard_image.shape[1] - 1) / 2))
     s_y = int(centre_of_image[1] - ((chessboard_image.shape[0] - 1) / 2))
 
+    # pylint: disable=unsupported-assignment-operation
     charuco_image[s_y:s_y + chessboard_image.shape[0],
                   s_x:s_x + chessboard_image.shape[1]] = chessboard_image
 

@@ -25,7 +25,7 @@ class ChessboardPointDetector(PointDetector):
         :param square_size_in_mm: physical size of chessboard squares in mm
         :param scale: if you want to resize the image, specify scale factors
         """
-        super(ChessboardPointDetector, self).__init__(scale=scale)
+        super().__init__(scale=scale)
 
         self.number_of_corners = number_of_corners
         self.number_in_x, self.number_in_y = self.number_of_corners

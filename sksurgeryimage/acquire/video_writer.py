@@ -14,8 +14,6 @@ import numpy as np
 LOGGER = logging.getLogger(__name__)
 
 # pylint:disable=useless-object-inheritance
-
-
 class VideoWriter(object):
     """
     Class to write images to disk using cv2.VideoWriter.
@@ -25,6 +23,7 @@ class VideoWriter(object):
     :param width: width of input frame
     :param height: height of input frame
     """
+    # pylint: disable=too-many-arguments
     def __init__(self, filename, fps=25, width=640, height=480, codec='MJPG'):
 
         self.filename = None
@@ -102,11 +101,11 @@ class TimestampedVideoWriter(VideoWriter):
     :param filename: Filename to save output video to.
                      Timestamp file is "filename + 'timestamps'"
     """
+    # pylint: disable=too-many-arguments
     def __init__(self, filename, fps=25, width=640,
                  height=480, codec='MJPG'):
 
-        super(TimestampedVideoWriter, self).__init__(filename, fps,
-                                                     width, height, codec)
+        super().__init__(filename, fps, width, height, codec)
 
         suffix = '.timestamps.txt'
         basename, _ = os.path.splitext(filename)
@@ -132,7 +131,7 @@ class TimestampedVideoWriter(VideoWriter):
         :param timestamp: Timestamp data
         :type timestamp: datetime.datetime object
         """
-        super(TimestampedVideoWriter, self).write_frame(frame)
+        super().write_frame(frame)
 
         if not timestamp:
             timestamp = self.default_timestamp_message
@@ -160,13 +159,11 @@ class ThreadedTimestampedVideoWriter(TimestampedVideoWriter):
     threaded_vw.add_to_queue(frame, timestamp)
 
     threaded_vw.stop() """
-
+    # pylint: disable=too-many-arguments
     def __init__(self, filename, fps=25, width=640,
                  height=480, codec='MJPG'):
 
-        super(ThreadedTimestampedVideoWriter, self).__init__(filename, fps,
-                                                             width, height,
-                                                             codec)
+        super().__init__(filename, fps, width, height, codec)
         self.started = False
         self.queue = Queue()
         self.sleep_time = 1 / 1E5

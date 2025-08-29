@@ -13,12 +13,11 @@ from sksurgeryimage.calibration import charuco
 LOGGER = logging.getLogger(__name__)
 
 # pylint: disable=too-many-instance-attributes
-
-
 class CharucoPointDetector(PointDetector):
     """
     Class to detect ChArUco points in a 2D video image.
     """
+    # pylint: disable=too-many-arguments
     def __init__(self, dictionary,
                  number_of_squares,
                  size,
@@ -36,7 +35,7 @@ class CharucoPointDetector(PointDetector):
         :param camera_matrix: OpenCV 3x3 camera calibration matrix
         :param distortion_coefficients: OpenCV distortion coefficients
         """
-        super(CharucoPointDetector, self).__init__(scale=scale)
+        super().__init__(scale=scale)
 
         self.dictionary = dictionary
         self.number_of_squares = number_of_squares

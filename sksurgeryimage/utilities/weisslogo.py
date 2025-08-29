@@ -1,7 +1,7 @@
 """A class for making a natty WEISS logo"""
 from math import cos, pi
 from numpy import full, int32, uint8
-from cv2 import fillConvexPoly, circle
+import cv2
 from sksurgeryimage.utilities.utilities import noisy_image
 
 class WeissLogo():
@@ -47,7 +47,7 @@ class WeissLogo():
         vertices.append((end_points[0][0] + thickness/2, end_points[0][1]))
         vertices.append((end_points[4][0] + thickness/2, end_points[4][1]))
         vertices.append((end_points[4][0] - thickness/2, end_points[4][1]))
-        fillConvexPoly(self._background, int32(vertices), color=[255, 255, 255])
+        cv2.fillConvexPoly(self._background, int32(vertices), color=[255, 255, 255])
 
         vertices = []
         vertices.append(((image_size-lblength)/2,
@@ -58,7 +58,7 @@ class WeissLogo():
                          (image_size+thickness)/2))
         vertices.append(((image_size-lblength)/2,
                          (image_size+thickness)/2))
-        fillConvexPoly(self._background, int32(vertices), color=[255, 255, 255])
+        cv2.fillConvexPoly(self._background, int32(vertices), color=[255, 255, 255])
 
         vertices = []
         vertices.append((
@@ -73,7 +73,7 @@ class WeissLogo():
         vertices.append((
             (-sblength * qtr_pi_cos - thickness * qtr_pi_cos + image_size)/2,
             (sblength * qtr_pi_cos - thickness * qtr_pi_cos + image_size)/2))
-        fillConvexPoly(self._background, int32(vertices), color=[255, 255, 255])
+        cv2.fillConvexPoly(self._background, int32(vertices), color=[255, 255, 255])
 
         vertices = []
         vertices.append(
@@ -88,10 +88,10 @@ class WeissLogo():
         vertices.append(
             (shlength * qtr_pi_cos + (-thickness * qtr_pi_cos + image_size)/2,
              shlength * qtr_pi_cos + (thickness * qtr_pi_cos + image_size)/2))
-        fillConvexPoly(self._background, int32(vertices), color=[255, 255, 255])
+        cv2.fillConvexPoly(self._background, int32(vertices), color=[255, 255, 255])
 
         for point in end_points:
-            circle(self._background, (int32(point[0]), int32(point[1])),
+            cv2.circle(self._background, (int32(point[0]), int32(point[1])),
                    radius=int32(thickness/2 + 1), color=[255, 255, 255],
                    thickness=-1)
 

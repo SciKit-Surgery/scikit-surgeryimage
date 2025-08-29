@@ -15,6 +15,7 @@ import sksurgeryimage.processing.interlace as i
 LOGGER = logging.getLogger(__name__)
 
 
+# pylint: disable=too-few-public-methods
 class StereoVideoLayouts:
     """
     Class to hold some constants, like an enum.

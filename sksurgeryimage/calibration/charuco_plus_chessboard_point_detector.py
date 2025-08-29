@@ -22,6 +22,7 @@ class CharucoPlusChessboardPointDetector(PointDetector):
     Class to detect ChArUco points and Chessboard points
     in a 2D grey scale video image.
     """
+    # pylint: disable=too-many-arguments, too-many-locals
     def __init__(self,
                  reference_image,
                  minimum_number_of_points=50,
@@ -58,7 +59,7 @@ class CharucoPlusChessboardPointDetector(PointDetector):
         :param error_if_no_charuco: if True, throws Exception when
         no ChArUco tags are seen
         """
-        super(CharucoPlusChessboardPointDetector, self).__init__(scale=scale)
+        super().__init__(scale=scale)
 
         if reference_image is None:
             raise ValueError("You must provide a reference image of all points")
