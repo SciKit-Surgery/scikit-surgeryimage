@@ -25,7 +25,7 @@ class CharucoPointDetector(PointDetector):
                  scale=(1, 1),
                  camera_matrix=None,
                  distortion_coefficients=None,
-                 filtering=False):
+                 legacy_pattern=True):
         """
         Constructs a CharucoPointDetector.
 
@@ -46,14 +46,14 @@ class CharucoPointDetector(PointDetector):
         self.size = size
         self.camera_matrix = camera_matrix
         self.distortion_coefficients = distortion_coefficients
-        self.filtering = filtering
 
         self.image, self.board = \
             charuco.make_charuco_board(self.dictionary,
                                        self.number_of_squares,
                                        self.size,
                                        (self.number_of_squares[0] * 100,
-                                        self.number_of_squares[1] * 100)
+                                        self.number_of_squares[1] * 100),
+                                       legacy_pattern=legacy_pattern
                                        )
         self.object_points = np.zeros((self.total_number_of_points, 3))
         for i in range(0, self.total_number_of_points):
@@ -82,8 +82,7 @@ class CharucoPointDetector(PointDetector):
                                           self.board,
                                           image,
                                           self.camera_matrix,
-                                          self.distortion_coefficients,
-                                          self.filtering)
+                                          self.distortion_coefficients)
 
         if chessboard_ids is not None \
                 and chessboard_ids is not None \

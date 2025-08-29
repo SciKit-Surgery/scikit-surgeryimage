@@ -32,13 +32,13 @@ class CharucoPlusChessboardPointDetector(PointDetector):
                      cv2.aruco.DICT_4X4_250),
                  camera_matrix=None,
                  distortion_coeff=None,
-                 charuco_filtering=False,
                  use_chessboard_inset=True,
                  number_of_chessboard_squares=(9, 14),
                  chessboard_square_size=3,
                  chessboard_id_offset=500,
                  error_if_no_chessboard=True,
                  error_if_no_charuco=False,
+                 legacy_pattern=True
                  ):
         """
         Constructs a CharucoPlusChessboardPointDetector.
@@ -68,7 +68,6 @@ class CharucoPlusChessboardPointDetector(PointDetector):
         self.number_of_charuco_squares = number_of_charuco_squares
         self.size_of_charuco_squares = size_of_charuco_squares
         self.minimum_number_of_points = minimum_number_of_points
-        self.charuco_filtering = charuco_filtering
         self.number_of_chessboard_squares = number_of_chessboard_squares
         self.chessboard_square_size = chessboard_square_size
         self.chessboard_id_offset = chessboard_id_offset
@@ -95,9 +94,9 @@ class CharucoPlusChessboardPointDetector(PointDetector):
             cpd.CharucoPointDetector(dictionary,
                                      self.number_of_charuco_squares,
                                      self.size_of_charuco_squares,
-                                     filtering=self.charuco_filtering,
                                      camera_matrix=camera_matrix,
-                                     distortion_coefficients=distortion_coeff
+                                     distortion_coefficients=distortion_coeff,
+                                     legacy_pattern=legacy_pattern
                                      )
 
         self.chessboard_point_detector = None

@@ -4,18 +4,17 @@
 Tests for Aruco implementation of PointDetector.
 """
 
-import cv2 as cv2
-from cv2 import aruco
+import cv2
 import numpy as np
 import pytest
-from sksurgeryimage.calibration.aruco_point_detector import ArucoPointDetector
+import sksurgeryimage.calibration.aruco_point_detector as apd
 
 
 def test_aruco_detector_without_model():
     image = cv2.imread('tests/data/calibration/test-aruco.png')
-    dictionary = cv2.aruco.Dictionary_get(aruco.DICT_ARUCO_ORIGINAL)
-    parameters = cv2.aruco.DetectorParameters_create()
-    detector = ArucoPointDetector(dictionary, parameters, None, (1, 1))
+    dictionary = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_ARUCO_ORIGINAL)
+    parameters = cv2.aruco.DetectorParameters()
+    detector = apd.ArucoPointDetector(dictionary, parameters, None, (1, 1))
     ids, object_points, image_points = detector.get_points(image)
     assert ids.shape[0] == 12
     assert ids.shape[1] == 1
@@ -31,8 +30,8 @@ def test_aruco_detector_without_model():
 
 def test_aruco_detector_with_model():
     image = cv2.imread('tests/data/calibration/test-aruco.png')
-    dictionary = cv2.aruco.Dictionary_get(aruco.DICT_ARUCO_ORIGINAL)
-    parameters = cv2.aruco.DetectorParameters_create()
+    dictionary = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_ARUCO_ORIGINAL)
+    parameters = cv2.aruco.DetectorParameters()
 
     # The model should contain the ids and each 3D location for each model point.
     # Here we just generate dummy data.
@@ -43,7 +42,7 @@ def test_aruco_detector_with_model():
         model[i][0][1] = i * 3
         model[i][0][2] = 0
 
-    detector = ArucoPointDetector(dictionary, parameters, model, (1, 1))
+    detector = apd.ArucoPointDetector(dictionary, parameters, model, (1, 1))
     ids, object_points, image_points = detector.get_points(image)
     assert ids.shape[0] == 12
     assert ids.shape[1] == 1
@@ -61,8 +60,8 @@ def test_aruco_detector_with_model():
 
 def test_aruco_detector_with_point_not_in_model():
     image = cv2.imread('tests/data/calibration/test-aruco.png')
-    dictionary = cv2.aruco.Dictionary_get(aruco.DICT_ARUCO_ORIGINAL)
-    parameters = cv2.aruco.DetectorParameters_create()
+    dictionary = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_ARUCO_ORIGINAL)
+    parameters = cv2.aruco.DetectorParameters()
 
     # The model should contain the ids and each 3D location for each model point.
     # Here we just generate dummy data.
@@ -73,7 +72,7 @@ def test_aruco_detector_with_point_not_in_model():
         model[i][0][1] = i * 3
         model[i][0][2] = 0
 
-    detector = ArucoPointDetector(dictionary, parameters, model, (1, 1))
+    detector = apd.ArucoPointDetector(dictionary, parameters, model, (1, 1))
 
     with pytest.raises(KeyError):
         _, _, _ = detector.get_points(image)

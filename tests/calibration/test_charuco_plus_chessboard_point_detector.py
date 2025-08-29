@@ -4,7 +4,7 @@
 Tests for ChArUco + Chessboard implementation of PointDetector.
 """
 
-import cv2 as cv2
+import cv2
 import pytest
 import numpy as np
 from sksurgeryimage.calibration.charuco_plus_chessboard_point_detector import CharucoPlusChessboardPointDetector
@@ -23,7 +23,6 @@ def test_charuco_tutorial_stuff():
     square_size_mm = [5, 4]
     chessboard_squares = [9, 14]
     chessboard_square_size_mm = 3
-    filter_markers = True
 
     point_detector = \
         CharucoPlusChessboardPointDetector(
@@ -31,9 +30,9 @@ def test_charuco_tutorial_stuff():
             minimum_number_of_points=min_points_to_detect,
             number_of_charuco_squares=num_squares,
             size_of_charuco_squares=square_size_mm,
-            charuco_filtering=filter_markers,
             number_of_chessboard_squares=chessboard_squares,
             chessboard_square_size=chessboard_square_size_mm,
+            legacy_pattern = True # As pattern generated with OpenCV pre-4.6
         )
     #Tutorial-section1-end
 
@@ -62,7 +61,7 @@ def test_charuco_plus_chess_detector(load_reference_charuco_chessboard_image):
 
     ref_img = load_reference_charuco_chessboard_image
 
-    generated_image = ch.make_charuco_with_chessboard()
+    generated_image = ch.make_charuco_with_chessboard(legacy_pattern=True)
     output_file_name = 'tests/output/pattern_4x4_19x26_5_4_with_inset_9x14.png'
     cv2.imwrite(output_file_name, generated_image)
     generated_image = cv2.imread(output_file_name)

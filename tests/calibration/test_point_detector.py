@@ -61,10 +61,11 @@ def test_invalid_as_setting_none_camera_parameters():
 def test_invalid_as_setting_invalid_camera_matrix():
     detector = PointDetector()
     with pytest.raises(ValueError):
-        detector.set_camera_parameters(camera_intrinsics=np.eye(4))
+        detector.set_camera_parameters(camera_intrinsics=np.eye(4),
+                                       distortion_coefficients=np.zeros((1, 5)))
 
 
-def test_invalid_as_setting_invalid_camera_matrix():
+def test_invalid_as_setting_invalid_distortion_params():
     detector = PointDetector()
     with pytest.raises(ValueError):
         detector.set_camera_parameters(camera_intrinsics=np.eye(3),
