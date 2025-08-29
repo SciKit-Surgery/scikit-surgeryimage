@@ -4,11 +4,10 @@
 Functions to support camera calibration using ChArUco chessboard markers.
 """
 import cv2
-from cv2 import aruco  # pylint: disable=no-name-in-module
 import numpy as np
 
 
-def make_charuco_board(dictionary, number_of_squares, size, image_size):
+def make_charuco_board(dictionary, number_of_squares, size, image_size, legacy_pattern=True):
     """
     Generates a ChArUco pattern.
 
@@ -21,102 +20,25 @@ def make_charuco_board(dictionary, number_of_squares, size, image_size):
     :param number_of_squares: tuple of (number in x, number in y)
     :param size: tuple of (size of chessboard square, size of internal tag), mm.
     :param image_size: tuple of (image width, image height), pixels.
+    :param legacy_pattern: if True, uses the original OpenCV pattern (pre-OpenCV 4.6.0).
     :return: image, board
     """
     number_in_x, number_in_y = number_of_squares
     size_of_square, size_of_tag = size
 
-    board = aruco.CharucoBoard_create(number_in_x,
-                                      number_in_y,
-                                      size_of_square,
-                                      size_of_tag,
-                                      dictionary)
-
-    image = board.draw(image_size, 1, 0)
+    board = cv2.aruco.CharucoBoard((number_in_x, number_in_y),
+                                   size_of_square,
+                                   size_of_tag,
+                                   dictionary,
+                                   )
+    board.setLegacyPattern(legacy_pattern)
+    image = board.generateImage(image_size, marginSize=0, borderBits=1)
     return image, board
-
-
-def filter_out_wrong_markers(marker_corners,
-                             marker_ids,
-                             board):
-    """
-    Filters out markers that were mis-labelled. For each inner corner on the
-    ChArUco board, if both neighbouring markers are detected, look at the
-    projected positions of this corner using the perspective transformations
-    obtained form the two markers. If the two positions are not close (further
-    than 20 pixels away), then at least one of the markers is mis-labelled but
-    we won't know which one. Remove both markers.
-
-    :param marker_corners: marker corners detected by OpenCV
-    :param marker_ids: ids of markers detected
-    :param board: charuco board definition
-    :return: marker_corners, marker_ids
-    """
-    number_of_markers = len(marker_ids)
-
-    # Calculate local homographies for each marker
-    transformations = []
-
-    for i in range(0, number_of_markers):
-        marker_id = marker_ids[i][0]
-        marker_obj_corners = board.objPoints[marker_id]
-        marker_obj_corners_2d = marker_obj_corners[:, 0:2].astype(np.float32)
-        marker_img_corners = marker_corners[i][0].astype(np.float32)
-
-        trans = cv2.getPerspectiveTransform(marker_obj_corners_2d,
-                                            marker_img_corners)
-
-        transformations.append(trans)
-
-    # For each charuco corner, calculate its projected positions based on
-    # the closest markers' homographies
-    mask = np.ones((number_of_markers, 1), dtype=bool)
-    mask = mask.flatten()
-    number_of_corners = board.chessboardCorners.shape[0]
-    for i in range(0, number_of_corners):
-        obj_point_2d = board.chessboardCorners[i, 0:2].astype(np.float32)
-        obj_point_2d = np.reshape(obj_point_2d, (-1, 1, 2))
-        projected_positions = []
-        neighbour_markers = []
-
-        number_of_nearest_markers = len(board.nearestMarkerIdx[i])
-        assert number_of_nearest_markers == 2
-        for j in range(0, number_of_nearest_markers):
-            try:
-                marker_id = board.ids[board.nearestMarkerIdx[i][j][0]][0]
-            except IndexError:
-                marker_id = board.ids[board.nearestMarkerIdx[i][j]]
-
-            marker_index = -1
-            for k in range(0, number_of_markers):
-                if marker_ids[k][0] == marker_id:
-                    marker_index = k
-                    break
-
-            if marker_index is not -1:
-                # The input point array needs to be 3 dimensional!
-                out = cv2.perspectiveTransform(obj_point_2d,
-                                               transformations[marker_index])
-                projected_positions.append(out)
-                neighbour_markers.append(marker_index)
-
-        if len(projected_positions) > 1:
-            dis = np.linalg.norm(projected_positions[0]
-                                 - projected_positions[1])
-            if dis > 20:
-                mask[neighbour_markers] = False
-
-    marker_ids = marker_ids[mask]
-    marker_corners = np.array(marker_corners)
-    marker_corners = marker_corners[mask]
-
-    return marker_corners, marker_ids
 
 
 def detect_charuco_points(dictionary, board, image,
                           camera_matrix=None,
-                          distortion_coefficients=None,
-                          filtering=False):
+                          distortion_coefficients=None):
     """
     Extracts ChArUco points. If you can provide camera matrices,
     it may be more accurate.
@@ -126,28 +48,26 @@ def detect_charuco_points(dictionary, board, image,
     :param image: grey scale image in which to search
     :param camera_matrix: if specified, the 3x3 camera intrinsic matrix
     :param distortion_coefficients: if specified, the distortion coefficients
-    :param filtering: if True, filter out wrongly detected markers
     :return: marker_corners, marker_ids, chessboard_corners, chessboard_ids
     """
-    detection_parameters = aruco.DetectorParameters_create()
+    detection_parameters = cv2.aruco.DetectorParameters()
     detection_parameters.maxErroneousBitsInBorderRate = 0.1
     detection_parameters.perspectiveRemovePixelPerCell = 30
     detection_parameters.perspectiveRemoveIgnoredMarginPerCell = 0.3
+
+    # pylint: disable=unpacking-non-sequence
     marker_corners, marker_ids, _ =\
-        aruco.detectMarkers(image, dictionary,
-                            parameters=detection_parameters)
+        cv2.aruco.detectMarkers(image, dictionary,
+                                parameters=detection_parameters)
 
     chessboard_corners = None
     chessboard_ids = None
 
     if marker_corners:
 
-        if filtering:
-            marker_corners, marker_ids = \
-                filter_out_wrong_markers(marker_corners, marker_ids, board)
-
+        # pylint: disable=unpacking-non-sequence
         _, chessboard_corners, chessboard_ids \
-            = aruco.interpolateCornersCharuco(
+            = cv2.aruco.interpolateCornersCharuco(
                 markerCorners=marker_corners,
                 markerIds=marker_ids,
                 image=image,
@@ -172,6 +92,8 @@ def draw_charuco_corners(image, chessboard_corners, chessboard_ids):
     :return: new image with corners marked
     """
     cloned = image.copy()
+    if chessboard_corners is None or chessboard_ids is None:
+        return cloned
 
     output = cv2.aruco.drawDetectedCornersCharuco(
         image=cloned,
@@ -203,6 +125,7 @@ def erase_charuco_markers(image, marker_corners):
     return cloned
 
 
+# pylint: disable=too-many-arguments, too-many-locals
 def make_charuco_with_chessboard(
         dictionary=cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_4X4_250),
         charuco_squares=(19, 26),
@@ -210,7 +133,8 @@ def make_charuco_with_chessboard(
         pixels_per_millimetre=10,
         chessboard_squares=(9, 14),
         chessboard_size=3,
-        chessboard_border=0.7
+        chessboard_border=0.7,
+        legacy_pattern=True
         ):
     """
     Helper function to make an image of a calibration target combining
@@ -228,6 +152,7 @@ def make_charuco_with_chessboard(
     :param chessboard_squares: tuple of (squares in x, squares in y)
     :param chessboard_size: size of chessboard squares in mm
     :param chessboard_border: border round chessboard, as fraction of square
+    :param legacy_pattern: if True, uses the original OpenCV pattern (pre-OpenCV 4.6.0).
     :return: calibration image
     """
     charuco_pixels_per_square = charuco_size[0] * pixels_per_millimetre
@@ -237,7 +162,8 @@ def make_charuco_with_chessboard(
         (charuco_squares[0], charuco_squares[1]),
         (charuco_size[0], charuco_size[1]),
         (charuco_squares[0] * charuco_pixels_per_square,
-         charuco_squares[1] * charuco_pixels_per_square)
+         charuco_squares[1] * charuco_pixels_per_square),
+        legacy_pattern=legacy_pattern
     )
 
     centre_of_image = (
@@ -283,6 +209,7 @@ def make_charuco_with_chessboard(
     s_x = int(centre_of_image[0] - ((chessboard_image.shape[1] - 1) / 2))
     s_y = int(centre_of_image[1] - ((chessboard_image.shape[0] - 1) / 2))
 
+    # pylint: disable=unsupported-assignment-operation
     charuco_image[s_y:s_y + chessboard_image.shape[0],
                   s_x:s_x + chessboard_image.shape[1]] = chessboard_image
 

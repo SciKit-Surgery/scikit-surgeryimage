@@ -52,6 +52,7 @@ class DottyGridPointDetector(PointDetector):
 
     More specifically, a grid of dots with 4 larger dots at known locations.
     """
+    # pylint: disable=too-many-arguments
     def __init__(self,
                  model_points,
                  list_of_indexes,
@@ -93,7 +94,7 @@ class DottyGridPointDetector(PointDetector):
         :param max_area: maximum area when filtering by area
         :param dot_detector_params: instance of cv2.SimpleBlobDetector_Params()
         """
-        super(DottyGridPointDetector, self).\
+        super().\
             __init__(scale=scale,
                      camera_intrinsics=camera_intrinsics,
                      distortion_coefficients=distortion_coefficients

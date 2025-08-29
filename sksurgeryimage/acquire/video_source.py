@@ -81,8 +81,8 @@ class TimestampedVideoSource:
         set_h = self.source.get(cv2.CAP_PROP_FRAME_HEIGHT)
 
         if set_w != width or set_h != height:
-            raise ValueError(f"Tried to set width/height to {width} x {height} \
-                 but failed. Width and height set to {set_w} x {set_h}")
+            raise ValueError(f"Tried to set width/height to {width} x {height} "
+                             f"but failed. Width and height set to {set_w} x {set_h}")
 
     def grab(self):
         """

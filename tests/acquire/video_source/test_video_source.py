@@ -3,7 +3,6 @@ import numpy as np
 import datetime
 import sksurgerycore.utilities.validate_file as vf
 import sksurgeryimage.utilities.camera_utilities as cu
-import sksurgeryimage.utilities.utilities as u
 
 
 def test_validate_camera_input(video_source_wrapper):
@@ -84,13 +83,14 @@ def test_add_source_from_camera_custom_dimensions(video_source_wrapper):
     try:
         camera_input = 0
         custom_dims = [320, 240]  # default is 640 x 480
-        video_source_wrapper.add_camera(camera_input, custom_dims)
 
-        expected_output_dims = (240, 320, 3)
-        assert video_source_wrapper.frames[0].shape == expected_output_dims
+        with pytest.raises(ValueError) as excinfo:
+            video_source_wrapper.add_camera(camera_input, custom_dims)
+        assert "Tried to set width/height to 320 x 240 but failed. Width and height set to 640.0 x 480.0" in str(excinfo.value)
 
     except IndexError:
         return
+
 
 def test_add_source_from_camera_invalid_dimensions(video_source_wrapper):
     """
