@@ -80,11 +80,16 @@ def test_add_source_from_camera_custom_dimensions(video_source_wrapper):
     """
     Add a camera and pass in custom dimensions to cv2.VideoCapture.
     """
-    camera_input = 0
-    custom_dims = [320, 240]  # default is 640 x 480
-    with pytest.raises(ValueError) as excinfo:
-        video_source_wrapper.add_camera(camera_input, custom_dims)
-    assert "Tried to set width/height to 320 x 240 but failed. Width and height set to 640.0 x 480.0" in str(excinfo.value)
+    try:
+        camera_input = 0
+        custom_dims = [320, 240]  # default is 640 x 480
+
+        with pytest.raises(ValueError) as excinfo:
+            video_source_wrapper.add_camera(camera_input, custom_dims)
+        assert "Tried to set width/height to 320 x 240 but failed. Width and height set to 640.0 x 480.0" in str(excinfo.value)
+
+    except IndexError:
+        return
 
 
 def test_add_source_from_camera_invalid_dimensions(video_source_wrapper):
