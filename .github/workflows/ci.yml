@@ -54,7 +54,7 @@ jobs:
 
       - name: Linting
         run: |
-          pylint --rcfile=tests/pylintrc sksurgeryimage
+          pylint --rcfile=tests/pylintrc --ignore _version.py sksurgeryimage
 
       - name: Run coveralls
         run: |
