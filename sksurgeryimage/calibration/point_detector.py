@@ -8,6 +8,7 @@ e.g. Chessboard corners, SIFT points, Charuco points etc.
 
 import logging
 import copy
+from typing import Tuple
 import numpy as np
 import cv2
 
@@ -51,9 +52,9 @@ class PointDetector:
     :param distortion_coefficients: [1xn] distortion coefficients
     """
     def __init__(self,
-                 scale=(1, 1),
-                 camera_intrinsics=None,
-                 distortion_coefficients=None):
+                 scale: Tuple[float, float]=(1, 1),
+                 camera_intrinsics: np.ndarray=None,
+                 distortion_coefficients: np.ndarray=None):
 
         self.scale = scale
         self.scale_x, self.scale_y = scale
@@ -71,8 +72,8 @@ class PointDetector:
                                        distortion_coefficients)
 
     def set_camera_parameters(self,
-                              camera_intrinsics,
-                              distortion_coefficients):
+                              camera_intrinsics: np.ndarray,
+                              distortion_coefficients: np.ndarray):
         """
         Enables camera parameters to be set dynamically at run-time.
         Calls _validate_camera_parameters().
@@ -85,7 +86,7 @@ class PointDetector:
         self.camera_intrinsics = copy.deepcopy(camera_intrinsics)
         self.distortion_coefficients = copy.deepcopy(distortion_coefficients)
 
-    def get_camera_parameters(self):
+    def get_camera_parameters(self) -> Tuple[np.ndarray, np.ndarray]:
         """
         Returns a copy of the camera matrix, and distortion coefficients.
         Throws RuntimeError if either are None.
@@ -99,7 +100,7 @@ class PointDetector:
         tmp_dc = copy.deepcopy(self.distortion_coefficients)
         return tmp_ci, tmp_dc
 
-    def get_points(self, image, is_distorted=True):
+    def get_points(self, image: np.ndarray, is_distorted:bool=True) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
         """
         Client's call this method to extract points from an image.
 
@@ -138,7 +139,7 @@ class PointDetector:
 
         return ids, object_points, image_points
 
-    def _internal_get_points(self, image, is_distorted=True):
+    def _internal_get_points(self, image: np.ndarray, is_distorted: bool=True):
         """
         Derived classes override this one.
 
