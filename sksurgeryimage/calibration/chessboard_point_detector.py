@@ -6,6 +6,7 @@ Chessboard implementation of PointDetector.
 
 import logging
 import copy
+from typing import Tuple
 import cv2
 import numpy as np
 from sksurgeryimage.calibration.point_detector import PointDetector
@@ -17,13 +18,20 @@ class ChessboardPointDetector(PointDetector):
     """
     Class to detect chessboard points in a 2D grey scale video image.
     """
-    def __init__(self, number_of_corners, square_size_in_mm, scale=(1, 1)):
+    def __init__(self,
+                 number_of_corners: Tuple[int, int],
+                 square_size_in_mm: int,
+                 scale: Tuple[float, float]=(1.0, 1.0),
+                 chessboard_flags: int=cv2.CALIB_CB_ADAPTIVE_THRESH+cv2.CALIB_CB_NORMALIZE_IMAGE+cv2.CALIB_CB_FILTER_QUADS,
+                 optimisation_criteria: Tuple[int, int, float]=(cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001)):
         """
         Constructs a ChessboardPointDetector.
 
-        :param number_of_corners: tuple of (number in x, number in y)
+        :param number_of_corners: tuple of (number in x, number in y), number of internal corners.
         :param square_size_in_mm: physical size of chessboard squares in mm
         :param scale: if you want to resize the image, specify scale factors
+        :param chessboard_flags: OpenCV flags to pass to cv2.findChessboardCorners
+        :param optimisation_criteria: criteria for cv2.cornerSubPix
         """
         super().__init__(scale=scale)
 
@@ -31,6 +39,8 @@ class ChessboardPointDetector(PointDetector):
         self.number_in_x, self.number_in_y = self.number_of_corners
         self.expected_number_of_points = self.number_in_x * self.number_in_y
         self.square_size_in_mm = square_size_in_mm
+        self.chessboard_flags = chessboard_flags
+        self.optimisation_criteria = optimisation_criteria
 
         self.object_points = np.zeros((self.expected_number_of_points, 3))
         self.ids = np.zeros((self.expected_number_of_points, 1), dtype=np.int16)
@@ -42,7 +52,7 @@ class ChessboardPointDetector(PointDetector):
             self.object_points[i][2] = 0
             self.ids[i][0] = i
 
-    def _internal_get_points(self, image, is_distorted=True):
+    def _internal_get_points(self, image: np.ndarray, is_distorted: bool=True):
         """
         Extracts points using OpenCV's chessboard implementation.
 
@@ -51,21 +61,16 @@ class ChessboardPointDetector(PointDetector):
         """
         img_points = np.zeros((0, 2))
 
-        detection_criteria = cv2.CALIB_CB_ADAPTIVE_THRESH\
-            + cv2.CALIB_CB_FILTER_QUADS
         ret, corners = cv2.findChessboardCorners(image,
                                                  self.number_of_corners,
-                                                 detection_criteria)
+                                                 self.chessboard_flags)
 
-        optimisation_criteria = (cv2.TERM_CRITERIA_EPS
-                                 + cv2.TERM_CRITERIA_MAX_ITER,
-                                 30, 0.001)
         if ret:
             img_points = cv2.cornerSubPix(image,
                                           corners,
                                           (11, 11),
                                           (-1, -1),
-                                          optimisation_criteria
+                                          self.optimisation_criteria
                                           )
 
             # If successful, we return all ids, 3D points and 2D points.
