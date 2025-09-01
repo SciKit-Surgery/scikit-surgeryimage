@@ -4,6 +4,7 @@
 import os
 import copy
 import cv2
+import numpy as np
 
 
 def get_annotated_image(input_image, ids, image_points, color=(0, 255, 0)):
@@ -37,3 +38,25 @@ def write_annotated_image(input_image, ids, image_points, image_file_name):
                                + previous_dir
                                + '_labelled.png')
     cv2.imwrite(output_file, annotated_image)
+
+
+def get_intersect(a_1, a_2, b_1, b_2):
+    """
+    Returns the point of intersection of the lines
+    passing through a2,a1 and b2,b1.
+
+    See https://stackoverflow.com/questions/3252194/numpy-and-line-intersections
+
+    :param a_1: [x, y] a point on the first line
+    :param a_2: [x, y] another point on the first line
+    :param b_1: [x, y] a point on the second line
+    :param b_2: [x, y] another point on the second line
+    """
+    stacked = np.vstack([a_1, a_2, b_1, b_2])
+    homogenous = np.hstack((stacked, np.ones((4, 1))))
+    line_1 = np.cross(homogenous[0], homogenous[1])
+    line_2 = np.cross(homogenous[2], homogenous[3])
+    p_x, p_y, p_z = np.cross(line_1, line_2)
+    if p_z == 0:  # lines are parallel
+        return float('inf'), float('inf')
+    return p_x/p_z, p_y/p_z

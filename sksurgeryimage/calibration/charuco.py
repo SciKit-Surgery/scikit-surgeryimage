@@ -7,7 +7,7 @@ import cv2
 import numpy as np
 
 
-def make_charuco_board(dictionary, number_of_squares, size, image_size, legacy_pattern=True):
+def make_charuco_board(dictionary, number_of_squares, size, image_size, legacy_pattern=True, start_id=0):
     """
     Generates a ChArUco pattern.
 
@@ -25,20 +25,25 @@ def make_charuco_board(dictionary, number_of_squares, size, image_size, legacy_p
     """
     number_in_x, number_in_y = number_of_squares
     size_of_square, size_of_tag = size
-
+    finish_id = start_id + np.ceil(((number_in_x * number_in_y) / 2.0)).astype(int)
+    ids = np.arange(start_id, finish_id)
     board = cv2.aruco.CharucoBoard((number_in_x, number_in_y),
                                    size_of_square,
                                    size_of_tag,
                                    dictionary,
+                                   ids=ids
                                    )
     board.setLegacyPattern(legacy_pattern)
     image = board.generateImage(image_size, marginSize=0, borderBits=1)
     return image, board
 
 
-def detect_charuco_points(dictionary, board, image,
+def detect_charuco_points(dictionary: cv2.aruco.Dictionary,
+                          board,
+                          image,
                           camera_matrix=None,
-                          distortion_coefficients=None):
+                          distortion_coefficients=None,
+                          parameters: cv2.aruco.DetectorParameters=None):
     """
     Extracts ChArUco points. If you can provide camera matrices,
     it may be more accurate.
@@ -50,15 +55,17 @@ def detect_charuco_points(dictionary, board, image,
     :param distortion_coefficients: if specified, the distortion coefficients
     :return: marker_corners, marker_ids, chessboard_corners, chessboard_ids
     """
-    detection_parameters = cv2.aruco.DetectorParameters()
-    detection_parameters.maxErroneousBitsInBorderRate = 0.1
-    detection_parameters.perspectiveRemovePixelPerCell = 30
-    detection_parameters.perspectiveRemoveIgnoredMarginPerCell = 0.3
+    if parameters is None:
+        parameters = cv2.aruco.DetectorParameters()
+        parameters.maxErroneousBitsInBorderRate = 0.1
+        parameters.perspectiveRemovePixelPerCell = 30
+        parameters.perspectiveRemoveIgnoredMarginPerCell = 0.3
 
     # pylint: disable=unpacking-non-sequence
     marker_corners, marker_ids, _ =\
-        cv2.aruco.detectMarkers(image, dictionary,
-                                parameters=detection_parameters)
+        cv2.aruco.detectMarkers(image,
+                                dictionary=dictionary,
+                                parameters=parameters)
 
     chessboard_corners = None
     chessboard_ids = None
@@ -134,7 +141,8 @@ def make_charuco_with_chessboard(
         chessboard_squares=(9, 14),
         chessboard_size=3,
         chessboard_border=0.7,
-        legacy_pattern=True
+        legacy_pattern=True,
+        start_id=0
         ):
     """
     Helper function to make an image of a calibration target combining
@@ -143,7 +151,7 @@ def make_charuco_with_chessboard(
     is correctly scaled.
 
     Defaults are as used in SmartLiver project. Not also, that we compute
-    the image and coordinates in portrait, but it's used in landscape.
+    the image and coordinates in portrait, but it's normally used in landscape.
 
     :param dictionary: ChArUco dictionary
     :param charuco_squares: tuple of (squares in x, squares in y)
@@ -153,23 +161,22 @@ def make_charuco_with_chessboard(
     :param chessboard_size: size of chessboard squares in mm
     :param chessboard_border: border round chessboard, as fraction of square
     :param legacy_pattern: if True, uses the original OpenCV pattern (pre-OpenCV 4.6.0).
+    :param start_id: id of first marker in ChArUco board
     :return: calibration image
     """
     charuco_pixels_per_square = charuco_size[0] * pixels_per_millimetre
-
+    size_x = charuco_squares[0] * charuco_pixels_per_square
+    size_y = charuco_squares[1] * charuco_pixels_per_square
     charuco_image, _ = make_charuco_board(
         dictionary,
-        (charuco_squares[0], charuco_squares[1]),
-        (charuco_size[0], charuco_size[1]),
-        (charuco_squares[0] * charuco_pixels_per_square,
-         charuco_squares[1] * charuco_pixels_per_square),
-        legacy_pattern=legacy_pattern
+        number_of_squares=(charuco_squares[0], charuco_squares[1]),
+        size=(charuco_size[0], charuco_size[1]),
+        image_size=(size_x, size_y),
+        legacy_pattern=legacy_pattern,
+        start_id=start_id
     )
 
-    centre_of_image = (
-        ((charuco_squares[0] * charuco_pixels_per_square) - 1) / 2.0,
-        ((charuco_squares[1] * charuco_pixels_per_square) - 1) / 2.0
-    )
+    centre_of_image = ((size_x - 1) / 2.0, (size_y - 1) / 2.0)
 
     # Creates minimum size chessboard, one pixel per chessboard square.
     chessboard_image = np.zeros((chessboard_squares[1],
@@ -192,8 +199,8 @@ def make_charuco_with_chessboard(
     # Draw white polygon around chessboard
     corners = np.zeros((4, 2))
     corner_offsets = (
-        ((chessboard_squares[0] / 2) + chessboard_border) * chessboard_scale,
-        ((chessboard_squares[1] / 2) + chessboard_border) * chessboard_scale
+        ((chessboard_squares[0] / 2.0) + chessboard_border) * chessboard_scale,
+        ((chessboard_squares[1] / 2.0) + chessboard_border) * chessboard_scale
     )
     corners[0][0] = int(centre_of_image[0] - corner_offsets[0])
     corners[0][1] = int(centre_of_image[1] - corner_offsets[1])

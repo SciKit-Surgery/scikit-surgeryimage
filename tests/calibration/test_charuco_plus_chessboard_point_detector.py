@@ -3,20 +3,18 @@
 """
 Tests for ChArUco + Chessboard implementation of PointDetector.
 """
-
+import os
 import cv2
 import pytest
 import numpy as np
-from sksurgeryimage.calibration.charuco_plus_chessboard_point_detector import CharucoPlusChessboardPointDetector
+import sksurgeryimage.calibration.charuco_plus_chessboard_point_detector as cpcbd
 import sksurgeryimage.calibration.point_detector_utils as pdu
 import sksurgeryimage.calibration.charuco as ch
 
-def test_charuco_tutorial_stuff():
-    """ Code that is used in tutorials. """
-
-    #Tutorial-section1-start
-    ref_image = "tests/data/calibration/pattern_4x4_19x26_5_4_with_inset_9x14.png"
-    charuco_pattern = cv2.imread(ref_image)
+def _create_default_detector():
+    # Tutorial-section1-start
+    input_image_file = "tests/data/calibration/pattern_4x4_19x26_5_4_with_inset_9x14.png"
+    input_image = cv2.imread(input_image_file)
 
     min_points_to_detect = 50
     num_squares = [19, 26]
@@ -25,8 +23,8 @@ def test_charuco_tutorial_stuff():
     chessboard_square_size_mm = 3
 
     point_detector = \
-        CharucoPlusChessboardPointDetector(
-            charuco_pattern,
+        cpcbd.CharucoPlusChessboardPointDetector(
+            dictionary=cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_4X4_250),
             minimum_number_of_points=min_points_to_detect,
             number_of_charuco_squares=num_squares,
             size_of_charuco_squares=square_size_mm,
@@ -34,30 +32,118 @@ def test_charuco_tutorial_stuff():
             chessboard_square_size=chessboard_square_size_mm,
             legacy_pattern = True # As pattern generated with OpenCV pre-4.6
         )
-    #Tutorial-section1-end
+    # Tutorial-section1-end
+    return input_image, point_detector
+
+def test_charuco_plus_chessboard_tutorial_stuff():
+    """ Code that is used in tutorials. """
+    input_image, point_detector = _create_default_detector()
 
     #Tutorial-section2-start
-    ids, object_points, image_points = point_detector.get_points(charuco_pattern)
+    ids, object_points, image_points = point_detector.get_points(input_image)
     #Tutorial-section2-end
 
     #Tutorial-section3-start
-    for idx in range(ids.shape[0]):
-        text = str(ids[idx][0])
-        x = int(image_points[idx][0])
-        y = int(image_points[idx][1])
-        
-        cv2.putText(charuco_pattern,
-                    text,
-                    (x, y),
-                    cv2.FONT_HERSHEY_SIMPLEX,
-                    0.5,
-                    (0, 255, 0),
-                    2,
-                    cv2.LINE_AA)
-
+    annotated_image = pdu.get_annotated_image(input_image, ids, image_points)
+    cv2.imwrite(os.path.join("tests", "output", "test_charuco_plus_chessboard_tutorial_stuff.png"), annotated_image)
     #Tutorial-section3-end
 
-def test_charuco_plus_chess_detector(load_reference_charuco_chessboard_image):
+    # For the above image, we should assert stuff to test it's working!
+    # We expect ChArUco to start in top left corner, x-axis right, y-axis down.
+    assert ids.shape[0] == 468
+    assert image_points[0][0] < image_points[1][0]
+    assert np.allclose(image_points[0][1], image_points[1][1], atol=0.5)
+    assert np.allclose(image_points[0][0], image_points[18][0], atol=0.5)
+    assert image_points[0][1] < image_points[18][1]
+    # Should also check that Chessboard is in the right place.
+    # We expect chessboard to start at id=364, origin bottom right, x-axis left, y-axis up.
+    assert image_points[364][0] > image_points[365][0]
+    assert np.allclose(image_points[364][1], image_points[365][1], atol=0.5)
+    assert np.allclose(image_points[364][0], image_points[372][0], atol=0.5)
+    assert image_points[364][1] > image_points[18][0]
+
+    #Tutorial-section4-start
+    reference_image = point_detector.get_reference_image()
+    ids, object_points, image_points = point_detector.get_points(reference_image)
+    annotated_image = pdu.get_annotated_image(reference_image, ids, image_points)
+    cv2.imwrite(os.path.join("tests", "output", "test_charuco_plus_chessboard_tutorial_stuff_reference.png"), annotated_image)
+    # Tutorial-section4-end
+
+def test_charuco_plus_chessboard_rotate_90():
+    input_image, point_detector = _create_default_detector()
+    ids, object_points, image_points = point_detector.get_points(input_image)
+    rotated_image = cv2.rotate(input_image, cv2.ROTATE_90_CLOCKWISE)
+    rotated_ids, rotated_object_points, rotated_image_points = point_detector.get_points(rotated_image)
+    annotated_image_cb = pdu.get_annotated_image(rotated_image, rotated_ids, rotated_image_points)
+    cv2.imwrite(os.path.join("tests", "output", "test_charuco_plus_chessboard_rotate_90.png"), annotated_image_cb)
+
+    # Object points should not change.
+    # They are derived from the internal reference image, and keyed by id.
+    assert np.allclose(object_points, rotated_object_points)
+
+    # We expect ChArUco to start in top right corner, x-axis down, y-axis left.
+    assert ids.shape[0] == 468
+    assert np.allclose(rotated_image_points[0][0], rotated_image_points[1][0], atol=0.5)
+    assert rotated_image_points[0][1] < rotated_image_points[1][1]
+    assert rotated_image_points[0][0] > rotated_image_points[18][0]
+    assert np.allclose(rotated_image_points[0][1], rotated_image_points[18][1], atol=0.5)
+    # We expect chessboard to start at id=364, origin bottom left, x-axis up, y-axis right.
+    assert np.allclose(rotated_image_points[364][0], rotated_image_points[365][0], atol=0.5)
+    assert rotated_image_points[364][1] > rotated_image_points[365][1]
+    assert rotated_image_points[364][0] < rotated_image_points[372][0]
+    assert np.allclose(rotated_image_points[364][1], rotated_image_points[372][1], atol=0.5)
+
+
+def test_charuco_plus_chessboard_rotate_180():
+    input_image, point_detector = _create_default_detector()
+    ids, object_points, image_points = point_detector.get_points(input_image)
+    rotated_image = cv2.rotate(input_image, cv2.ROTATE_180)
+    rotated_ids, rotated_object_points, rotated_image_points = point_detector.get_points(rotated_image)
+    annotated_image_cb = pdu.get_annotated_image(rotated_image, rotated_ids, rotated_image_points)
+    cv2.imwrite(os.path.join("tests", "output", "test_charuco_plus_chessboard_rotate_180.png"), annotated_image_cb)
+
+    # Object points should not change.
+    # They are derived from the internal reference image, and keyed by id.
+    assert np.allclose(object_points, rotated_object_points)
+
+    # We expect ChArUco to start in bottom right corner, x-axis up, y-axis right.
+    assert ids.shape[0] == 468
+    assert rotated_image_points[0][0] > rotated_image_points[1][0]
+    assert np.allclose(rotated_image_points[0][1], rotated_image_points[1][1], atol=0.5)
+    assert np.allclose(rotated_image_points[0][0], rotated_image_points[18][0], atol=0.5)
+    assert rotated_image_points[0][1] > rotated_image_points[18][1]
+    # We expect chessboard to start at id=364, origin top right, x-axis down, y-axis left.
+    assert rotated_image_points[364][0] < rotated_image_points[365][0]
+    assert np.allclose(rotated_image_points[364][1], rotated_image_points[365][1], atol=0.5)
+    assert np.allclose(rotated_image_points[364][0], rotated_image_points[372][0], atol=0.5)
+    assert rotated_image_points[364][1] < rotated_image_points[372][1]
+
+def test_charuco_plus_chessboard_rotate_270():
+    input_image, point_detector = _create_default_detector()
+    ids, object_points, image_points = point_detector.get_points(input_image)
+    rotated_image = cv2.rotate(input_image, cv2.ROTATE_90_COUNTERCLOCKWISE)
+    rotated_ids, rotated_object_points, rotated_image_points = point_detector.get_points(rotated_image)
+    annotated_image_cb = pdu.get_annotated_image(rotated_image, rotated_ids, rotated_image_points)
+    cv2.imwrite(os.path.join("tests", "output", "test_charuco_plus_chessboard_rotate_270.png"), annotated_image_cb)
+
+    # Object points should not change.
+    # They are derived from the internal reference image, and keyed by id.
+    assert np.allclose(object_points, rotated_object_points)
+
+    # We expect ChArUco to start in bottom left corner, x-axis left, y-axis up.
+    assert ids.shape[0] == 468
+    assert np.allclose(rotated_image_points[0][0], rotated_image_points[1][0], atol=0.5)
+    assert rotated_image_points[0][1] > rotated_image_points[1][1]
+    assert rotated_image_points[0][0] < rotated_image_points[18][0]
+    assert np.allclose(rotated_image_points[0][1], rotated_image_points[18][1], atol=0.5)
+    # We expect chessboard to start at id=364, origin top left, x-axis right, y-axis down.
+    assert np.allclose(rotated_image_points[364][0], rotated_image_points[365][0], atol=0.5)
+    assert rotated_image_points[364][1] < rotated_image_points[365][1]
+    assert rotated_image_points[364][0] > rotated_image_points[372][0]
+    assert np.allclose(rotated_image_points[364][1], rotated_image_points[372][1], atol=0.5)
+
+
+def test_charuco_generated_image(load_reference_charuco_chessboard_image):
 
     ref_img = load_reference_charuco_chessboard_image
 
@@ -66,15 +152,12 @@ def test_charuco_plus_chess_detector(load_reference_charuco_chessboard_image):
     cv2.imwrite(output_file_name, generated_image)
     generated_image = cv2.imread(output_file_name)
 
-    input_file_name = 'tests/data/calibration/pattern_4x4_19x26_5_4_with_inset_9x14.png'
-    reference_image = cv2.imread(input_file_name)
+    assert np.allclose(ref_img, generated_image)
 
-    assert np.allclose(reference_image, generated_image)
-
-    detector = CharucoPlusChessboardPointDetector(ref_img)
-    ids_portrait, object_points_portrait, image_points_portrait = detector.get_points(reference_image)
+    _, detector = _create_default_detector()
+    ids_portrait, object_points_portrait, image_points_portrait = detector.get_points(ref_img)
     if ids_portrait.shape[0] > 0:
-        pdu.write_annotated_image(reference_image, ids_portrait, image_points_portrait, 'tests/output/pattern_4x4_19x26_5_4_with_inset_9x14_portrait.png')
+        pdu.write_annotated_image(ref_img, ids_portrait, image_points_portrait, 'tests/output/pattern_4x4_19x26_5_4_with_inset_9x14_portrait.png')
 
     input_file_name = 'tests/data/calibration/pattern_4x4_19x26_5_4_with_inset_9x14_landscape.png'
     image = cv2.imread(input_file_name)
@@ -93,85 +176,75 @@ def test_charuco_plus_chess_detector(load_reference_charuco_chessboard_image):
     assert np.allclose(object_points_portrait, object_points_landscape)
 
 
-def test_charuco_plus_chess_invalid_because_no_reference_image():
+def test_charuco_plus_chess_invalid_because_no_dictionary():
 
-    with pytest.raises(ValueError):
-        detector = CharucoPlusChessboardPointDetector(None,
-                                                      use_chessboard_inset=True,
-                                                      number_of_chessboard_squares=None)
-
-
-def test_charuco_plus_chess_invalid_because_reference_image_wrong_type():
-
-    with pytest.raises(ValueError):
-        detector = CharucoPlusChessboardPointDetector("wrong type",
-                                                      use_chessboard_inset=True,
-                                                      number_of_chessboard_squares=None)
+    with pytest.raises(ValueError) as excinfo:
+        detector = cpcbd.CharucoPlusChessboardPointDetector(dictionary=None)
+    assert str(excinfo.value) == "dictionary is None"
 
 
-def test_charuco_plus_chess_invalid_because_no_chessboard_squares(load_reference_charuco_chessboard_image):
+def test_charuco_plus_chess_invalid_because_no_chessboard_squares():
 
-    ref_img = load_reference_charuco_chessboard_image
-
-    with pytest.raises(ValueError):
-        detector = CharucoPlusChessboardPointDetector(ref_img,
-                                                      use_chessboard_inset=True,
-                                                      number_of_chessboard_squares=None)
-
-
-def test_charuco_plus_chess_invalid_because_no_chessboard_size(load_reference_charuco_chessboard_image):
-
-    ref_img = load_reference_charuco_chessboard_image
-
-    with pytest.raises(ValueError):
-        detector = CharucoPlusChessboardPointDetector(ref_img,
-                                                      use_chessboard_inset=True,
-                                                      chessboard_square_size=None)
+    with pytest.raises(ValueError) as excinfo:
+        detector = cpcbd.CharucoPlusChessboardPointDetector(dictionary=cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_4X4_250),
+                                                            use_chessboard_inset=True,
+                                                            number_of_chessboard_squares=None)
+    assert str(excinfo.value) == "You must provide the number of chessboard corners"
 
 
-def test_charuco_plus_chess_invalid_because_no_id_offset(load_reference_charuco_chessboard_image):
+def test_charuco_plus_chess_invalid_because_no_chessboard_size():
 
-    ref_img = load_reference_charuco_chessboard_image
-
-    with pytest.raises(ValueError):
-        detector = CharucoPlusChessboardPointDetector(ref_img,
-                                                      use_chessboard_inset=True,
-                                                      chessboard_id_offset=None)
-
-
-def test_charuco_plus_chess_invalid_because_id_offset_negative(load_reference_charuco_chessboard_image):
-
-    ref_img = load_reference_charuco_chessboard_image
-
-    with pytest.raises(ValueError):
-        detector = CharucoPlusChessboardPointDetector(ref_img,
-                                                      use_chessboard_inset=True,
-                                                      chessboard_id_offset=-1)
+    with pytest.raises(ValueError) as excinfo:
+        detector = cpcbd.CharucoPlusChessboardPointDetector(dictionary=cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_4X4_250),
+                                                            use_chessboard_inset=True,
+                                                            chessboard_square_size=None)
+    assert str(excinfo.value) == "You must provide the size of chessboard squares"
 
 
-def test_charuco_plus_chess_invalid_because_id_offset_too_small(load_reference_charuco_chessboard_image):
+def test_charuco_plus_chess_invalid_because_no_id_offset():
 
-    ref_img = load_reference_charuco_chessboard_image
+    with pytest.raises(ValueError) as excinfo:
+        detector = cpcbd.CharucoPlusChessboardPointDetector(dictionary=cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_4X4_250),
+                                                            use_chessboard_inset=True,
+                                                            chessboard_id_offset=None)
+    assert str(excinfo.value) == "You must provide chessboard ID offset"
+
+
+def test_charuco_plus_chess_invalid_because_id_offset_negative():
+
+    with pytest.raises(ValueError) as excinfo:
+        detector = cpcbd.CharucoPlusChessboardPointDetector(dictionary=cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_4X4_250),
+                                                            use_chessboard_inset=True,
+                                                            chessboard_id_offset=-1)
+    assert str(excinfo.value) == "Chessboard ID offset must be positive."
+
+
+def test_charuco_plus_chess_invalid_because_id_offset_too_small():
 
     # The default 26*19 grid will result in a maximum of 25*18 corners
     # from the ChArUco bit, so we must have an id_offset of at least 450.
-    with pytest.raises(ValueError):
-        detector = CharucoPlusChessboardPointDetector(ref_img,
-                                                      use_chessboard_inset=True,
-                                                      chessboard_id_offset=449)
+    with pytest.raises(ValueError) as excinfo:
+        detector = cpcbd.CharucoPlusChessboardPointDetector(dictionary=cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_4X4_250),
+                                                            use_chessboard_inset=True,
+                                                            chessboard_id_offset=449)
 
-    detector = CharucoPlusChessboardPointDetector(ref_img,
-                                                  use_chessboard_inset=True,
-                                                  chessboard_id_offset=450)
+    assert str(excinfo.value) == "Chessboard ID offset must > number of ChArUco tags."
+
+    detector = cpcbd.CharucoPlusChessboardPointDetector(dictionary=cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_4X4_250),
+                                                        use_chessboard_inset=True,
+                                                        chessboard_id_offset=450)
 
 
 def test_charuco_plus_chess_invalid_because_no_chessboard_detected(load_reference_charuco_chessboard_image):
 
     ref_img = load_reference_charuco_chessboard_image
-
     roi = ref_img[0:400, 0:400, :]
 
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError) as excinfo:
         # If user specifies in constructor that we are using a chessboard, then a chessboard must be detected.
-        detector = CharucoPlusChessboardPointDetector(ref_img)
+        detector = cpcbd.CharucoPlusChessboardPointDetector(dictionary=cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_4X4_250),
+                                                            use_chessboard_inset=True
+                                                            )
         _, _, _ = detector.get_points(roi)
+
+    assert str(excinfo.value) == "No chessboard detected."
