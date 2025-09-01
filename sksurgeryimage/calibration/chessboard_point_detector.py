@@ -33,15 +33,11 @@ class ChessboardPointDetector(PointDetector):
         :param chessboard_flags: OpenCV flags to pass to cv2.findChessboardCorners
         :param optimisation_criteria: criteria for cv2.cornerSubPix
         """
-        super().__init__(scale=scale)
-
+        model_points = {}
         self.number_of_corners = number_of_corners
         self.number_in_x, self.number_in_y = self.number_of_corners
         self.expected_number_of_points = self.number_in_x * self.number_in_y
         self.square_size_in_mm = square_size_in_mm
-        self.chessboard_flags = chessboard_flags
-        self.optimisation_criteria = optimisation_criteria
-        self.model_points = {}
         self.object_points = np.zeros((self.expected_number_of_points, 3))
         self.ids = np.zeros((self.expected_number_of_points, 1), dtype=np.int16)
         for i in range(0, self.expected_number_of_points):
@@ -51,7 +47,12 @@ class ChessboardPointDetector(PointDetector):
                                        * self.square_size_in_mm
             self.object_points[i][2] = 0
             self.ids[i][0] = i
-            self.model_points[i] = self.object_points[i]
+            model_points[i] = self.object_points[i]
+
+        super().__init__(model_points=model_points, scale=scale)
+
+        self.chessboard_flags = chessboard_flags
+        self.optimisation_criteria = optimisation_criteria
 
     def _internal_get_points(self, image: np.ndarray, is_distorted: bool=True):
         """
@@ -81,9 +82,3 @@ class ChessboardPointDetector(PointDetector):
 
         # If we didn't find all points, return consistent set of 'nothing'
         return np.zeros((0, 1)), np.zeros((0, 3)), img_points
-
-    def get_model_points(self) -> dict[int, np.ndarray]:
-        """
-        Returns a [Nx3] numpy ndarray representing the model points in 3D.
-        """
-        return copy.deepcopy(self.model_points)

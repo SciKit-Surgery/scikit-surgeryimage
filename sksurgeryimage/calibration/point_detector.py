@@ -52,6 +52,7 @@ class PointDetector:
     :param distortion_coefficients: [1xn] distortion coefficients
     """
     def __init__(self,
+                 model_points: dict[int, np.ndarray],
                  scale: Tuple[float, float]=(1, 1),
                  camera_intrinsics: np.ndarray=None,
                  distortion_coefficients: np.ndarray=None):
@@ -60,6 +61,7 @@ class PointDetector:
         self.scale_x, self.scale_y = scale
         self.camera_intrinsics = None
         self.distortion_coefficients = None
+        self.model_points = model_points
         if camera_intrinsics is not None and distortion_coefficients is None:
             raise ValueError("camera_intrinsics is not None, "
                              "but distortion_coefficients are None??")
@@ -153,8 +155,6 @@ class PointDetector:
 
     def get_model_points(self) -> dict[int, np.ndarray]:
         """
-        Derived classes should override this.
-
         The PointDetector should return a Dictionary of id:3D point as int:np.ndarray(1,3).
         Normally, all points are planar, e.g. chessboard, so z=0. But you could
         have calibration point in 3D, so we return a 3D point. e.g. ArUco points
@@ -162,4 +162,4 @@ class PointDetector:
 
         :return: dict[int, np.ndarray(1, 3)]
         """
-        raise NotImplementedError()
+        return copy.deepcopy(self.model_points)

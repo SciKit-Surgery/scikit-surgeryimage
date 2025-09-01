@@ -47,7 +47,7 @@ class ArucoPointDetector(PointDetector):
     def __init__(self,
                  dictionary: cv2.aruco.Dictionary,
                  parameters: cv2.aruco.DetectorParameters,
-                 model: dict,
+                 model_points: dict,
                  scale:Tuple[float, float]=(1.0, 1.0),
                  ):
         """
@@ -55,19 +55,18 @@ class ArucoPointDetector(PointDetector):
 
         :param dictionary: aruco dictionary
         :param parameters: aruco parameters
-        :param model: dictionary of {id : 3D point as numpy 1x3 array}
+        :param model_points: dictionary of {id : 3D point as numpy 1x3 array}
         :param scale: if you want to cv::resize the image, specify scale factors
         """
-        super().__init__(scale=scale)
         if dictionary is None:
             raise ValueError("dictionary is None. Programming bug.")
         if parameters is None:
             raise ValueError("parameters is None. Programming bug.")
-        if model is None:
-            raise ValueError("model is None. Programming bug.")
+        if model_points is None:
+            raise ValueError("model_points is None. Programming bug.")
+        super().__init__(model_points=model_points, scale=scale)
         self.dictionary = dictionary
         self.parameters = parameters
-        self.model = model
 
     def _internal_get_points(self,
                              image: np.ndarray,
@@ -87,7 +86,7 @@ class ArucoPointDetector(PointDetector):
         # Check how many points we detected, whose id is in the model.
         number_of_points = 0
         for i in range(ids.shape[0]):
-            if ids[i][0] in self.model:
+            if ids[i][0] in self.model_points:
                 number_of_points += 1
 
         returned_ids = np.zeros((number_of_points, 1), dtype=np.int32)
@@ -97,9 +96,9 @@ class ArucoPointDetector(PointDetector):
         if number_of_points > 0:
 
             for i in range(number_of_points):
-                if ids[i][0] in self.model.keys(): # avoids key error
+                if ids[i][0] in self.model_points.keys(): # avoids key error
                     point_id = ids[i][0]
-                    object_point = self.model[point_id]
+                    object_point = self.model_points[point_id]
 
                     # intersect diagonals, more accurate than each corner.
                     centre = get_intersect(corners[i][0][0],
@@ -116,15 +115,3 @@ class ArucoPointDetector(PointDetector):
                     returned_ids[i][0] = point_id
 
         return returned_ids, object_points, image_points
-
-
-    def get_model_points(self):
-        """
-        The PointDetector should return a Dictionary of id:3D point as int:np.ndarray(1,3).
-        Normally, all points are planar, e.g. chessboard, so z=0. But you could
-        have calibration point in 3D, so we return a 3D point. e.g. ArUco points
-        on a non-planar surface.
-
-        :return: dict[int, np.ndarray(1, 3)]
-        """
-        return copy.deepcopy(self.model)
