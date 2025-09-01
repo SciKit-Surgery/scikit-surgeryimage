@@ -41,7 +41,7 @@ class ChessboardPointDetector(PointDetector):
         self.square_size_in_mm = square_size_in_mm
         self.chessboard_flags = chessboard_flags
         self.optimisation_criteria = optimisation_criteria
-
+        self.model_points = {}
         self.object_points = np.zeros((self.expected_number_of_points, 3))
         self.ids = np.zeros((self.expected_number_of_points, 1), dtype=np.int16)
         for i in range(0, self.expected_number_of_points):
@@ -51,6 +51,7 @@ class ChessboardPointDetector(PointDetector):
                                        * self.square_size_in_mm
             self.object_points[i][2] = 0
             self.ids[i][0] = i
+            self.model_points[i] = self.object_points[i]
 
     def _internal_get_points(self, image: np.ndarray, is_distorted: bool=True):
         """
@@ -81,8 +82,8 @@ class ChessboardPointDetector(PointDetector):
         # If we didn't find all points, return consistent set of 'nothing'
         return np.zeros((0, 1)), np.zeros((0, 3)), img_points
 
-    def get_model_points(self):
+    def get_model_points(self) -> dict[int, np.ndarray]:
         """
         Returns a [Nx3] numpy ndarray representing the model points in 3D.
         """
-        return copy.deepcopy(self.object_points)
+        return copy.deepcopy(self.model_points)

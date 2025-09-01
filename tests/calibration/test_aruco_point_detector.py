@@ -3,45 +3,58 @@
 """
 Tests for Aruco implementation of PointDetector.
 """
-
+import os
 import cv2
 import numpy as np
 import pytest
+import sksurgeryimage.calibration.point_detector_utils as pdu
 import sksurgeryimage.calibration.aruco_point_detector as apd
 
 
-def test_aruco_detector_without_model():
-    image = cv2.imread('tests/data/calibration/test-aruco.png')
+def _get_model_1():
+    model = {}
+    model[860] = np.array([[0, 0, 0]], dtype=np.float32)
+    model[759] = np.array([[20, 0, 0]], dtype=np.float32)
+    model[752] = np.array([[40, 0, 0]], dtype=np.float32)
+    model[892] = np.array([[0, 20, 0]], dtype=np.float32)
+    model[304] = np.array([[20, 20, 0]], dtype=np.float32)
+    model[996] = np.array([[40, 20, 0]], dtype=np.float32)
+    model[11] = np.array([[0, 40, 0]], dtype=np.float32)
+    model[1000] = np.array([[20, 40, 0]], dtype=np.float32)
+    model[962] = np.array([[40, 40, 0]], dtype=np.float32)
+    model[308] = np.array([[0, 60, 0]], dtype=np.float32)
+    model[109] = np.array([[20, 60, 0]], dtype=np.float32)
+    model[560] = np.array([[40, 60, 0]], dtype=np.float32)
+    return model
+
+
+def test_init_no_dictionary():
+    with pytest.raises(ValueError) as excinfo:
+        _ = apd.ArucoPointDetector(None, None, None)
+    assert 'dictionary is None' in str(excinfo.value)
+
+
+def test_init_no_parameters():
+    dictionary = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_ARUCO_ORIGINAL)
+    with pytest.raises(ValueError) as excinfo:
+        _ = apd.ArucoPointDetector(dictionary, None, None)
+    assert 'parameters is None' in str(excinfo.value)
+
+
+def test_init_no_model():
     dictionary = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_ARUCO_ORIGINAL)
     parameters = cv2.aruco.DetectorParameters()
-    detector = apd.ArucoPointDetector(dictionary, parameters, None, (1, 1))
-    ids, object_points, image_points = detector.get_points(image)
-    assert ids.shape[0] == 12
-    assert ids.shape[1] == 1
-    assert object_points.shape[0] == 0  # if we don't provide model, we can't output 3D coordinates.
-    assert object_points.shape[1] == 3
-    assert image_points.shape[0] == 12
-    assert image_points.shape[1] == 2
-
-    # This should return a numpy ndarray with zero rows.
-    model = detector.get_model_points()
-    assert model.shape[0] == 0
+    with pytest.raises(ValueError) as excinfo:
+        _ = apd.ArucoPointDetector(dictionary, parameters, None)
+    assert 'model is None' in str(excinfo.value)
 
 
 def test_aruco_detector_with_model():
-    image = cv2.imread('tests/data/calibration/test-aruco.png')
+    image_file = 'tests/data/calibration/test-aruco.png'
+    model = _get_model_1()
+    image = cv2.imread(image_file)
     dictionary = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_ARUCO_ORIGINAL)
     parameters = cv2.aruco.DetectorParameters()
-
-    # The model should contain the ids and each 3D location for each model point.
-    # Here we just generate dummy data.
-    model = {}
-    for i in range(0, 2000):
-        model[i] = np.ones((1, 3))
-        model[i][0][0] = i * 2
-        model[i][0][1] = i * 3
-        model[i][0][2] = 0
-
     detector = apd.ArucoPointDetector(dictionary, parameters, model, (1, 1))
     ids, object_points, image_points = detector.get_points(image)
     assert ids.shape[0] == 12
@@ -50,29 +63,44 @@ def test_aruco_detector_with_model():
     assert object_points.shape[1] == 3
     assert image_points.shape[0] == 12
     assert image_points.shape[1] == 2
-    print('ArUco ids=' + str(ids))
-    print('ArUco object_points=' + str(object_points))
-    print('ArUco image_points=' + str(image_points))
-
     model = detector.get_model_points()
-    assert model.shape[0] == 2000
+    assert isinstance(model, dict)
+    assert len(model.keys()) == 12
+
+    annotated_image = pdu.get_annotated_image(image, ids, image_points)
+    cv2.imwrite(os.path.join("tests", "output", "test_aruco_detector_with_model.png"), annotated_image)
+
+    # Ordering is not obvious. However, the order of the ids
+    # should match the order of the image point and object point.
+    # But we don't know which tag comes out first.
+    # So, I've manually worked out the index of a few points.
+    assert ids[11] == 860
+    assert object_points[11][0] == 0
+    assert object_points[11][1] == 0
+    assert object_points[11][2] == 0
+    assert ids[9] == 759
+    assert object_points[9][0] == 20
+    assert object_points[9][1] == 0
+    assert object_points[9][2] == 0
+    assert ids[8] == 892
+    assert object_points[8][0] == 0
+    assert object_points[8][1] == 20
+    assert object_points[8][2] == 0
 
 
 def test_aruco_detector_with_point_not_in_model():
     image = cv2.imread('tests/data/calibration/test-aruco.png')
+    model = _get_model_1()
+    del model[1000]
     dictionary = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_ARUCO_ORIGINAL)
     parameters = cv2.aruco.DetectorParameters()
 
-    # The model should contain the ids and each 3D location for each model point.
-    # Here we just generate dummy data.
-    model = {}
-    for i in range(0, 2):
-        model[i] = np.ones((1, 3))
-        model[i][0][0] = i * 2
-        model[i][0][1] = i * 3
-        model[i][0][2] = 0
 
     detector = apd.ArucoPointDetector(dictionary, parameters, model, (1, 1))
-
-    with pytest.raises(KeyError):
-        _, _, _ = detector.get_points(image)
+    ids, object_points, image_points = detector.get_points(image)
+    assert ids.shape[0] == 11
+    assert ids.shape[1] == 1
+    assert object_points.shape[0] == 11
+    assert object_points.shape[1] == 3
+    assert image_points.shape[0] == 11
+    assert image_points.shape[1] == 2

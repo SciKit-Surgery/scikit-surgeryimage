@@ -28,6 +28,12 @@ def test_chessboard_detector():
     assert image_points[1][0] > image_points[0][0]
     assert image_points[13][1] > image_points[0][1]
 
+    model = detector.get_model_points()
+    assert isinstance(model, dict)
+    assert len(model.keys()) == 130
+    for i in range(130):
+        np.testing.assert_array_equal(model[i], object_points[i])
+
     # Here, we are testing that when we scale the image,
     # we get the same 2D points back (within tolerance).
     # This is because we sometimes use interlaced HD, which
@@ -39,9 +45,6 @@ def test_chessboard_detector():
     np.testing.assert_array_equal(ids, ids2)
     np.testing.assert_array_equal(object_points, object_points2)
     np.testing.assert_allclose(image_points, image_points2, 0.01, 2)
-
-    model = detector2.get_model_points()
-    assert model.shape[0] == 130
 
 
 def test_chessboard_detector_rotated_90():

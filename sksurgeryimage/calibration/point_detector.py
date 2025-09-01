@@ -9,8 +9,8 @@ e.g. Chessboard corners, SIFT points, Charuco points etc.
 import logging
 import copy
 from typing import Tuple
-import numpy as np
 import cv2
+import numpy as np
 
 LOGGER = logging.getLogger(__name__)
 
@@ -145,20 +145,21 @@ class PointDetector:
 
         :param image: numpy 2D grey scale image.
         :param is_distorted: False if the input image has already been \
-             undistorted.
+                undistorted. This is optional, and if the derived class does not
+                need it, it can be ignored.
         :return: ids, object_points, image_points as Nx[1,3,2] ndarrays
         """
         raise NotImplementedError()
 
-    def get_model_points(self):
+    def get_model_points(self) -> dict[int, np.ndarray]:
         """
-        Derived classes should override this, to detector returns the
-        complete model of 3D points. e.g. for a chessboard this would be
-        all the corners in chessboard coordinates (e.g. z=0).
+        Derived classes should override this.
 
-        By design, this can return an ndarray with zero rows, if the
-        detector does not support 3D coordinates.
+        The PointDetector should return a Dictionary of id:3D point as int:np.ndarray(1,3).
+        Normally, all points are planar, e.g. chessboard, so z=0. But you could
+        have calibration point in 3D, so we return a 3D point. e.g. ArUco points
+        on a non-planar surface.
 
-        :return: [Nx3] numpy ndarray representing model points.
+        :return: dict[int, np.ndarray(1, 3)]
         """
         raise NotImplementedError()
