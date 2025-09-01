@@ -13,7 +13,7 @@ from sksurgeryimage.calibration.point_detector import PointDetector
 
 LOGGER = logging.getLogger(__name__)
 
-
+# pylint: disable=too-many-arguments, too-many-instance-attributes
 class ChessboardPointDetector(PointDetector):
     """
     Class to detect chessboard points in a 2D grey scale video image.
@@ -22,8 +22,13 @@ class ChessboardPointDetector(PointDetector):
                  number_of_corners: Tuple[int, int],
                  square_size_in_mm: int,
                  scale: Tuple[float, float]=(1.0, 1.0),
-                 chessboard_flags: int=cv2.CALIB_CB_ADAPTIVE_THRESH+cv2.CALIB_CB_NORMALIZE_IMAGE+cv2.CALIB_CB_FILTER_QUADS,
-                 optimisation_criteria: Tuple[int, int, float]=(cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001)):
+                 chessboard_flags: int=cv2.CALIB_CB_ADAPTIVE_THRESH
+                                       + cv2.CALIB_CB_NORMALIZE_IMAGE
+                                       + cv2.CALIB_CB_FILTER_QUADS,
+                 optimisation_criteria: Tuple[int, int, float]=(cv2.TERM_CRITERIA_EPS
+                                                                + cv2.TERM_CRITERIA_MAX_ITER,
+                                                                30,
+                                                                0.001)):
         """
         Constructs a ChessboardPointDetector.
 

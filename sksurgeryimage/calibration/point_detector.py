@@ -47,6 +47,9 @@ class PointDetector:
     to improve the point detection process itself. It would be up to the
     derived class to decide how to use them, if at all.
 
+    See get_model_points() for how to return the 3D points, as Dict[int, np.ndarray(1,3)].
+    Derived classes must assign self.model_points in their constructor.
+
     :param scale: tuple (x scale, y scale) to scale up/down the image
     :param camera_intrinsics: [3x3] camera matrix
     :param distortion_coefficients: [1xn] distortion coefficients
@@ -101,7 +104,8 @@ class PointDetector:
         tmp_dc = copy.deepcopy(self.distortion_coefficients)
         return tmp_ci, tmp_dc
 
-    def get_points(self, image: np.ndarray, is_distorted:bool=True) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+    def get_points(self, image: np.ndarray, is_distorted:bool=True) \
+            -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
         """
         Client's call this method to extract points from an image.
 

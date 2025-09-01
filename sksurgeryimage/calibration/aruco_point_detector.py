@@ -67,11 +67,7 @@ class ArucoPointDetector(pd.PointDetector):
                                     self.dictionary,
                                     parameters=self.parameters)
 
-        # Check how many points we detected, whose id is in the model.
-        number_of_points = 0
-        for i in range(ids.shape[0]):
-            if ids[i][0] in self.model_points:
-                number_of_points += 1
+        number_of_points = pdu.get_number_of_points(ids, self.model_points)
 
         returned_ids = np.zeros((number_of_points, 1), dtype=np.int32)
         image_points = np.zeros((number_of_points, 2))

@@ -60,3 +60,16 @@ def get_intersect(a_1, a_2, b_1, b_2):
     if p_z == 0:  # lines are parallel
         return float('inf'), float('inf')
     return p_x/p_z, p_y/p_z
+
+
+def get_number_of_points(ids: np.ndarray,
+                         model: dict
+                         ):
+    """
+    Counts how many ids in ids (Nx1 ndarray), are in the model (dict of {id: 3D point},
+    """
+    number_of_points = 0
+    for i in range(ids.shape[0]):
+        if ids[i][0] in model:
+            number_of_points += 1
+    return number_of_points

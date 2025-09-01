@@ -7,7 +7,13 @@ import cv2
 import numpy as np
 
 
-def make_charuco_board(dictionary, number_of_squares, size, image_size, legacy_pattern=True, start_id=0):
+# pylint: disable=too-many-arguments
+def make_charuco_board(dictionary,
+                       number_of_squares,
+                       size,
+                       image_size,
+                       legacy_pattern: bool=True,
+                       start_id: int=0):
     """
     Generates a ChArUco pattern.
 

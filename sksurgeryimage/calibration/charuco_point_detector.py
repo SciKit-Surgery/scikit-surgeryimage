@@ -7,12 +7,13 @@ import logging
 import copy
 import numpy as np
 import cv2
+import sksurgeryimage.calibration.point_detector_utils as pdu
 from sksurgeryimage.calibration.point_detector import PointDetector
 from sksurgeryimage.calibration import charuco
 
 LOGGER = logging.getLogger(__name__)
 
-# pylint: disable=too-many-instance-attributes
+# pylint: disable=too-many-instance-attributes, too-many-locals
 class CharucoPointDetector(PointDetector):
     """
     Class to detect ChArUco points in a 2D video image.
@@ -40,7 +41,8 @@ class CharucoPointDetector(PointDetector):
         :param camera_matrix: OpenCV 3x3 camera calibration matrix
         :param distortion_coefficients: OpenCV distortion coefficients
         :param legacy_pattern: if True, uses OpenCV pre-4.6 ChArUco pattern
-        :param parameters: OpenCV aruco DetectorParameters, if None, will create reasonable defaults.
+        :param parameters: OpenCV aruco DetectorParameters, if None,
+               will create reasonable defaults.
         """
         super().__init__(scale=scale)
         if dictionary is None:
@@ -76,11 +78,13 @@ class CharucoPointDetector(PointDetector):
         number_of_chessboard_corners = len(chessboard_corners_3d)
         if number_of_chessboard_ids != number_of_chessboard_corners:
             raise ValueError(f"Number of chessboard ids {number_of_chessboard_ids}, "
-                             f"doesn't match number of chessboard corners {number_of_chessboard_ids}. ")
+                f"doesn't match number of chessboard corners {number_of_chessboard_ids}. ")
         for i in range(0, number_of_chessboard_ids):
             idx = chessboard_ids[i][0]
             if idx < 0 or idx >= number_of_chessboard_corners:
-                raise ValueError(f"chessboard id {idx} is out of range 0 to {number_of_chessboard_corners-1}")
+                raise ValueError(f"chessboard id {idx} is out of range "
+                                 f"0 to {number_of_chessboard_corners-1}")
+            # pylint: disable=unsubscriptable-object
             model_points[idx] = chessboard_corners_3d[idx]
         self.model_points = model_points
 
@@ -107,10 +111,7 @@ class CharucoPointDetector(PointDetector):
             and chessboard_ids is not None \
             and len(chessboard_corners) > 0 \
             and len(chessboard_ids) > 0:
-
-            for i in range(chessboard_ids.shape[0]):
-                if chessboard_ids[i][0] in self.model_points:
-                    number_of_points += 1
+            number_of_points = pdu.get_number_of_points(chessboard_ids, self.model_points)
 
         returned_ids = np.zeros((number_of_points, 1), dtype=np.int32)
         image_points = np.zeros((number_of_points, 2))

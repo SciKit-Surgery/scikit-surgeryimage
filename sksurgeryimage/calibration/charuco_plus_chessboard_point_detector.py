@@ -25,7 +25,7 @@ class CharucoPlusChessboardPointDetector(pd.PointDetector):
     Class to detect ChArUco points and Chessboard points
     in a 2D grey scale video image.
     """
-    # pylint: disable=too-many-arguments, too-many-locals
+    # pylint: disable=too-many-arguments, too-many-locals, too-many-statements
     def __init__(self,
                  dictionary: cv2.aruco.Dictionary,
                  number_of_charuco_squares=(19, 26),
@@ -43,8 +43,13 @@ class CharucoPlusChessboardPointDetector(pd.PointDetector):
                  error_if_no_charuco=False,
                  legacy_pattern=True,
                  parameters: cv2.aruco.DetectorParameters = None,
-                 chessboard_flags: int = cv2.CALIB_CB_ADAPTIVE_THRESH + cv2.CALIB_CB_NORMALIZE_IMAGE + cv2.CALIB_CB_FILTER_QUADS,
-                 optimisation_criteria: Tuple[int, int, float] = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001)
+                 chessboard_flags: int = cv2.CALIB_CB_ADAPTIVE_THRESH
+                                         + cv2.CALIB_CB_NORMALIZE_IMAGE
+                                         + cv2.CALIB_CB_FILTER_QUADS,
+                 optimisation_criteria: Tuple[int, int, float] = (cv2.TERM_CRITERIA_EPS
+                                                                  + cv2.TERM_CRITERIA_MAX_ITER,
+                                                                  30,
+                                                                  0.001)
                  ):
         """
         Constructs a CharucoPlusChessboardPointDetector.
@@ -66,7 +71,8 @@ class CharucoPlusChessboardPointDetector(pd.PointDetector):
         :param error_if_no_charuco: if True, throws Exception when
                no ChArUco tags are seen
         :param legacy_pattern: if True, uses OpenCV pre-4.6 ChArUco pattern
-        :param parameters: OpenCV aruco DetectorParameters, if None, will create reasonable defaults.
+        :param parameters: OpenCV aruco DetectorParameters,
+               if None, will create reasonable defaults.
         """
         super().__init__(scale=scale)
         self.number_of_charuco_squares = number_of_charuco_squares
@@ -111,7 +117,8 @@ class CharucoPlusChessboardPointDetector(pd.PointDetector):
 
             self.chessboard_point_detector = \
                 cbpd.ChessboardPointDetector(
-                    number_of_corners=(self.number_of_chessboard_squares[0] - 1, self.number_of_chessboard_squares[1] - 1),
+                    number_of_corners=(self.number_of_chessboard_squares[0] - 1,
+                                       self.number_of_chessboard_squares[1] - 1),
                     square_size_in_mm=self.chessboard_square_size,
                     chessboard_flags=chessboard_flags,
                     optimisation_criteria=optimisation_criteria
@@ -125,52 +132,67 @@ class CharucoPlusChessboardPointDetector(pd.PointDetector):
             chessboard_size=chessboard_square_size,
             legacy_pattern=legacy_pattern,
             start_id=start_id,
-            pixels_per_millimetre=(size_of_charuco_squares[0] * size_of_charuco_squares[1])
+            pixels_per_millimetre=(size_of_charuco_squares[0]
+                                   * size_of_charuco_squares[1])
         )
 
-        # Need to map between chessboard coordinates and ChArUco coordinates and keep them consistent.
+        # Need to map between chessboard coordinates and
+        # ChArUco coordinates and keep them consistent.
         self.rotation_matrix = np.eye(3)
         self.translation_vector = np.zeros((3, 1))
         if use_chessboard_inset:
-            _, chess_object_points, chess_image_points = self.chessboard_point_detector.get_points(self.reference_image)
+            _, chess_object_points, chess_image_points \
+                = self.chessboard_point_detector.get_points(self.reference_image)
 
-            # Pick 3 points, the origin, the furthest in x-axis, furthest in y-axis, in chessboard coords.
+            # Pick 3 points, the origin, the furthest in x-axis,
+            # furthest in y-axis, in chessboard coords.
             fixed_points = np.zeros((3,3))
             fixed_points[0][0] = chess_object_points[0][0]
             fixed_points[0][1] = chess_object_points[0][1]
             x_offset = number_of_chessboard_squares[0] - 2
             fixed_points[1][0] = chess_object_points[x_offset][0]
             fixed_points[1][1] = chess_object_points[x_offset][1]
-            y_offset = (number_of_chessboard_squares[0] - 1) * (number_of_chessboard_squares[1] - 2)
+            y_offset = ((number_of_chessboard_squares[0] - 1)
+                        * (number_of_chessboard_squares[1] - 2))
             fixed_points[2][0] = chess_object_points[y_offset][0]
             fixed_points[2][1] = chess_object_points[y_offset][1]
 
             # Now we need the SAME points in ChArUco coords.
-            _, charuco_object_points, charuco_image_points = self.charuco_point_detector.get_points(self.reference_image)
+            _, charuco_object_points, charuco_image_points = (
+                self.charuco_point_detector.get_points(self.reference_image))
             moving_points = np.zeros((3,3))
             charuco_origin_img = charuco_image_points[0]
             charuco_opposite_img = charuco_image_points[-1]
             charuco_origin_obj = charuco_object_points[0]
             charuco_opposite_obj = charuco_object_points[-1]
 
-            charuco_pix_per_mm_x = (charuco_origin_img[0] - charuco_opposite_img[0]) / (charuco_origin_obj[0] - charuco_opposite_obj[0])
-            charuco_pix_per_mm_y = (charuco_origin_img[1] - charuco_opposite_img[1]) / (charuco_origin_obj[1] - charuco_opposite_obj[1])
+            charuco_pix_per_mm_x = ((charuco_origin_img[0] - charuco_opposite_img[0])
+                                    / (charuco_origin_obj[0] - charuco_opposite_obj[0]))
+            charuco_pix_per_mm_y = ((charuco_origin_img[1] - charuco_opposite_img[1])
+                                    / (charuco_origin_obj[1] - charuco_opposite_obj[1]))
 
-            moving_points[0][0] = (chess_image_points[0][0] - charuco_origin_img[0]) / charuco_pix_per_mm_x + charuco_origin_obj[0]
-            moving_points[0][1] = (chess_image_points[0][1] - charuco_origin_img[1]) / charuco_pix_per_mm_y + charuco_origin_obj[1]
-            moving_points[1][0] = (chess_image_points[x_offset][0] - charuco_origin_img[0]) / charuco_pix_per_mm_x + charuco_origin_obj[0]
-            moving_points[1][1] = (chess_image_points[x_offset][1] - charuco_origin_img[1]) / charuco_pix_per_mm_y + charuco_origin_obj[1]
-            moving_points[2][0] = (chess_image_points[y_offset][0] - charuco_origin_img[0]) / charuco_pix_per_mm_x + charuco_origin_obj[0]
-            moving_points[2][1] = (chess_image_points[y_offset][1] - charuco_origin_img[1]) / charuco_pix_per_mm_y + charuco_origin_obj[1]
+            moving_points[0][0] = ((chess_image_points[0][0] - charuco_origin_img[0])
+                                   / charuco_pix_per_mm_x + charuco_origin_obj[0])
+            moving_points[0][1] = ((chess_image_points[0][1] - charuco_origin_img[1])
+                                   / charuco_pix_per_mm_y + charuco_origin_obj[1])
+            moving_points[1][0] = ((chess_image_points[x_offset][0] - charuco_origin_img[0])
+                                   / charuco_pix_per_mm_x + charuco_origin_obj[0])
+            moving_points[1][1] = ((chess_image_points[x_offset][1] - charuco_origin_img[1])
+                                   / charuco_pix_per_mm_y + charuco_origin_obj[1])
+            moving_points[2][0] = ((chess_image_points[y_offset][0] - charuco_origin_img[0])
+                                   / charuco_pix_per_mm_x + charuco_origin_obj[0])
+            moving_points[2][1] = ((chess_image_points[y_offset][1] - charuco_origin_img[1])
+                                   / charuco_pix_per_mm_y + charuco_origin_obj[1])
 
             # Do point-based rigid registration
-            self.rotation_matrix, self.translation_vector, fre = proc.orthogonal_procrustes(fixed=fixed_points, moving=moving_points)
+            self.rotation_matrix, self.translation_vector, fre \
+                = proc.orthogonal_procrustes(fixed=fixed_points, moving=moving_points)
             if fre > 0.01:
                 raise ValueError(f"High fiducial registration error when "
                                  f"registering chessboard to ChArUco: {fre:.2f}mm")
 
         # Run this detector on the reference image, to get a model of ALL the available points.
-        ids, object_points, image_points = self.get_points(self.reference_image)
+        ids, object_points, _ = self.get_points(self.reference_image)
         model_points = {}
         for i in range(0, ids.shape[0]):
             idx = ids[i][0]
@@ -211,7 +233,10 @@ class CharucoPlusChessboardPointDetector(pd.PointDetector):
             chess_ids = chess_ids + self.chessboard_id_offset
 
             # Map chessboard points into ChArUco space
-            chess_object_points = np.transpose(np.matmul(self.rotation_matrix, np.transpose(chess_object_points)) + self.translation_vector)
+            chess_object_points = np.transpose(
+                np.matmul(self.rotation_matrix, np.transpose(chess_object_points))
+                + self.translation_vector
+            )
 
             if charuco_ids.shape[0] == 0:
 
