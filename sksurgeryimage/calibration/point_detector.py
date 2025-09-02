@@ -8,8 +8,9 @@ e.g. Chessboard corners, SIFT points, Charuco points etc.
 
 import logging
 import copy
-import numpy as np
+from typing import Tuple
 import cv2
+import numpy as np
 
 LOGGER = logging.getLogger(__name__)
 
@@ -46,19 +47,23 @@ class PointDetector:
     to improve the point detection process itself. It would be up to the
     derived class to decide how to use them, if at all.
 
+    See get_model_points() for how to return the 3D points, as Dict[int, np.ndarray(1,3)].
+    Derived classes must assign self.model_points in their constructor.
+
     :param scale: tuple (x scale, y scale) to scale up/down the image
     :param camera_intrinsics: [3x3] camera matrix
     :param distortion_coefficients: [1xn] distortion coefficients
     """
     def __init__(self,
-                 scale=(1, 1),
-                 camera_intrinsics=None,
-                 distortion_coefficients=None):
+                 scale: Tuple[float, float]=(1, 1),
+                 camera_intrinsics: np.ndarray=None,
+                 distortion_coefficients: np.ndarray=None):
 
         self.scale = scale
         self.scale_x, self.scale_y = scale
         self.camera_intrinsics = None
         self.distortion_coefficients = None
+        self.model_points = None # But MUST be assigned in derived class.
         if camera_intrinsics is not None and distortion_coefficients is None:
             raise ValueError("camera_intrinsics is not None, "
                              "but distortion_coefficients are None??")
@@ -71,8 +76,8 @@ class PointDetector:
                                        distortion_coefficients)
 
     def set_camera_parameters(self,
-                              camera_intrinsics,
-                              distortion_coefficients):
+                              camera_intrinsics: np.ndarray,
+                              distortion_coefficients: np.ndarray):
         """
         Enables camera parameters to be set dynamically at run-time.
         Calls _validate_camera_parameters().
@@ -85,7 +90,7 @@ class PointDetector:
         self.camera_intrinsics = copy.deepcopy(camera_intrinsics)
         self.distortion_coefficients = copy.deepcopy(distortion_coefficients)
 
-    def get_camera_parameters(self):
+    def get_camera_parameters(self) -> Tuple[np.ndarray, np.ndarray]:
         """
         Returns a copy of the camera matrix, and distortion coefficients.
         Throws RuntimeError if either are None.
@@ -99,7 +104,8 @@ class PointDetector:
         tmp_dc = copy.deepcopy(self.distortion_coefficients)
         return tmp_ci, tmp_dc
 
-    def get_points(self, image, is_distorted=True):
+    def get_points(self, image: np.ndarray, is_distorted:bool=True) \
+            -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
         """
         Client's call this method to extract points from an image.
 
@@ -138,26 +144,25 @@ class PointDetector:
 
         return ids, object_points, image_points
 
-    def _internal_get_points(self, image, is_distorted=True):
+    def _internal_get_points(self, image: np.ndarray, is_distorted: bool=True):
         """
         Derived classes override this one.
 
         :param image: numpy 2D grey scale image.
         :param is_distorted: False if the input image has already been \
-             undistorted.
+                undistorted. This is optional, and if the derived class does not
+                need it, it can be ignored.
         :return: ids, object_points, image_points as Nx[1,3,2] ndarrays
         """
         raise NotImplementedError()
 
-    def get_model_points(self):
+    def get_model_points(self) -> dict[int, np.ndarray]:
         """
-        Derived classes should override this, to detector returns the
-        complete model of 3D points. e.g. for a chessboard this would be
-        all the corners in chessboard coordinates (e.g. z=0).
+        The PointDetector should return a Dictionary of id:3D point as int:np.ndarray(1,3).
+        Normally, all points are planar, e.g. chessboard, so z=0. But you could
+        have calibration point in 3D, so we return a 3D point. e.g. ArUco points
+        on a non-planar surface.
 
-        By design, this can return an ndarray with zero rows, if the
-        detector does not support 3D coordinates.
-
-        :return: [Nx3] numpy ndarray representing model points.
+        :return: dict[int, np.ndarray(1, 3)]
         """
-        raise NotImplementedError()
+        return copy.deepcopy(self.model_points)

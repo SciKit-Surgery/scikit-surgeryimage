@@ -38,6 +38,7 @@ def setup_dotty_metal_model():
             counter = counter + 1
     return model_points
 
+
 @pytest.fixture(scope="function")
 def setup_dotty_metal_model_OR():
     number_of_points = 18 * 25
@@ -53,6 +54,7 @@ def setup_dotty_metal_model_OR():
             model_points[counter][5] = 0
             counter = counter + 1
     return model_points
+
 
 @pytest.fixture(scope="function")
 def load_reference_charuco_chessboard_image():

@@ -6,7 +6,6 @@ Dotty Grid implementation of PointDetector.
 
 # pylint:disable=too-many-instance-attributes
 
-import copy
 import logging
 import cv2
 import numpy as np
@@ -15,9 +14,9 @@ from sksurgeryimage.calibration.point_detector import PointDetector
 LOGGER = logging.getLogger(__name__)
 
 
-def get_model_points(dots_rows_columns: (int, int),
-                     pixels_per_mm: int,
-                     dot_separation: float) -> np.ndarray:
+def create_model_points(dots_rows_columns: (int, int),
+                        pixels_per_mm: int,
+                        dot_separation: float) -> np.ndarray:
     """Generate the expected locations of dots in the pattern, in pixel space.
 
     :param dots_rows_columns: Number of rows, number of columns
@@ -400,6 +399,12 @@ class DottyGridPointDetector(PointDetector):
 
     def get_model_points(self):
         """
-        Returns a [Nx3] numpy ndarray representing the model points in 3D.
+        If you look in base class, this is expected to return Dict[int, np.ndarray]
         """
-        return copy.deepcopy(self.model_points[:, 3:6])
+        result_dict = {}
+        # pylint: disable=consider-using-enumerate
+        for i in range(len(self.model_points)):
+            point_id = int(self.model_points[i][0])
+            point_coords = self.model_points[i][3:6]
+            result_dict[point_id] = point_coords
+        return result_dict
