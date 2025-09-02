@@ -10,3 +10,7 @@
 # Mac Finder:
 .DS_Store
 
+# PyInstaller or docs
+build/
+dist/
+
