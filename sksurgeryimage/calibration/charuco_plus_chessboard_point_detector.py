@@ -208,7 +208,7 @@ class CharucoPlusChessboardPointDetector(pd.PointDetector):
         :return: ids, object_points, image_points as Nx[1,3,2] ndarrays
         """
         charuco_ids, charuco_object_points, charuco_image_points = \
-            self.charuco_point_detector.get_points(image)
+            self.charuco_point_detector.get_points(image, is_distorted=is_distorted)
 
         if self.error_if_no_charuco and charuco_ids.shape[0] == 0:
             raise ValueError("No ChArUco detected.")
@@ -221,7 +221,7 @@ class CharucoPlusChessboardPointDetector(pd.PointDetector):
             # With image: tests/data/calibration/pattern_4x4_19x26_5_4_with_inset_9_14.png,
             # origin is bottom right of chessboard image, with x left and y up.
             chess_ids, chess_object_points, chess_image_points = \
-                self.chessboard_point_detector.get_points(image)
+                self.chessboard_point_detector.get_points(image, is_distorted=is_distorted)
 
             if self.error_if_no_chessboard and chess_ids.shape[0] == 0:
                 raise ValueError("No chessboard detected.")

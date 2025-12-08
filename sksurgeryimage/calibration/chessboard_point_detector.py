@@ -67,12 +67,17 @@ class ChessboardPointDetector(PointDetector):
         :param image: numpy 2D grey scale image.
         :return: ids, object_points, image_points as Nx[1,3,2] ndarrays
         """
-        img_points = np.zeros((0, 2))
+        if (is_distorted
+            and self.camera_intrinsics is not None
+            and self.distortion_coefficients is not None):
+
+            image = cv2.undistort(image, self.camera_intrinsics, self.distortion_coefficients)
 
         ret, corners = cv2.findChessboardCorners(image,
                                                  self.number_of_corners,
                                                  self.chessboard_flags)
 
+        img_points = np.zeros((0, 2))
         if ret:
             img_points = cv2.cornerSubPix(image,
                                           corners,

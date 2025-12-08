@@ -102,8 +102,9 @@ class CharucoPointDetector(PointDetector):
             charuco.detect_charuco_points(self.dictionary,
                                           self.board,
                                           image,
-                                          self.camera_matrix,
-                                          self.distortion_coefficients)
+                                          is_distorted=is_distorted,
+                                          camera_matrix=self.camera_matrix,
+                                          distortion_coefficients=self.distortion_coefficients)
 
         # Check how many points we detected, whose id is in the model.
         number_of_points = 0
