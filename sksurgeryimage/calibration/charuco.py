@@ -47,6 +47,7 @@ def make_charuco_board(dictionary,
 def detect_charuco_points(dictionary: cv2.aruco.Dictionary,
                           board,
                           image,
+                          is_distorted: bool=True,
                           camera_matrix=None,
                           distortion_coefficients=None,
                           parameters: cv2.aruco.DetectorParameters=None):
@@ -57,6 +58,7 @@ def detect_charuco_points(dictionary: cv2.aruco.Dictionary,
     :param dictionary: aruco dictionary definition
     :param board: aruco board definition
     :param image: grey scale image in which to search
+    :param is_distorted: if True, image is distorted.
     :param camera_matrix: if specified, the 3x3 camera intrinsic matrix
     :param distortion_coefficients: if specified, the distortion coefficients
     :return: marker_corners, marker_ids, chessboard_corners, chessboard_ids
@@ -79,15 +81,26 @@ def detect_charuco_points(dictionary: cv2.aruco.Dictionary,
     if marker_corners:
 
         # pylint: disable=unpacking-non-sequence
-        _, chessboard_corners, chessboard_ids \
-            = cv2.aruco.interpolateCornersCharuco(
-                markerCorners=marker_corners,
-                markerIds=marker_ids,
-                image=image,
-                board=board,
-                cameraMatrix=camera_matrix,
-                distCoeffs=distortion_coefficients
-                )
+        if is_distorted:
+            _, chessboard_corners, chessboard_ids \
+                = cv2.aruco.interpolateCornersCharuco(
+                    markerCorners=marker_corners,
+                    markerIds=marker_ids,
+                    image=image,
+                    board=board,
+                    cameraMatrix=camera_matrix,
+                    distCoeffs=distortion_coefficients
+                    )
+        else:
+            _, chessboard_corners, chessboard_ids \
+                = cv2.aruco.interpolateCornersCharuco(
+                    markerCorners=marker_corners,
+                    markerIds=marker_ids,
+                    image=image,
+                    board=board,
+                    cameraMatrix=None,
+                    distCoeffs=None
+                    )
 
     return marker_corners,\
         marker_ids,\

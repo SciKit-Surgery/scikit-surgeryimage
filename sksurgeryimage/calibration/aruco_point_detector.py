@@ -61,6 +61,14 @@ class ArucoPointDetector(pd.PointDetector):
         :param image: numpy 2D grey scale image.
         :return: ids, object_points, image_points
         """
+        if (is_distorted
+            and self.camera_intrinsics is not None
+            and self.distortion_coefficients is not None):
+
+            image = cv2.undistort(image,
+                                  self.camera_intrinsics,
+                                  self.distortion_coefficients)
+
         # pylint: disable=unpacking-non-sequence
         corners, ids, _ = \
             cv2.aruco.detectMarkers(image,

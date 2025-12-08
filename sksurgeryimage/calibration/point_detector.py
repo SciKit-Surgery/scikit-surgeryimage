@@ -3,7 +3,7 @@
 """
 Base class for a PointDetector.
 
-e.g. Chessboard corners, SIFT points, Charuco points etc.
+e.g. Chessboard corners, ArUco points, Charuco points etc.
 """
 
 import logging
@@ -47,8 +47,9 @@ class PointDetector:
     to improve the point detection process itself. It would be up to the
     derived class to decide how to use them, if at all.
 
-    See get_model_points() for how to return the 3D points, as Dict[int, np.ndarray(1,3)].
-    Derived classes must assign self.model_points in their constructor.
+    See get_model_points() for how to return the 3D points, as
+    Dict[int, np.ndarray(1,3)]. Derived classes must assign self.model_points
+    in their constructor.
 
     :param scale: tuple (x scale, y scale) to scale up/down the image
     :param camera_intrinsics: [3x3] camera matrix
@@ -104,14 +105,20 @@ class PointDetector:
         tmp_dc = copy.deepcopy(self.distortion_coefficients)
         return tmp_ci, tmp_dc
 
-    def get_points(self, image: np.ndarray, is_distorted:bool=True) \
+    def get_points(self,
+                   image: np.ndarray,
+                   is_distorted:bool=True) \
             -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
         """
         Client's call this method to extract points from an image.
+        Remember that these PointDetectors could be used for camera
+        calibration, or other computer visions tasks. So, derived
+        classes must return accurate points. So, they should
+        deal with the is_distorted flag in an appropriate manner.
 
         :param image: numpy 2D RGB/grayscale image.
         :param is_distorted: False if the input image has already been \
-             undistorted.
+             undistorted, and True otherwise.
         :return: ids, object_points, image_points as Nx[1,3,2] ndarrays
         """
 
@@ -135,6 +142,7 @@ class PointDetector:
         else:
             resized = grey
 
+        # So, we pass the is_distorted flag through to derived classes.
         ids, object_points, image_points = \
             self._internal_get_points(resized, is_distorted=is_distorted)
 
@@ -150,8 +158,8 @@ class PointDetector:
 
         :param image: numpy 2D grey scale image.
         :param is_distorted: False if the input image has already been \
-                undistorted. This is optional, and if the derived class does not
-                need it, it can be ignored.
+                undistorted and True otherwise. Derived classes must deal \
+                with this flag appropriately and return accurate points.
         :return: ids, object_points, image_points as Nx[1,3,2] ndarrays
         """
         raise NotImplementedError()
@@ -161,7 +169,7 @@ class PointDetector:
         The PointDetector should return a Dictionary of id:3D point as int:np.ndarray(1,3).
         Normally, all points are planar, e.g. chessboard, so z=0. But you could
         have calibration point in 3D, so we return a 3D point. e.g. ArUco points
-        on a non-planar surface.
+        on a non-planar surface. Note: derived classes MUST populate self.model_points.
 
         :return: dict[int, np.ndarray(1, 3)]
         """
