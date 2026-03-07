@@ -16,7 +16,7 @@ def __write_annotated_image(image, ids, image_points, file_name):
     previous_dir = os.path.dirname(split_path[0])
     previous_dir = os.path.basename(previous_dir)
     base_name = os.path.basename(split_path[0])
-    output_file = os.path.join('tests/output', base_name + '_' + previous_dir + '_labelled.png')
+    output_file = os.path.join('tests/output', previous_dir + "_" + base_name + '_labelled.png')
     cv2.imwrite(output_file, image)
 
 
