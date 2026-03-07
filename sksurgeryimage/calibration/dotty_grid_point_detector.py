@@ -119,7 +119,7 @@ class DottyGridPointDetector(PointDetector):
         self.dot_detector_params.filterByConvexity = False
         self.dot_detector_params.filterByInertia = True
         self.dot_detector_params.filterByCircularity = True
-        self.dot_detector_params.minCircularity = 0.7
+        self.dot_detector_params.minCircularity = 0.5
         self.dot_detector_params.filterByArea = True
         self.dot_detector_params.minArea = self.min_area
         self.dot_detector_params.maxArea = self.max_area
