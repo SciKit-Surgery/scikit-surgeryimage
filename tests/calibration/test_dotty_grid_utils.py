@@ -24,7 +24,7 @@ def __check_real_image(model_points,
                        image_file_name,
                        intrinsics_file_name,
                        distortion_file_name,
-                       is_metal=False,
+                       is_daniil_prototype=False,
                        is_distorted=True
                        ):
     logging.basicConfig(level=logging.DEBUG)
@@ -34,7 +34,7 @@ def __check_real_image(model_points,
 
     size = (2600, 1900)
     fiducials = [133, 141, 308, 316]
-    if is_metal:
+    if is_daniil_prototype:
         fiducials = [69, 74, 149, 154]
         size = (1360, 1200)
 
