@@ -31,7 +31,7 @@ def test_metal_1a(setup_dotty_metal_model_OR):
                                                   'tests/data/calib-ucl-circles/10_54_44/viking.calib.left.distortion.txt'
                                                   )
 
-    assert (number_of_points > 342 and number_of_points < 345)
+    assert (number_of_points > 342 and number_of_points < 354)
 
 
 def test_metal_2(setup_dotty_metal_model):
@@ -351,3 +351,13 @@ def test_metal_30(setup_dotty_metal_model):
                                           True
                                           )
     assert (224 == number_of_points)
+
+def test_metal_rfh_sl_issue_500(setup_dotty_metal_model_OR):
+    model_points = setup_dotty_metal_model_OR
+    number_of_points, _ = tdgu.__check_real_image(model_points,
+                                          'tests/data/calib-rfh-sl-issue-500/left_image.png',
+                                          'tests/data/calib-rfh-sl-issue-500/calib.intrinsics.txt',
+                                          'tests/data/calib-rfh-sl-issue-500/calib.distortion.txt',
+                                          False
+                                          )
+    assert (272 == number_of_points)

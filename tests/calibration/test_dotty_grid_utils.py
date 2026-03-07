@@ -16,7 +16,7 @@ def __write_annotated_image(image, ids, image_points, file_name):
     previous_dir = os.path.dirname(split_path[0])
     previous_dir = os.path.basename(previous_dir)
     base_name = os.path.basename(split_path[0])
-    output_file = os.path.join('tests/output', base_name + '_' + previous_dir + '_labelled.png')
+    output_file = os.path.join('tests/output', previous_dir + "_" + base_name + '_labelled.png')
     cv2.imwrite(output_file, image)
 
 
@@ -24,7 +24,7 @@ def __check_real_image(model_points,
                        image_file_name,
                        intrinsics_file_name,
                        distortion_file_name,
-                       is_metal=False,
+                       is_daniil_prototype=False,
                        is_distorted=True
                        ):
     logging.basicConfig(level=logging.DEBUG)
@@ -34,7 +34,7 @@ def __check_real_image(model_points,
 
     size = (2600, 1900)
     fiducials = [133, 141, 308, 316]
-    if is_metal:
+    if is_daniil_prototype:
         fiducials = [69, 74, 149, 154]
         size = (1360, 1200)
 
