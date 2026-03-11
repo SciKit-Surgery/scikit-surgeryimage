@@ -184,28 +184,9 @@ class DottyGridPointDetector(PointDetector):
         # Note that keypoints and undistorted_keypoints
         # can be of different length
         if len(keypoints) > 4 and len(undistorted_keypoints) > 4:
-            number_of_keypoints = len(keypoints)
+
             number_of_undistorted_keypoints = len(undistorted_keypoints)
-
-            # These are for intermediate storage.
-            key_points = \
-                np.zeros((number_of_keypoints, 3))
-            undistorted_key_points = \
-                np.zeros((number_of_undistorted_keypoints, 3))
-
-            # Converting OpenCV keypoints to numpy key_points
-            counter = 0
-            for key in keypoints:
-                key_points[counter][0] = key.size
-                key_points[counter][1] = key.pt[0]
-                key_points[counter][2] = key.pt[1]
-                counter = counter + 1
-            counter = 0
-            for key in undistorted_keypoints:
-                undistorted_key_points[counter][0] = key.size
-                undistorted_key_points[counter][1] = key.pt[0]
-                undistorted_key_points[counter][2] = key.pt[1]
-                counter = counter + 1
+            undistorted_key_points = np.array([(p.size, p.pt[0], p.pt[1]) for p in undistorted_keypoints], dtype=np.float32)
 
             # Sort undistorted_key_points and pick biggest 4
             sorted_points = undistorted_key_points[
@@ -253,14 +234,9 @@ class DottyGridPointDetector(PointDetector):
                                          self.reference_image_size)
             warped_keypoints = detector.detect(warped)
             number_of_warped_keypoints = len(warped_keypoints)
-            warped_key_points = \
-                np.zeros((number_of_warped_keypoints, 3))
-            counter = 0
-            for key in warped_keypoints:
-                warped_key_points[counter][0] = key.size
-                warped_key_points[counter][1] = key.pt[0]
-                warped_key_points[counter][2] = key.pt[1]
-                counter = counter + 1
+            warped_key_points = np.array([(p.size, p.pt[0], p.pt[1]) for p in warped_keypoints],
+                                              dtype=np.float32)
+
             img_points = np.zeros((number_of_warped_keypoints, 2))
             object_points = np.zeros((number_of_warped_keypoints, 3))
             indexes = np.zeros((number_of_warped_keypoints, 1),
