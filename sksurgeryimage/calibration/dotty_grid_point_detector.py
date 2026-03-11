@@ -187,7 +187,8 @@ class DottyGridPointDetector(PointDetector):
             return default_return
 
         number_of_undistorted_keypoints = len(undistorted_keypoints)
-        undistorted_key_points = np.array([(p.size, p.pt[0], p.pt[1]) for p in undistorted_keypoints], dtype=np.float32)
+        undistorted_key_points = np.array([(p.size, p.pt[0], p.pt[1])
+                                           for p in undistorted_keypoints], dtype=np.float32)
 
         # Sort undistorted_key_points and pick biggest 4
         sorted_points = undistorted_key_points[
