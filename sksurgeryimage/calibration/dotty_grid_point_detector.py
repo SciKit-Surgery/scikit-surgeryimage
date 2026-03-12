@@ -259,6 +259,11 @@ class DottyGridPointDetector(PointDetector):
             cv2.perspectiveTransform(transformed_points,
                                      np.linalg.inv(homography))
 
+        ###################################################################
+        # Note: Start of block optimised by Google Gemini.
+        #       Check git history to find previous, loop-based solution.
+        ###################################################################
+
         # For each transformed point, find closest point in reference grid.
         warped_pts = np.array([p.pt for p in warped_keypoints], dtype=np.float32)
         model_xy = self.model_points[:, 1:3].astype(np.float32)
@@ -272,8 +277,12 @@ class DottyGridPointDetector(PointDetector):
         matched_points[:, 2:4] = self.model_points[best_ids, 1:3]
         min_dists = np.sqrt(np.min(dist_sq, axis=1))
         rms_error = np.mean(min_dists)
-        LOGGER.debug('Matching points to reference, RMS=%s', rms_error)
+        ###################################################################
+        # Note: End of block optimised by Google Gemini.
+        #       Check git history to find previous, loop-based solution.
+        ###################################################################
 
+        LOGGER.debug('Matching points to reference, RMS=%s', rms_error)
         if rms_error > self.rms_tolerance:
             LOGGER.warning('Matching points to reference, RMS too high')
             return default_return
@@ -284,6 +293,11 @@ class DottyGridPointDetector(PointDetector):
         img_points[:, 0:2] = flattened_inverted
 
         if is_distorted:
+            ###################################################################
+            # Note: Start of block optimised by Google Gemini.
+            #       Check git history to find previous, loop-based solution.
+            ###################################################################
+
             # Input image was a distorted image, so now we have to map
             # undistorted points back to distorted points.
             fx = self.camera_intrinsics[0, 0]
@@ -305,6 +319,10 @@ class DottyGridPointDetector(PointDetector):
             img_points = np.zeros((len(matched_points), 2), dtype=np.float32)
             img_points[:, 0] = dist_x * fx + cx
             img_points[:, 1] = dist_y * fy + cy
+            ###################################################################
+            # Note: End of block optimised by Google Gemini.
+            #       Check git history to find previous, loop-based solution.
+            ###################################################################
 
         _, unique_idxs, counts = \
             np.unique(indexes, return_index=True, return_counts=True)
