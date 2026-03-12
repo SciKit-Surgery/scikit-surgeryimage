@@ -183,219 +183,158 @@ class DottyGridPointDetector(PointDetector):
 
         # Note that keypoints and undistorted_keypoints
         # can be of different length
-        if len(keypoints) > 4 and len(undistorted_keypoints) > 4:
-            number_of_keypoints = len(keypoints)
-            number_of_undistorted_keypoints = len(undistorted_keypoints)
+        if len(keypoints) <= 4 or len(undistorted_keypoints) <= 4:
+            return default_return
 
-            # These are for intermediate storage.
-            key_points = \
-                np.zeros((number_of_keypoints, 3))
-            undistorted_key_points = \
-                np.zeros((number_of_undistorted_keypoints, 3))
+        number_of_undistorted_keypoints = len(undistorted_keypoints)
+        undistorted_key_points = np.array([(p.size, p.pt[0], p.pt[1])
+                                           for p in undistorted_keypoints], dtype=np.float32)
 
-            # Converting OpenCV keypoints to numpy key_points
-            counter = 0
-            for key in keypoints:
-                key_points[counter][0] = key.size
-                key_points[counter][1] = key.pt[0]
-                key_points[counter][2] = key.pt[1]
-                counter = counter + 1
-            counter = 0
-            for key in undistorted_keypoints:
-                undistorted_key_points[counter][0] = key.size
-                undistorted_key_points[counter][1] = key.pt[0]
-                undistorted_key_points[counter][2] = key.pt[1]
-                counter = counter + 1
+        # Sort undistorted_key_points and pick biggest 4
+        sorted_points = undistorted_key_points[
+            undistorted_key_points[:, 0].argsort()]
 
-            # Sort undistorted_key_points and pick biggest 4
-            sorted_points = undistorted_key_points[
-                undistorted_key_points[:, 0].argsort()]
+        biggest_four = np.zeros((4, 5))
+        counter = 0
+        for row_counter in range(number_of_undistorted_keypoints - 4,
+                                 number_of_undistorted_keypoints):
+            biggest_four[counter][0] = sorted_points[row_counter][1]
+            biggest_four[counter][1] = sorted_points[row_counter][2]
+            counter = counter + 1
 
-            biggest_four = np.zeros((4, 5))
-            counter = 0
-            for row_counter in range(number_of_undistorted_keypoints - 4,
-                                     number_of_undistorted_keypoints):
-                biggest_four[counter][0] = sorted_points[row_counter][1]
-                biggest_four[counter][1] = sorted_points[row_counter][2]
-                counter = counter + 1
+        LOGGER.debug('Biggest 4 points in undistorted image:%s',
+                     str(biggest_four))
 
-            LOGGER.debug('Biggest 4 points in undistorted image:%s',
-                         str(biggest_four))
+        # Labelling which points are below or to the right of the centroid,
+        # and assigning a score.
+        centroid = np.mean(biggest_four, axis=0)
 
-            # Labelling which points are below or to the right of the centroid,
-            # and assigning a score.
-            centroid = np.mean(biggest_four, axis=0)
+        for row_counter in range(4):
+            if biggest_four[row_counter][1] > centroid[1]:
+                biggest_four[row_counter][2] = 1
+            if biggest_four[row_counter][0] > centroid[0]:
+                biggest_four[row_counter][3] = 1
 
-            for row_counter in range(4):
-                if biggest_four[row_counter][1] > centroid[1]:
-                    biggest_four[row_counter][2] = 1
-                if biggest_four[row_counter][0] > centroid[0]:
-                    biggest_four[row_counter][3] = 1
+        for row_counter in range(4):
+            biggest_four[row_counter][4] = \
+                biggest_four[row_counter][2] * 2 \
+                + biggest_four[row_counter][3]
 
-            for row_counter in range(4):
-                biggest_four[row_counter][4] = \
-                    biggest_four[row_counter][2] * 2 \
-                    + biggest_four[row_counter][3]
+        # Then we sort by this score, so the fiducials are
+        # top left, top right, bottom left, bottom right.
+        sorted_fiducials = biggest_four[biggest_four[:, 4].argsort()]
 
-            # Then we sort by this score, so the fiducials are
-            # top left, top right, bottom left, bottom right.
-            sorted_fiducials = biggest_four[biggest_four[:, 4].argsort()]
+        # Find the homography between the distortion corrected points
+        # and the reference points, from an ideal face-on image.
+        homography, _ = \
+            cv2.findHomography(sorted_fiducials[:, 0:2],
+                               self.model_fiducials[:, 1:3])
 
-            # Find the homography between the distortion corrected points
-            # and the reference points, from an ideal face-on image.
-            homography, _ = \
-                cv2.findHomography(sorted_fiducials[:, 0:2],
-                                   self.model_fiducials[:, 1:3])
+        # Warp image to cannonical face on.
+        warped = cv2.warpPerspective(undistorted_image,
+                                     homography,
+                                     self.reference_image_size)
+        warped_keypoints = detector.detect(warped)
+        number_of_warped_keypoints = len(warped_keypoints)
+        warped_key_points = np.array([(p.size, p.pt[0], p.pt[1])
+                                      for p in warped_keypoints], dtype=np.float32)
+        img_points = np.zeros((number_of_warped_keypoints, 2))
 
-            # Warp image to cannonical face on.
-            warped = cv2.warpPerspective(undistorted_image,
-                                         homography,
-                                         self.reference_image_size)
-            warped_keypoints = detector.detect(warped)
-            number_of_warped_keypoints = len(warped_keypoints)
-            warped_key_points = \
-                np.zeros((number_of_warped_keypoints, 3))
-            counter = 0
-            for key in warped_keypoints:
-                warped_key_points[counter][0] = key.size
-                warped_key_points[counter][1] = key.pt[0]
-                warped_key_points[counter][2] = key.pt[1]
-                counter = counter + 1
-            img_points = np.zeros((number_of_warped_keypoints, 2))
-            object_points = np.zeros((number_of_warped_keypoints, 3))
-            indexes = np.zeros((number_of_warped_keypoints, 1),
-                               dtype=np.int16)
-            matched_points = \
-                np.zeros((number_of_warped_keypoints, 4))
+        # Note, warped_key_points and undistorted_key_points
+        # have different order.
 
-            # Note, warped_key_points and undistorted_key_points
-            # have different order.
+        float_array = warped_key_points[:, 1:3] \
+            .astype(np.float32) \
+            .reshape(-1, 1, 2)
 
-            float_array = warped_key_points[:, 1:3] \
-                .astype(np.float32) \
-                .reshape(-1, 1, 2)
+        transformed_points = \
+            cv2.perspectiveTransform(float_array,
+                                     np.eye(3))
 
-            transformed_points = \
-                cv2.perspectiveTransform(float_array,
-                                         np.eye(3))
+        if transformed_points is None:
+            LOGGER.info("transformed_points is None, skipping")
+            return default_return
 
-            if transformed_points is None:
-                LOGGER.info("transformed_points is None, skipping")
-                return default_return
+        inverted_points = \
+            cv2.perspectiveTransform(transformed_points,
+                                     np.linalg.inv(homography))
 
-            inverted_points = \
-                cv2.perspectiveTransform(transformed_points,
-                                         np.linalg.inv(homography))
+        ###################################################################
+        # Note: Start of block optimised by Google Gemini.
+        #       Check git history to find previous, loop-based solution.
+        ###################################################################
 
-            # For each transformed point, find closest point in reference grid.
-            rms_error = 0
-            counter = 0
-            for transformed_point in transformed_points:
-                best_distance_so_far = np.finfo('d').max
-                best_id_so_far = -1
-                for model_point_counter in range(self.model_points.shape[0]):
-                    sq_dist = (self.model_points[model_point_counter][1]
-                               - transformed_point[0][0]) \
-                            * (self.model_points[model_point_counter][1]
-                               - transformed_point[0][0]) \
-                            + (self.model_points[model_point_counter][2]
-                               - transformed_point[0][1]) \
-                            * (self.model_points[model_point_counter][2]
-                               - transformed_point[0][1])
+        # For each transformed point, find closest point in reference grid.
+        warped_pts = np.array([p.pt for p in warped_keypoints], dtype=np.float32)
+        model_xy = self.model_points[:, 1:3].astype(np.float32)
+        diff = warped_pts[:, np.newaxis, :] - model_xy[np.newaxis, :, :]
+        dist_sq = np.sum(diff ** 2, axis=2)
+        best_ids = np.argmin(dist_sq, axis=1)
+        indexes = self.model_points[best_ids, 0].reshape(-1, 1).astype(np.int16)
+        object_points = self.model_points[best_ids, 3:6]
+        matched_points = np.zeros((len(warped_pts), 4), dtype=np.float32)
+        matched_points[:, 0:2] = warped_pts
+        matched_points[:, 2:4] = self.model_points[best_ids, 1:3]
+        min_dists = np.sqrt(np.min(dist_sq, axis=1))
+        rms_error = np.mean(min_dists)
+        ###################################################################
+        # Note: End of block optimised by Google Gemini.
+        #       Check git history to find previous, loop-based solution.
+        ###################################################################
 
-                    if sq_dist < best_distance_so_far:
-                        best_id_so_far = model_point_counter
-                        best_distance_so_far = sq_dist
+        LOGGER.debug('Matching points to reference, RMS=%s', rms_error)
+        if rms_error > self.rms_tolerance:
+            LOGGER.warning('Matching points to reference, RMS too high')
+            return default_return
 
-                indexes[counter] = self.model_points[best_id_so_far][0]
-                object_points[counter][0] = self.model_points[best_id_so_far][3]
-                object_points[counter][1] = self.model_points[best_id_so_far][4]
-                object_points[counter][2] = self.model_points[best_id_so_far][5]
-                matched_points[counter][0] = \
-                    warped_key_points[counter][1]
-                matched_points[counter][1] = \
-                    warped_key_points[counter][2]
-                matched_points[counter][2] = \
-                    self.model_points[best_id_so_far][1]
-                matched_points[counter][3] = \
-                    self.model_points[best_id_so_far][2]
-                rms_error = rms_error + best_distance_so_far
-                counter = counter + 1
+        # Now copy inverted points into matched_points
+        flattened_inverted = inverted_points.reshape(-1, 2)
+        matched_points[:, 0:2] = flattened_inverted
+        img_points[:, 0:2] = flattened_inverted
 
-            # Compute total RMS error, to see if fit was good enough.
-            rms_error = rms_error / number_of_undistorted_keypoints
-            rms_error = np.sqrt(rms_error)
+        if is_distorted:
+            ###################################################################
+            # Note: Start of block optimised by Google Gemini.
+            #       Check git history to find previous, loop-based solution.
+            ###################################################################
 
-            LOGGER.debug('Matching points to reference, RMS=%s', rms_error)
+            # Input image was a distorted image, so now we have to map
+            # undistorted points back to distorted points.
+            fx = self.camera_intrinsics[0, 0]
+            fy = self.camera_intrinsics[1, 1]
+            cx = self.camera_intrinsics[0, 2]
+            cy = self.camera_intrinsics[1, 2]
 
-            if rms_error > self.rms_tolerance:
-                LOGGER.warning('Matching points to reference, RMS too high')
-                return np.zeros((0, 1)), np.zeros((0, 3)), np.zeros((0, 2))
+            rel_x = (matched_points[:, 0] - cx) / fx
+            rel_y = (matched_points[:, 1] - cy) / fy
+            r2 = rel_x**2 + rel_y**2
+            r4 = r2 ** 2
+            r6 = r2 * r4
+            k1, k2, p1, p2, k3 = self.distortion_coefficients
 
-            # Now copy inverted points into matched_points
-            # pylint: disable=consider-using-enumerate
-            for counter in range(len(inverted_points)):
-                matched_points[counter][0] = inverted_points[counter][0][0]
-                matched_points[counter][1] = inverted_points[counter][0][1]
-                img_points[counter][0] = inverted_points[counter][0][0]
-                img_points[counter][1] = inverted_points[counter][0][1]
+            radial = 1 + k1 * r2 + k2 * r4 + k3 * r6
 
-            if is_distorted:
-                # Input image was a distorted image, so now we have to map
-                # undistorted points back to distorted points.
-                for counter in range(number_of_warped_keypoints):
-                    # Distort point to match original input image.
-                    relative_x = (matched_points[counter][0]
-                                  - self.camera_intrinsics[0][2]) \
-                                 / self.camera_intrinsics[0][0]
-                    relative_y = (matched_points[counter][1]
-                                  - self.camera_intrinsics[1][2]) \
-                                 / self.camera_intrinsics[1][1]
-                    r2 = relative_x * relative_x + relative_y * relative_y
-                    radial = (1
-                              + self.distortion_coefficients[0] * r2
-                              + self.distortion_coefficients[1] * r2 * r2
-                              + self.distortion_coefficients[4] * r2 * r2 * r2
-                              )
-                    distorted_x = relative_x * radial
-                    distorted_y = relative_y * radial
+            dist_x = rel_x * radial + (2 * p1 * rel_x * rel_y + p2 * (r2 + 2 * rel_x**2))
+            dist_y = rel_y * radial + (p1 * (r2 + 2 * rel_y**2) + 2 * p2 * rel_x * rel_y)
+            img_points = np.zeros((len(matched_points), 2), dtype=np.float32)
+            img_points[:, 0] = dist_x * fx + cx
+            img_points[:, 1] = dist_y * fy + cy
+            ###################################################################
+            # Note: End of block optimised by Google Gemini.
+            #       Check git history to find previous, loop-based solution.
+            ###################################################################
 
-                    distorted_x = distorted_x + (
-                        2 * self.distortion_coefficients[2]
-                        * relative_x * relative_y
-                        + self.distortion_coefficients[3]
-                        * (r2 + 2
-                           * relative_x
-                           * relative_x))
+        _, unique_idxs, counts = \
+            np.unique(indexes, return_index=True, return_counts=True)
 
-                    distorted_y = distorted_y + (
-                        self.distortion_coefficients[2]
-                        * (r2 + 2 * relative_y
-                           * relative_y)
-                        + 2 *
-                        self.distortion_coefficients[3]
-                        * relative_x * relative_y)
+        unique_idxs = unique_idxs[counts == 1]
 
-                    distorted_x = distorted_x * self.camera_intrinsics[0][0] \
-                                  + self.camera_intrinsics[0][2]
-                    distorted_y = distorted_y * self.camera_intrinsics[1][1] \
-                                  + self.camera_intrinsics[1][2]
+        indexes = indexes[unique_idxs]
+        object_points = object_points[unique_idxs]
+        img_points = img_points[unique_idxs]
 
-                    img_points[counter][0] = distorted_x
-                    img_points[counter][1] = distorted_y
+        return indexes, object_points, img_points
 
-            _, unique_idxs, counts = \
-                np.unique(indexes, return_index=True, return_counts=True)
-
-            unique_idxs = unique_idxs[counts == 1]
-
-            indexes = indexes[unique_idxs]
-            object_points = object_points[unique_idxs]
-            img_points = img_points[unique_idxs]
-
-            return indexes, object_points, img_points
-
-        return default_return
 
     def get_model_points(self):
         """
