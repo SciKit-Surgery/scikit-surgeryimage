@@ -98,7 +98,7 @@ def detect_charuco_points(dictionary: cv2.aruco.Dictionary,
                     markerIds=marker_ids,
                     image=image,
                     board=board,
-                    cameraMatrix=None,
+                    cameraMatrix=camera_matrix,
                     distCoeffs=None
                     )
 
