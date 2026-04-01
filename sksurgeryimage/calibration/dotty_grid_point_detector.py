@@ -236,6 +236,9 @@ class DottyGridPointDetector(PointDetector):
                                      self.reference_image_size)
         warped_keypoints = detector.detect(warped)
         number_of_warped_keypoints = len(warped_keypoints)
+        if number_of_warped_keypoints == 0:
+            LOGGER.warning("No points detected in warped image.")
+            return default_return
         warped_key_points = np.array([(p.size, p.pt[0], p.pt[1])
                                       for p in warped_keypoints], dtype=np.float32)
         img_points = np.zeros((number_of_warped_keypoints, 2))
