@@ -44,7 +44,9 @@ class CharucoPointDetector(PointDetector):
         :param parameters: OpenCV aruco DetectorParameters, if None,
                will create reasonable defaults.
         """
-        super().__init__(scale=scale)
+        super().__init__(scale=scale,
+                         camera_intrinsics=camera_matrix,
+                         distortion_coefficients=distortion_coefficients)
         if dictionary is None:
             raise ValueError("dictionary is None")
         self.dictionary = dictionary
@@ -52,8 +54,6 @@ class CharucoPointDetector(PointDetector):
         self.number_in_x = self.number_of_squares[0] - 1
         self.number_in_y = self.number_of_squares[1] - 1
         self.size = size
-        self.camera_matrix = camera_matrix
-        self.distortion_coefficients = distortion_coefficients
         self.parameters = parameters
         self.total_number_of_points = self.number_in_x * self.number_in_y
 
@@ -70,7 +70,7 @@ class CharucoPointDetector(PointDetector):
         _, _, _, chessboard_ids = charuco.detect_charuco_points(self.dictionary,
                                                                 self.board,
                                                                 self.reference_image,
-                                                                self.camera_matrix,
+                                                                self.camera_intrinsics,
                                                                 self.distortion_coefficients,
                                                                 self.parameters)
         chessboard_corners_3d = self.board.getChessboardCorners()
@@ -103,7 +103,7 @@ class CharucoPointDetector(PointDetector):
                                           self.board,
                                           image,
                                           is_distorted=is_distorted,
-                                          camera_matrix=self.camera_matrix,
+                                          camera_matrix=self.camera_intrinsics,
                                           distortion_coefficients=self.distortion_coefficients)
 
         # Check how many points we detected, whose id is in the model.

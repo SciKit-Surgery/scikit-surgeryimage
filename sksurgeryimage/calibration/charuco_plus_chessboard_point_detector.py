@@ -74,7 +74,9 @@ class CharucoPlusChessboardPointDetector(pd.PointDetector):
         :param parameters: OpenCV aruco DetectorParameters,
                if None, will create reasonable defaults.
         """
-        super().__init__(scale=scale)
+        super().__init__(scale=scale,
+                         camera_intrinsics=camera_matrix,
+                         distortion_coefficients=distortion_coeff)
         self.number_of_charuco_squares = number_of_charuco_squares
         self.size_of_charuco_squares = size_of_charuco_squares
         self.minimum_number_of_points = minimum_number_of_points
