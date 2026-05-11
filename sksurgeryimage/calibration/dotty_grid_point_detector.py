@@ -58,7 +58,6 @@ class DottyGridPointDetector(PointDetector):
                  camera_intrinsics,
                  distortion_coefficients,
                  scale=(1, 1),
-                 reference_image_size=None,
                  rms=30,
                  gaussian_sigma=5,
                  threshold_window_size=151,
@@ -84,7 +83,6 @@ class DottyGridPointDetector(PointDetector):
         :param camera_intrinsics: 3x3 ndarray of camera intrinsics
         :param distortion_coefficients: 1x5 ndarray of distortion coeffs.
         :param scale: if you want to resize the image, specify scale factors
-        :param reference_image_size: used to warp undistorted image to reference
         :param rms: max root mean square error when finding grid points
         :param gaussian_sigma: sigma for Gaussian blurring
         :param threshold_window_size: window size for adaptive thresholding
@@ -101,13 +99,10 @@ class DottyGridPointDetector(PointDetector):
 
         if len(list_of_indexes) != 4:
             raise ValueError('list_of_index not of length 4')
-        if reference_image_size is None:
-            raise ValueError('You must provide a reference image size')
 
         self.model_points = model_points
         self.list_of_indexes = list_of_indexes
         self.model_fiducials = self.model_points[self.list_of_indexes]
-        self.reference_image_size = reference_image_size
         self.rms_tolerance = rms
         self.gaussian_sigma = gaussian_sigma
         self.threshold_window_size = threshold_window_size
@@ -127,6 +122,8 @@ class DottyGridPointDetector(PointDetector):
         if dot_detector_params is not None:
             self.dot_detector_params = dot_detector_params
 
+        self.detector = cv2.SimpleBlobDetector_create(self.dot_detector_params)
+
     def _internal_get_points(self, image, is_distorted=True):
         """
         Extracts points.
@@ -137,11 +134,9 @@ class DottyGridPointDetector(PointDetector):
         :return: ids, object_points, image_points as Nx[1,3,2] ndarrays
         """
 
-        # pylint:disable=too-many-locals, invalid-name, too-many-branches
-        # pylint:disable=too-many-statements
+        # pylint:disable=too-many-locals, invalid-name
+        # pylint:disable=too-many-statements, too-many-function-args
 
-        # If we didn't find all points, of the fit was poor,
-        # return a consistent set of 'nothing'
         default_return = np.zeros((0, 1)), np.zeros((0, 3)), np.zeros((0, 2))
 
         smoothed = cv2.GaussianBlur(image,
@@ -155,58 +150,45 @@ class DottyGridPointDetector(PointDetector):
                                             self.threshold_window_size,
                                             self.threshold_offset)
 
-        # Detect points in the distorted image
-        detector = cv2.SimpleBlobDetector_create(self.dot_detector_params)
-        keypoints = detector.detect(thresholded)
+        # Single blob detection on the smoothed, thresholded image.
+        keypoints = self.detector.detect(thresholded)
 
-        # If input image is distorted, undistort and also detect points
-        # in undistorted image.
-        if is_distorted:
-            undistorted_image = cv2.undistort(smoothed,
-                                              self.camera_intrinsics,
-                                              self.distortion_coefficients
-                                              )
-
-            undistorted_thresholded = \
-                cv2.adaptiveThreshold(undistorted_image,
-                                      255,
-                                      cv2.ADAPTIVE_THRESH_MEAN_C,
-                                      cv2.THRESH_BINARY,
-                                      self.threshold_window_size,
-                                      self.threshold_offset)
-
-            undistorted_keypoints = detector.detect(undistorted_thresholded)
-
-        else:
-            undistorted_image = image
-            undistorted_keypoints = keypoints
-
-        # Note that keypoints and undistorted_keypoints
-        # can be of different length
-        if len(keypoints) <= 4 or len(undistorted_keypoints) <= 4:
+        if len(keypoints) <= 4:
             return default_return
 
-        number_of_undistorted_keypoints = len(undistorted_keypoints)
-        undistorted_key_points = np.array([(p.size, p.pt[0], p.pt[1])
-                                           for p in undistorted_keypoints], dtype=np.float32)
+        # Extract keypoint coordinates (distorted image space).
+        distorted_pts = np.array([p.pt for p in keypoints],
+                                 dtype=np.float32)
+        keypoint_sizes = np.array([p.size for p in keypoints],
+                                  dtype=np.float32)
 
-        # Sort undistorted_key_points and pick biggest 4
-        sorted_points = undistorted_key_points[
-            undistorted_key_points[:, 0].argsort()]
+        # Get points in undistorted space for homography estimation.
+        if is_distorted:
+            pts_for_homography = cv2.undistortPoints(
+                distorted_pts.reshape(-1, 1, 2),
+                self.camera_intrinsics,
+                self.distortion_coefficients,
+                P=self.camera_intrinsics
+            ).reshape(-1, 2)
+        else:
+            pts_for_homography = distorted_pts
+
+        # Sort by size and pick biggest 4 as fiducials.
+        number_of_keypoints = len(keypoints)
+        sorted_indices = keypoint_sizes.argsort()
 
         biggest_four = np.zeros((4, 5))
         counter = 0
-        for row_counter in range(number_of_undistorted_keypoints - 4,
-                                 number_of_undistorted_keypoints):
-            biggest_four[counter][0] = sorted_points[row_counter][1]
-            biggest_four[counter][1] = sorted_points[row_counter][2]
-            counter = counter + 1
+        for idx in sorted_indices[number_of_keypoints - 4:]:
+            biggest_four[counter][0] = pts_for_homography[idx, 0]
+            biggest_four[counter][1] = pts_for_homography[idx, 1]
+            counter += 1
 
-        LOGGER.debug('Biggest 4 points in undistorted image:%s',
+        LOGGER.debug('Biggest 4 points in undistorted space:%s',
                      str(biggest_four))
 
-        # Labelling which points are below or to the right of the centroid,
-        # and assigning a score.
+        # Label which points are below or to the right of the centroid,
+        # and assign a score for ordering.
         centroid = np.mean(biggest_four, axis=0)
 
         for row_counter in range(4):
@@ -220,113 +202,50 @@ class DottyGridPointDetector(PointDetector):
                 biggest_four[row_counter][2] * 2 \
                 + biggest_four[row_counter][3]
 
-        # Then we sort by this score, so the fiducials are
-        # top left, top right, bottom left, bottom right.
+        # Sort so fiducials are: top-left, top-right, bottom-left,
+        # bottom-right.
         sorted_fiducials = biggest_four[biggest_four[:, 4].argsort()]
 
-        # Find the homography between the distortion corrected points
-        # and the reference points, from an ideal face-on image.
+        # Find homography from undistorted fiducials to reference grid.
         homography, _ = \
             cv2.findHomography(sorted_fiducials[:, 0:2],
                                self.model_fiducials[:, 1:3])
 
-        # Warp image to cannonical face on.
-        warped = cv2.warpPerspective(undistorted_image,
-                                     homography,
-                                     self.reference_image_size)
-        warped_keypoints = detector.detect(warped)
-        number_of_warped_keypoints = len(warped_keypoints)
-        if number_of_warped_keypoints == 0:
-            LOGGER.warning("No points detected in warped image.")
-            return default_return
-        warped_key_points = np.array([(p.size, p.pt[0], p.pt[1])
-                                      for p in warped_keypoints], dtype=np.float32)
-        img_points = np.zeros((number_of_warped_keypoints, 2))
-
-        # Note, warped_key_points and undistorted_key_points
-        # have different order.
-
-        float_array = warped_key_points[:, 1:3] \
-            .astype(np.float32) \
-            .reshape(-1, 1, 2)
-
-        transformed_points = \
-            cv2.perspectiveTransform(float_array,
-                                     np.eye(3))
-
-        if transformed_points is None:
-            LOGGER.info("transformed_points is None, skipping")
+        if homography is None:
+            LOGGER.warning("Could not compute homography.")
             return default_return
 
-        inverted_points = \
-            cv2.perspectiveTransform(transformed_points,
-                                     np.linalg.inv(homography))
+        # Warp all undistorted points into reference space using
+        # perspectiveTransform (instead of warping the whole image).
+        warped_pts = cv2.perspectiveTransform(
+            pts_for_homography.reshape(-1, 1, 2),
+            homography
+        ).reshape(-1, 2)
 
-        ###################################################################
-        # Note: Start of block optimised by Google Gemini.
-        #       Check git history to find previous, loop-based solution.
-        ###################################################################
-
-        # For each transformed point, find closest point in reference grid.
-        warped_pts = np.array([p.pt for p in warped_keypoints], dtype=np.float32)
+        # Match each warped point to the nearest reference grid point.
         model_xy = self.model_points[:, 1:3].astype(np.float32)
         diff = warped_pts[:, np.newaxis, :] - model_xy[np.newaxis, :, :]
         dist_sq = np.sum(diff ** 2, axis=2)
         best_ids = np.argmin(dist_sq, axis=1)
-        indexes = self.model_points[best_ids, 0].reshape(-1, 1).astype(np.int16)
+
+        indexes = self.model_points[best_ids, 0] \
+            .reshape(-1, 1).astype(np.int16)
         object_points = self.model_points[best_ids, 3:6]
-        matched_points = np.zeros((len(warped_pts), 4), dtype=np.float32)
-        matched_points[:, 0:2] = warped_pts
-        matched_points[:, 2:4] = self.model_points[best_ids, 1:3]
+
         min_dists = np.sqrt(np.min(dist_sq, axis=1))
         rms_error = np.mean(min_dists)
-        ###################################################################
-        # Note: End of block optimised by Google Gemini.
-        #       Check git history to find previous, loop-based solution.
-        ###################################################################
 
         LOGGER.debug('Matching points to reference, RMS=%s', rms_error)
         if rms_error > self.rms_tolerance:
             LOGGER.warning('Matching points to reference, RMS too high')
             return default_return
 
-        # Now copy inverted points into matched_points
-        flattened_inverted = inverted_points.reshape(-1, 2)
-        matched_points[:, 0:2] = flattened_inverted
-        img_points[:, 0:2] = flattened_inverted
+        # The image points are the original detected coordinates.
+        # These are in the distorted input image space (or undistorted
+        # if is_distorted=False), which is what the caller expects.
+        img_points = distorted_pts.copy()
 
-        if is_distorted:
-            ###################################################################
-            # Note: Start of block optimised by Google Gemini.
-            #       Check git history to find previous, loop-based solution.
-            ###################################################################
-
-            # Input image was a distorted image, so now we have to map
-            # undistorted points back to distorted points.
-            fx = self.camera_intrinsics[0, 0]
-            fy = self.camera_intrinsics[1, 1]
-            cx = self.camera_intrinsics[0, 2]
-            cy = self.camera_intrinsics[1, 2]
-
-            rel_x = (matched_points[:, 0] - cx) / fx
-            rel_y = (matched_points[:, 1] - cy) / fy
-            r2 = rel_x**2 + rel_y**2
-            r4 = r2 ** 2
-            r6 = r2 * r4
-            k1, k2, p1, p2, k3 = self.distortion_coefficients
-
-            radial = 1 + k1 * r2 + k2 * r4 + k3 * r6
-
-            dist_x = rel_x * radial + (2 * p1 * rel_x * rel_y + p2 * (r2 + 2 * rel_x**2))
-            dist_y = rel_y * radial + (p1 * (r2 + 2 * rel_y**2) + 2 * p2 * rel_x * rel_y)
-            img_points = np.zeros((len(matched_points), 2), dtype=np.float32)
-            img_points[:, 0] = dist_x * fx + cx
-            img_points[:, 1] = dist_y * fy + cy
-            ###################################################################
-            # Note: End of block optimised by Google Gemini.
-            #       Check git history to find previous, loop-based solution.
-            ###################################################################
-
+        # Remove duplicate ID assignments, keeping only unique matches.
         _, unique_idxs, counts = \
             np.unique(indexes, return_index=True, return_counts=True)
 
