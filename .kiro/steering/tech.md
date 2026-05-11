@@ -28,22 +28,26 @@
 
 ## Common Commands
 
+The tox `test` environment creates a virtualenv at `.tox/test/` with all dependencies installed. To run tests directly without re-creating the venv, use `.tox/test/bin/python3`:
+
 ```bash
-# Run tests with coverage
+# Run tests with coverage (full tox, creates/reuses venv)
 tox -e test
 
-# Run linting
+# Run linting (full tox)
 tox -e lint
 
 # Build docs
 tox -e docs
 
-# Run tests directly (without tox)
-coverage run -a --source ./sksurgeryimage -m pytest -v -s ./tests/
-coverage report -m
+# Run tests directly using the tox venv (fast, skips venv setup)
+.tox/test/bin/python3 -m pytest -v -s ./tests/
 
-# Lint directly
-pylint --rcfile=tests/pylintrc --ignore _version.py sksurgeryimage
+# Run a specific test file
+.tox/test/bin/python3 -m pytest -v -s ./tests/calibration/test_dotty_grid_point_detector.py
+
+# Lint directly using the tox venv
+.tox/test/bin/python3 -m pylint --rcfile=tests/pylintrc --ignore _version.py sksurgeryimage
 
 # Install in development mode
 pip install -e .
