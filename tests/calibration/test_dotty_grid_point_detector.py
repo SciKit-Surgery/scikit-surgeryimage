@@ -28,9 +28,6 @@ def test_tutorial_stuff():
     # Location of the large dots in the pattern
     fiducial_indexes = [132, 142, 307, 317]
 
-    # Image size
-    reference_image_size = [1900, 2600]
-
     left_intrinsic_matrix = np.loadtxt("tests/data/calib-ucl-circles/calib.left.intrinsics.txt")
     left_distortion_matrix = np.loadtxt("tests/data/calib-ucl-circles/calib.left.distortion.txt")
 
@@ -39,9 +36,7 @@ def test_tutorial_stuff():
             model_points,
             fiducial_indexes,
             left_intrinsic_matrix,
-            left_distortion_matrix,
-            reference_image_size=(reference_image_size[1],
-                                    reference_image_size[0])
+            left_distortion_matrix
             )
 
     dot_pattern = cv2.imread("tests/data/calib-ucl-circles/circles-25x18-r50-s2.png")

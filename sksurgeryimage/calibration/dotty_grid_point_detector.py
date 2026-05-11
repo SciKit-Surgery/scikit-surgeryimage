@@ -58,7 +58,6 @@ class DottyGridPointDetector(PointDetector):
                  camera_intrinsics,
                  distortion_coefficients,
                  scale=(1, 1),
-                 reference_image_size=None,
                  rms=30,
                  gaussian_sigma=5,
                  threshold_window_size=151,
@@ -84,7 +83,6 @@ class DottyGridPointDetector(PointDetector):
         :param camera_intrinsics: 3x3 ndarray of camera intrinsics
         :param distortion_coefficients: 1x5 ndarray of distortion coeffs.
         :param scale: if you want to resize the image, specify scale factors
-        :param reference_image_size: used to warp undistorted image to reference
         :param rms: max root mean square error when finding grid points
         :param gaussian_sigma: sigma for Gaussian blurring
         :param threshold_window_size: window size for adaptive thresholding
@@ -101,13 +99,10 @@ class DottyGridPointDetector(PointDetector):
 
         if len(list_of_indexes) != 4:
             raise ValueError('list_of_index not of length 4')
-        if reference_image_size is None:
-            raise ValueError('You must provide a reference image size')
 
         self.model_points = model_points
         self.list_of_indexes = list_of_indexes
         self.model_fiducials = self.model_points[self.list_of_indexes]
-        self.reference_image_size = reference_image_size
         self.rms_tolerance = rms
         self.gaussian_sigma = gaussian_sigma
         self.threshold_window_size = threshold_window_size
